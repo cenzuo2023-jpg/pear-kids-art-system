@@ -5948,9 +5948,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         `"${(a.note || '').replace(/"/g, '""')}"`
       ]);
 
-      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('
-
-');
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
