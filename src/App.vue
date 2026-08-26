@@ -488,6 +488,7 @@
                     <button @click="openIndividualPointModal(stu, 'add')" class="text-xs text-amber-400 font-bold hover:underline">⭐ 变更积分</button>
                     <button @click="openRecharge(stu)" class="text-xs text-emerald-400 font-bold hover:underline">续费</button>
                     <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400">档案 ↗</button>
+                    <button @click="archiveStudent(stu)" class="text-xs text-amber-500 hover:underline">归档</button>
                   </td>
                 </tr>
               </tbody>
@@ -1231,6 +1232,7 @@
                     <button @click="openRecharge(stu)" class="text-xs text-emerald-400 font-bold hover:underline">续费</button>
                     <button @click="openEditStudent(stu)" class="text-black dark:text-stone-400 hover:text-emerald-400">编辑</button>
                     <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400">档案 ↗</button>
+                    <button @click="archiveStudent(stu)" class="text-xs text-amber-500 hover:underline">归档</button>
                   </td>
                 </tr>
 
@@ -2301,6 +2303,10 @@
             <button @click="openEditStudent(profileStudent)" class="wf-btn-outline text-xs py-1.5 px-2.5" title="编辑学员档案">
               <i class="fa-solid fa-pen"></i>
             </button>
+            <button @click="archiveStudent(profileStudent); profileStudent = null" class="wf-btn-outline text-xs py-1.5 px-3 text-amber-500 border-amber-500/30 hover:bg-amber-500/10" title="归档该学员">
+              <i class="fa-solid fa-box-archive text-xs mr-1"></i>
+              <span>归档学员</span>
+            </button>
             <button @click="exportStudentAttendanceCSV(profileStudent)" class="wf-btn-outline text-xs py-1.5 px-2.5 text-emerald-400" title="导出个人考勤档案 CSV">
               <i class="fa-solid fa-file-csv"></i>
             </button>
@@ -3341,7 +3347,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     const THEME_KEY = 'XIANGCHILI_THEME';
 
     // 经典 4 大主视图：attendance | ranking | students | records
-    const currentTab = ref('attendance'); 
+    const currentTab = ref('attendance');
+    const attendanceSortOrder = ref('desc'); // 'desc' (最新在前) | 'asc' (最早在前) 
     // Tab 3 子视图：classes (班级管理) | students (学员名册) | archive (归档中心)
     const rosterSubTab = ref('classes');
     // Tab 2 排行榜子视图：hours (课时排行榜) | points (积分光荣榜)
@@ -6074,8 +6081,87 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       showToast(`班级【${cls.name}】已彻底删除`, 'info');
     };
 
+    
+    // ==========================================
+    // 🌐 浏览器前进/后退与 URL Hash 路由同步
+    // ==========================================
+    const isSyncingHash = ref(false);
+
+    const syncStateFromHash = () => {
+      isSyncingHash.value = true;
+      const hash = window.location.hash || '#attendance';
+      
+      if (hash.startsWith('#student-')) {
+        const sid = hash.replace('#student-', '');
+        const stu = students.value.find(s => s.id === sid);
+        if (stu) {
+          profileStudent.value = stu;
+          currentTab.value = 'students';
+        }
+      } else if (hash.startsWith('#class-')) {
+        const cid = hash.replace('#class-', '');
+        const cls = classes.value.find(c => c.id === cid);
+        if (cls) {
+          selectedClassDetail.value = cls;
+          currentTab.value = 'students';
+        }
+      } else if (hash === '#archive') {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'students';
+        rosterSubTab.value = 'archive';
+      } else if (hash === '#students-roster' || hash === '#students') {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'students';
+        rosterSubTab.value = 'students';
+      } else if (hash === '#students-classes') {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'students';
+        rosterSubTab.value = 'classes';
+      } else if (hash === '#ranking') {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'ranking';
+      } else if (hash === '#records' || hash === '#finance') {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'records';
+      } else {
+        profileStudent.value = null;
+        selectedClassDetail.value = null;
+        currentTab.value = 'attendance';
+      }
+      setTimeout(() => { isSyncingHash.value = false; }, 50);
+    };
+
+    // 监听状态变化同步到 URL Hash
+    watch([currentTab, rosterSubTab, () => profileStudent.value?.id, () => selectedClassDetail.value?.id], () => {
+      if (isSyncingHash.value) return;
+      let targetHash = '#' + currentTab.value;
+      if (profileStudent.value) {
+        targetHash = '#student-' + profileStudent.value.id;
+      } else if (selectedClassDetail.value) {
+        targetHash = '#class-' + selectedClassDetail.value.id;
+      } else if (currentTab.value === 'students') {
+        if (rosterSubTab.value === 'archive') targetHash = '#archive';
+        else if (rosterSubTab.value === 'students') targetHash = '#students-roster';
+        else targetHash = '#students-classes';
+      } else if (currentTab.value === 'records') {
+        targetHash = '#finance';
+      }
+      if (window.location.hash !== targetHash) {
+        window.history.pushState(null, '', targetHash);
+      }
+    });
+
+    window.addEventListener('popstate', syncStateFromHash);
+    window.addEventListener('hashchange', syncStateFromHash);
+
     onMounted(() => {
       loadData();
+      syncStateFromHash();
       window.addEventListener('click', handleGlobalClick);
     });
 </script>
