@@ -2969,26 +2969,78 @@
     <!-- 模态弹窗 2: 续费充值 (含积分赠送) -->
     <!-- ============================================================ -->
     <div v-if="showRechargeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl">
+      <div class="wf-card p-6 max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
-          <h3 class="font-bold text-base">学员续费充值</h3>
+          <h3 class="font-bold text-base">学员收费录入 / 续费充值</h3>
           <button @click="showRechargeModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
+        <!-- 模式切换: 在读老生续费 vs 新生交费建档 -->
+        <div class="flex p-1 bg-black/5 dark:bg-white/5 rounded-xl border border-black/10 dark:border-white/10 text-xs font-bold">
+          <button @click="rechargeMode = 'existing'" 
+            :class="rechargeMode === 'existing' ? 'bg-[#10E57A] text-black shadow-sm font-black' : 'text-black dark:text-stone-400 hover:text-black dark:hover:text-white'"
+            class="flex-1 py-1.5 rounded-lg transition text-center flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user-check"></i>
+            <span>在读老生续费</span>
+          </button>
+          <button @click="rechargeMode = 'new'" 
+            :class="rechargeMode === 'new' ? 'bg-[#10E57A] text-black shadow-sm font-black' : 'text-black dark:text-stone-400 hover:text-black dark:hover:text-white'"
+            class="flex-1 py-1.5 rounded-lg transition text-center flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>➕ 新生交费建档</span>
+          </button>
+        </div>
+
         <div class="space-y-3 text-xs">
-          <div>
-            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值学员</label>
+          <!-- 在读老生选择 -->
+          <div v-if="rechargeMode === 'existing'">
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">选择在读学员</label>
             <select v-model="rechargeForm.studentId" class="w-full px-3 py-2 wf-select font-bold">
-              <option value="" disabled>请选择充值学员...</option>
+              <option value="" disabled>请选择在读学员...</option>
               <option v-for="stu in activeStudents" :key="stu.id" :value="stu.id">
-                {{ stu.name }} ({{ getClassById(stu.classId)?.name || '未分配' }})
+                {{ stu.name }} ({{ getClassById(stu.classId)?.name || '未分班' }}) · 现余{{ stu.remainHours }}节
               </option>
             </select>
           </div>
 
+          <!-- 新生建档字段 -->
+          <div v-if="rechargeMode === 'new'" class="space-y-3 p-3 bg-black/[0.02] dark:bg-white/[0.02] rounded-xl border border-black/10 dark:border-white/10">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">新生姓名 <span class="text-rose-500">*</span></label>
+                <input v-model="rechargeForm.newStudentName" type="text" placeholder="例: 张小明" class="w-full px-3 py-2 wf-input font-bold">
+              </div>
+              <div>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">分配班级</label>
+                <select v-model="rechargeForm.newStudentClassId" class="w-full px-3 py-2 wf-select">
+                  <option v-for="c in activeClasses" :key="c.id" :value="c.id">🎨 {{ c.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">性别</label>
+                <select v-model="rechargeForm.newStudentGender" class="w-full px-3 py-2 wf-select">
+                  <option>女</option>
+                  <option>男</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">年龄 (岁)</label>
+                <input v-model.number="rechargeForm.newStudentAge" type="number" class="w-full px-3 py-2 wf-input">
+              </div>
+              <div>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">家长电话</label>
+                <input v-model="rechargeForm.newStudentParentPhone" type="text" placeholder="手机号" class="w-full px-3 py-2 wf-input">
+              </div>
+            </div>
+          </div>
+
+          <!-- 课时数与赠送 -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值课时数</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值/购买课时数</label>
               <input v-model.number="rechargeForm.hoursBought" type="number" class="w-full px-3 py-2 wf-input text-emerald-400 font-bold">
             </div>
             <div>
@@ -2997,6 +3049,7 @@
             </div>
           </div>
 
+          <!-- 实收金额与支付方式 -->
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-black dark:text-stone-400 mb-1 font-semibold">实收金额 (元)</label>
@@ -3013,20 +3066,35 @@
             </div>
           </div>
 
+          <!-- 赠送积分提示 -->
           <div class="p-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 flex items-center justify-between">
             <span>🎁 充值将赠送画币积分：</span>
             <strong class="font-mono">+{{ (rechargeForm.hoursBought || 0) + (rechargeForm.hoursGift || 0) }} 分</strong>
           </div>
 
+          <!-- 缴费说明与经办日期 -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">交费日期</label>
+              <input v-model="rechargeForm.payDate" type="date" class="w-full px-3 py-2 wf-input font-mono">
+            </div>
+            <div>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">经办老师</label>
+              <input v-model="rechargeForm.operator" type="text" class="w-full px-3 py-2 wf-input">
+            </div>
+          </div>
+
           <div>
             <label class="block text-black dark:text-stone-400 mb-1 font-semibold">缴费说明备注</label>
-            <input v-model="rechargeForm.remark" type="text" placeholder="例: 续费48课时大课包" class="w-full px-3 py-2 wf-input">
+            <input v-model="rechargeForm.remark" type="text" placeholder="例: 报名春季48课时常规班" class="w-full px-3 py-2 wf-input">
           </div>
         </div>
 
         <div class="pt-2 flex gap-2">
           <button @click="showRechargeModal = false" class="wf-btn-outline flex-1 py-2 justify-center">取消</button>
-          <button @click="submitRecharge" class="wf-btn-primary flex-1 py-2 justify-center">确认入账</button>
+          <button @click="submitRecharge" class="wf-btn-primary flex-1 py-2 justify-center">
+            {{ rechargeMode === 'new' ? '确认建档并入账' : '确认充值入账' }}
+          </button>
         </div>
       </div>
     </div>
@@ -5667,31 +5735,49 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     };
 
     // ==========================================
-    // 12. 续费充值
+    // 12. 续费充值 & 新生建档缴费
     // ==========================================
     const showRechargeModal = ref(false);
+    const rechargeMode = ref('existing'); // 'existing' | 'new'
     const rechargeForm = reactive({
       studentId: '',
       studentName: '',
+      newStudentName: '',
+      newStudentClassId: '',
+      newStudentGender: '女',
+      newStudentAge: 5,
+      newStudentParentPhone: '',
       hoursBought: 48,
       hoursGift: 0,
       amount: 4800,
       payMethod: '微信支付',
       payDate: new Date().toISOString().slice(0, 10),
       operator: '陈老师',
-      remark: '续报大课包'
+      remark: '常规续费充值'
     });
 
-    const openRecharge = (student) => {
-      rechargeForm.studentId = student.id;
-      rechargeForm.studentName = student.name;
+    const openRecharge = (student = {}) => {
+      if (student && student.id) {
+        rechargeMode.value = 'existing';
+        rechargeForm.studentId = student.id;
+        rechargeForm.studentName = student.name;
+      } else {
+        rechargeMode.value = 'existing';
+        rechargeForm.studentId = activeStudents.value[0]?.id || '';
+        rechargeForm.studentName = activeStudents.value[0]?.name || '';
+      }
+      rechargeForm.newStudentName = '';
+      rechargeForm.newStudentClassId = activeClasses.value[0]?.id || '';
+      rechargeForm.newStudentGender = '女';
+      rechargeForm.newStudentAge = 5;
+      rechargeForm.newStudentParentPhone = '';
       rechargeForm.hoursBought = 48;
       rechargeForm.hoursGift = 0;
       rechargeForm.amount = 4800;
       rechargeForm.payMethod = '微信支付';
       rechargeForm.payDate = new Date().toISOString().slice(0, 10);
       rechargeForm.operator = '陈老师';
-      rechargeForm.remark = '常规续费充值';
+      rechargeForm.remark = '常规充值交费';
       showRechargeModal.value = true;
     };
 
@@ -5701,36 +5787,95 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         showToast('充值课时数需大于0', 'warning');
         return;
       }
-      const s = students.value.find(stu => stu.id === rechargeForm.studentId);
-      if (!s) return;
 
+      let targetStudent = null;
       const nowStr = new Date().toLocaleString('zh-CN', { hour12: false });
-      s.remainHours = Number(s.remainHours) + addHours;
-      s.totalPurchased = Number(s.totalPurchased || 0) + addHours;
-
-      // 充值赠送专属积分奖励 (每充值1节赠送1分)
       const bonusPoints = addHours;
-      s.points = Number(s.points || 0) + bonusPoints;
-      s.totalPointsEarned = Number(s.totalPointsEarned || 0) + bonusPoints;
 
+      if (rechargeMode.value === 'new') {
+        if (!rechargeForm.newStudentName.trim()) {
+          showToast('请输入新生姓名', 'warning');
+          return;
+        }
+        const newStu = {
+          id: 'stu_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          name: rechargeForm.newStudentName.trim(),
+          gender: rechargeForm.newStudentGender || '女',
+          age: Number(rechargeForm.newStudentAge || 5),
+          classId: rechargeForm.newStudentClassId || activeClasses.value[0]?.id || '',
+          parentName: '',
+          parentPhone: rechargeForm.newStudentParentPhone || '',
+          remainHours: addHours,
+          totalPurchased: addHours,
+          totalConsumed: 0,
+          points: bonusPoints,
+          totalPointsEarned: bonusPoints,
+          redeemedCount: 0,
+          status: '在读',
+          joinDate: rechargeForm.payDate || new Date().toISOString().slice(0, 10),
+          notes: rechargeForm.remark || '新生缴费建档',
+          createdAt: new Date().toISOString()
+        };
+        students.value.unshift(newStu);
+        targetStudent = newStu;
+
+        hourLogs.value.unshift({
+          id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '新生建档缴费',
+          change: +addHours,
+          balanceAfter: targetStudent.remainHours,
+          relatedInfo: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时) (备注: ${rechargeForm.remark || '新生首次报名'})`,
+          operator: rechargeForm.operator,
+          time: nowStr
+        });
+      } else {
+        targetStudent = students.value.find(stu => stu.id === rechargeForm.studentId);
+        if (!targetStudent) {
+          showToast('请选择在读学员', 'warning');
+          return;
+        }
+
+        targetStudent.remainHours = Number(targetStudent.remainHours || 0) + addHours;
+        targetStudent.totalPurchased = Number(targetStudent.totalPurchased || 0) + addHours;
+        targetStudent.points = Number(targetStudent.points || 0) + bonusPoints;
+        targetStudent.totalPointsEarned = Number(targetStudent.totalPointsEarned || 0) + bonusPoints;
+
+        const noteText = rechargeForm.remark ? ` (备注: ${rechargeForm.remark})` : '';
+        hourLogs.value.unshift({
+          id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '续费充值',
+          change: +addHours,
+          balanceAfter: targetStudent.remainHours,
+          relatedInfo: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时)${noteText}`,
+          operator: rechargeForm.operator,
+          time: nowStr
+        });
+      }
+
+      // 积分流水
       pointLogs.value.unshift({
-        id: 'plog_' + Date.now(),
-        studentId: s.id,
-        studentName: s.name,
-        type: '续费赠送积分',
+        id: 'plog_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        studentId: targetStudent.id,
+        studentName: targetStudent.name,
+        type: rechargeMode.value === 'new' ? '新生赠送积分' : '续费赠送积分',
         points: +bonusPoints,
-        balanceAfter: s.points,
-        reason: `续费 ${addHours} 课时赠送画币积分`,
+        balanceAfter: targetStudent.points,
+        reason: `${rechargeMode.value === 'new' ? '新生报名' : '续费'} ${addHours} 课时赠送画币积分`,
         operator: rechargeForm.operator,
         time: nowStr
       });
 
-      const noteText = rechargeForm.remark ? ` (备注: ${rechargeForm.remark})` : '';
-
+      // 财务开单明细
       paymentOrders.value.unshift({
-        id: 'pay_' + Date.now(),
-        studentId: s.id,
-        studentName: s.name,
+        id: 'pay_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        orderNo: 'ORD' + Date.now(),
+        studentId: targetStudent.id,
+        studentName: targetStudent.name,
+        type: rechargeMode.value === 'new' ? '新生报名' : '老生续费',
         amount: Number(rechargeForm.amount || 0),
         hoursBought: Number(rechargeForm.hoursBought || 0),
         hoursGift: Number(rechargeForm.hoursGift || 0),
@@ -5741,25 +5886,13 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         remark: rechargeForm.remark
       });
 
-      hourLogs.value.unshift({
-        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        studentId: s.id,
-        studentName: s.name,
-        type: '续费充值',
-        change: +addHours,
-        balanceAfter: s.remainHours,
-        relatedInfo: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时)${noteText}`,
-        operator: rechargeForm.operator,
-        time: nowStr
-      });
-
       saveData();
       showRechargeModal.value = false;
-      showToast(`🎉 充值成功！【${s.name}】增加 ${addHours} 课时与 +${bonusPoints} 积分，当前剩余 ${s.remainHours} 节`);
+      showToast(`🎉 ${rechargeMode.value === 'new' ? '新生建档入账成功' : '续费充值成功'}！【${targetStudent.name}】增加 ${addHours} 课时，当前剩余 ${targetStudent.remainHours} 节`);
     };
 
     // ==========================================
-    // 13. 学员与班级新建/编辑
+    // 13. 学员录入与编辑
     // ==========================================
     const showStudentModal = ref(false);
     const isEditStudent = ref(false);
@@ -5862,7 +5995,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       showStudentModal.value = false;
     };
 
-    const deleteStudent = (s) => {
+    const deleteStudentconst deleteStudent = (s) => {
       if (confirm(`确定要彻底删除学员【${s.name}】吗？\n建议优先使用「归档」功能，归档后可随时恢复。彻底删除将无法找回！`)) {
         students.value = students.value.filter(item => item.id !== s.id);
         if (profileStudent.value && profileStudent.value.id === s.id) {
