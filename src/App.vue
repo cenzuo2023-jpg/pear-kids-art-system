@@ -3043,6 +3043,21 @@
             </div>
           </div>
 
+          <!-- 🌟 缴费时间与经办老师 (置顶突出显示) -->
+          <div class="grid grid-cols-2 gap-3 p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/20">
+            <div>
+              <label class="block text-black dark:text-stone-300 mb-1 font-bold flex items-center gap-1">
+                <span>📅 缴费时间 / 日期</span>
+                <span class="text-rose-500">*</span>
+              </label>
+              <input v-model="rechargeForm.payDate" type="date" class="w-full px-3 py-2 wf-input font-mono font-bold cursor-pointer bg-white dark:bg-stone-900 border-emerald-500/40">
+            </div>
+            <div>
+              <label class="block text-black dark:text-stone-300 mb-1 font-bold">经办老师</label>
+              <input v-model="rechargeForm.operator" type="text" placeholder="例: 陈老师" class="w-full px-3 py-2 wf-input bg-white dark:bg-stone-900">
+            </div>
+          </div>
+
           <!-- 课时数与赠送 -->
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -3076,18 +3091,6 @@
           <div class="p-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-300 flex items-center justify-between">
             <span>🎁 充值将赠送画币积分：</span>
             <strong class="font-mono">+{{ (rechargeForm.hoursBought || 0) + (rechargeForm.hoursGift || 0) }} 分</strong>
-          </div>
-
-          <!-- 缴费说明与经办日期 -->
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">📅 缴费时间 / 日期 <span class="text-emerald-400">*</span></label>
-              <input v-model="rechargeForm.payDate" type="date" class="w-full px-3 py-2 wf-input font-mono">
-            </div>
-            <div>
-              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">经办老师</label>
-              <input v-model="rechargeForm.operator" type="text" class="w-full px-3 py-2 wf-input">
-            </div>
           </div>
 
           <div>
