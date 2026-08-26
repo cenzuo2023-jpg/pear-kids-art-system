@@ -842,122 +842,154 @@
         <!-- 视图 2: 👶 学员名册档案 -->
         <div v-if="rosterSubTab === 'students'" class="space-y-4">
           
-          <div class="flex items-center justify-between gap-4 pb-2 border-b border-black/10 dark:border-white/10">
-            <div class="flex items-center gap-3 flex-wrap">
+          <!-- Notion 风格筛选与快速操作栏 -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-[#e2e2e0] dark:border-[#333] flex-wrap">
+            
+            <!-- 左侧：班级下拉 + 课时状态标签筛选 + 搜索框 -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              
+              <!-- 班级筛选 -->
               <div class="relative">
                 <select v-model="selectedRosterClassId" 
-                  class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer">
-                  <option value="all">🌈 全部在读小画家 ({{ activeStudents.length }}人)</option>
+                  class="appearance-none pl-3 pr-8 py-1.5 nt-select text-sm font-bold cursor-pointer">
+                  <option value="all">🌈 全校在读小画家 ({{ activeStudents.length }}人)</option>
                   <option v-for="c in activeClasses" :key="c.id" :value="c.id">
                     🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)
                   </option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
               </div>
 
+              <!-- 课时预警快捷分段标签 (Notion Filter Pills) -->
+              <div class="inline-flex items-center p-0.5 rounded-md border border-[#e2e2e0] dark:border-[#333] bg-[#f7f7f5] dark:bg-[#262626] text-xs">
+                <button @click="rosterHourFilter = 'all'"
+                  :class="rosterHourFilter === 'all' ? 'bg-white dark:bg-[#333] font-bold shadow-sm text-black dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-black'"
+                  class="px-2.5 py-1 rounded transition">
+                  全部 ({{ activeStudents.length }})
+                </button>
+                <button @click="rosterHourFilter = 'sufficient'"
+                  :class="rosterHourFilter === 'sufficient' ? 'bg-white dark:bg-[#333] font-bold shadow-sm text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-gray-400 hover:text-emerald-600'"
+                  class="px-2.5 py-1 rounded transition">
+                  充足 ({{ activeStudents.filter(s => Number(s.remainHours || 0) > 3).length }})
+                </button>
+                <button @click="rosterHourFilter = 'warning'"
+                  :class="rosterHourFilter === 'warning' ? 'bg-white dark:bg-[#333] font-bold shadow-sm text-amber-700 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400 hover:text-amber-600'"
+                  class="px-2.5 py-1 rounded transition">
+                  ⚠️ 待续费 ({{ activeStudents.filter(s => Number(s.remainHours || 0) <= 3 && Number(s.remainHours || 0) > 0).length }})
+                </button>
+                <button @click="rosterHourFilter = 'exhausted'"
+                  :class="rosterHourFilter === 'exhausted' ? 'bg-white dark:bg-[#333] font-bold shadow-sm text-rose-700 dark:text-rose-400' : 'text-gray-600 dark:text-gray-400 hover:text-rose-600'"
+                  class="px-2.5 py-1 rounded transition">
+                  🚫 告罄/欠费 ({{ activeStudents.filter(s => Number(s.remainHours || 0) <= 0).length }})
+                </button>
+              </div>
+
+              <!-- 搜索框 -->
               <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
-                <input v-model="rosterStudentSearch" type="text" placeholder="搜索学员姓名/电话..."
-                  class="w-48 sm:w-56 pl-9 pr-3 py-1.5 wf-input text-xs placeholder:text-black dark:text-stone-400">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input v-model="rosterStudentSearch" type="text" placeholder="搜索姓名/电话/家长..."
+                  class="w-44 sm:w-52 pl-8 pr-3 py-1.5 nt-input text-xs sm:text-sm placeholder:text-gray-400">
               </div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button @click="openAddStudent(selectedRosterClassId)" class="wf-btn-primary text-xs">
+            <!-- 右侧：录入与导出 -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button @click="openAddStudent(selectedRosterClassId)" class="nt-btn-primary text-xs sm:text-sm">
                 <i class="fa-solid fa-user-plus text-xs"></i>
                 <span>录入新学员</span>
               </button>
-              <button @click="exportClassAttendanceCSV(selectedRosterClassId)" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
-                <i class="fa-solid fa-file-csv"></i>
-                <span>导出名单</span>
+              <button @click="exportClassAttendanceCSV(selectedRosterClassId)" class="nt-btn-export text-xs sm:text-sm">
+                <i class="fa-solid fa-file-excel text-xs"></i>
+                <span>导出学员花名册 CSV</span>
               </button>
             </div>
+
           </div>
 
-          <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
+          <div class="overflow-x-auto w-full nt-card">
+            <table class="w-full text-left text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">年龄/性别</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所属班级</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[95px]">剩余课时</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">画币积分</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[160px]">家长联系方式</th>
-                  <th class="py-3.5 px-4 min-w-[140px]">备注</th>
-                  <th class="py-3.5 px-5 text-right whitespace-nowrap min-w-[190px]">操作</th>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
                   
-                  <!-- 🌟 学员姓名 (绝不折行 · 头像与姓名优雅横排) -->
-                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击查看个人详细档案">
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
                     <div class="flex items-center gap-2.5 whitespace-nowrap">
-                      <div class="w-7 h-7 rounded-lg border border-black/10 dark:border-white/20 flex items-center justify-center font-bold text-xs group-hover:border-emerald-400 transition flex-shrink-0" style="background-color: var(--bg-surface-hover);">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
                         {{ s.name.charAt(0) }}
                       </div>
-                      <span class="group-hover:text-emerald-400 transition-colors flex items-center gap-1 font-black text-sm whitespace-nowrap">
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
                         <span>{{ s.name }}</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                       </span>
                     </div>
                   </td>
 
-                  <!-- 年龄/性别 (单行) -->
-                  <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">
-                    <span class="font-mono">{{ s.age }}</span>岁 · {{ s.gender }}
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
                   </td>
 
-                  <!-- 所属班级 (单行高雅线框) -->
+                  <!-- 所属班级 -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="font-bold text-black dark:text-stone-300">{{ getClassById(s.classId).name }}</span>
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
                   </td>
 
-                  <!-- 剩余课时 (精致线框胶囊) -->
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
                   <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
-                    <span :class="s.remainHours <= 0 ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : s.remainHours <= 3 ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : 'text-[#10E57A] bg-emerald-500/10 border-emerald-500/30'"
-                      class="px-2 py-0.5 rounded border text-xs inline-block">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
                       余 {{ s.remainHours }} 节
                     </span>
                   </td>
 
-                  <!-- 🌟 画币积分 (高雅单行药丸徽标，绝不折行) -->
-                  <td class="py-3 px-4 whitespace-nowrap">
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
                     <button @click.stop="openIndividualPointModal(s, 'add')" 
-                      class="wf-badge-gold cursor-pointer hover:scale-105 active:scale-95 transition"
-                      :title="'点击变更【' + s.name + '】积分'">
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
                       <span>⭐ {{ s.points || 0 }}</span>
-                      <span class="text-[9px] opacity-75 ml-0.5">▾</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
                     </button>
                   </td>
 
                   <!-- 家长联系方式 -->
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 whitespace-nowrap">
-                    <span class="text-black dark:text-stone-300 font-semibold">{{ s.parentName }}</span>
-                    <span class="text-black dark:text-stone-400 ml-1">({{ s.parentPhone }})</span>
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
                   </td>
 
                   <!-- 备注 -->
-                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
                     {{ s.notes || '-' }}
                   </td>
 
-                  <!-- 快捷操作栏 (紧凑优雅单行按钮群，绝不折行) -->
-                  <td class="py-3 px-5 text-right whitespace-nowrap space-x-1.5">
-                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded-lg text-xs text-amber-400 hover:bg-amber-500/10 font-bold transition">
-                      ⭐ 积分
-                    </button>
-                    <button @click="openRecharge(s)" class="px-2 py-1 rounded-lg text-xs text-emerald-400 hover:bg-emerald-500/10 font-bold transition">
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
                       续费
                     </button>
-                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded-lg text-xs text-black dark:text-stone-400 hover:text-black dark:text-stone-200 hover:bg-white/5 transition">
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
                       编辑
                     </button>
-                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded-lg text-xs text-black dark:text-stone-400 hover:text-amber-400 hover:bg-amber-500/10 transition">
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
                       归档
                     </button>
-                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition">
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
                       删除
                     </button>
                   </td>
@@ -965,8 +997,8 @@
                 </tr>
 
                 <tr v-if="currentClassStudentsList.length === 0">
-                  <td colspan="8" class="py-12 text-center text-black dark:text-stone-400 text-xs">
-                    未找到在读学员，点击上方【录入新学员】添加
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
                   </td>
                 </tr>
               </tbody>
@@ -1634,56 +1666,98 @@
 
           <!-- 收费订单明细大表 -->
           <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
+            <table class="w-full text-left text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">订单编号</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">缴费时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">实收金额</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">充值课时</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">支付方式</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
-                  <th class="py-3.5 px-4 min-w-[140px]">收费说明与备注</th>
-                  <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[90px]">凭据</th>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="order in filteredPaymentOrders" :key="order.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.id }}</td>
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.payDate }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看个人档案">
-                      {{ order.studentName }} ↗
-                    </span>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
+                      </span>
+                    </div>
                   </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
-                    ¥ {{ (order.amount || 0).toLocaleString() }}
+
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
                   </td>
-                  <td class="py-3 px-4 font-mono font-bold whitespace-nowrap">
-                    <span>{{ order.hoursBought }} 节</span>
-                    <span v-if="order.hoursGift > 0" class="text-amber-400 text-xs ml-1 font-normal">(赠{{ order.hoursGift }})</span>
-                  </td>
+
+                  <!-- 所属班级 -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block font-mono"
-                      :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
-                      {{ order.payMethod || '微信支付' }}
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
-                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ order.remark || '-' }}</td>
-                  <td class="py-3 px-4 text-right whitespace-nowrap">
-                    <button @click="openReceiptModal(order)" class="wf-btn-outline text-xs py-1 px-2.5 text-emerald-400 border-emerald-500/30">
-                      <i class="fa-solid fa-receipt mr-1"></i>
-                      <span>电子收据</span>
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
                     </button>
                   </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
                 </tr>
 
-                <tr v-if="filteredPaymentOrders.length === 0">
-                  <td colspan="9" class="py-16 text-center text-black dark:text-stone-400 text-xs">
-                    未检索到符合条件的学员缴费收费订单，点击上方【清除筛选】或切换月份
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
                   </td>
                 </tr>
               </tbody>
@@ -1815,224 +1889,408 @@
           <!-- 维度 1: 🗓️ 月度课消汇总明细 -->
           <div v-if="consumptionPeriodType === 'month'" class="space-y-4">
             <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">统计月份</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">总消课课时</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">授课堂数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">应到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">实到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">请假人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">月度出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">折算教学产值</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <template v-for="m in monthlyConsumptionList" :key="m.monthKey">
-                    <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="m.expanded = !m.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-sm text-black dark:text-stone-100 flex items-center gap-2">
-                        <i :class="m.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-black dark:text-stone-400"></i>
-                        <span>{{ m.monthLabel }}</span>
-                        <span v-if="m.monthKey === currentYearMonth" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-normal">当月</span>
-                      </td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
-                        {{ m.consumedHours }} 节
-                      </td>
-                      <td class="py-3 px-4 font-mono text-black dark:text-stone-300">{{ m.sessionCount }} 堂</td>
-                      <td class="py-3 px-4 font-mono text-black dark:text-stone-400">{{ m.totalHeadcount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ m.presentCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-rose-400">{{ m.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200">{{ m.attendanceRate }}</td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
-                        ¥ {{ (m.estimatedValue || 0).toLocaleString() }}
-                      </td>
-                    </tr>
+              <table class="w-full text-left text-sm border-collapse select-none">
+              <thead>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
+                      </span>
+                    </div>
+                  </td>
 
-                    <!-- 月度下各班级课消展开明细 -->
-                    <tr v-if="m.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
-                      <td colspan="8" class="p-3 pl-8">
-                        <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-black dark:text-stone-400 font-bold mb-1">【{{ m.monthLabel }}】各班级具体消课明细：</div>
-                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                            <div v-for="cItem in (m.sessions || [])" :key="cItem.id"
-                              class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
-                              <div>
-                                <div class="font-bold text-black dark:text-stone-200">{{ cItem.theme }}</div>
-                                <div class="text-[10px] text-black dark:text-stone-400 font-mono mt-0.5">{{ cItem.className }} · {{ cItem.date }}</div>
-                              </div>
-                              <div class="text-right font-mono">
-                                <div class="font-bold text-emerald-400">{{ cItem.consumedHours }} 节</div>
-                                <div class="text-[10px] text-black dark:text-stone-400">到课 {{ cItem.presentCount }} 人</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
 
-                  <tr v-if="monthlyConsumptionList.length === 0">
-                    <td colspan="8" class="py-16 text-center text-black dark:text-stone-400 text-xs">
-                      暂无符合条件的月度课消考勤数据
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                  <!-- 所属班级 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
+                    </span>
+                  </td>
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
+                  </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
+                </tr>
+
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
           </div>
 
           <!-- 维度 2: 📅 周度课消汇总明细 -->
           <div v-if="consumptionPeriodType === 'week'" class="space-y-4">
             <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[160px]">周度区间</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">周消课课时</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">排课堂数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">实到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">请假人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">周出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">周产值估算</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <template v-for="w in weeklyConsumptionList" :key="w.weekKey">
-                    <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="w.expanded = !w.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-black dark:text-stone-100 flex items-center gap-2">
-                        <i :class="w.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-black dark:text-stone-400"></i>
-                        <span>{{ w.weekLabel }}</span>
-                      </td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
-                        {{ w.consumedHours }} 节
-                      </td>
-                      <td class="py-3 px-4 font-mono text-black dark:text-stone-300">{{ w.sessionCount }} 堂</td>
-                      <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ w.presentCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-rose-400">{{ w.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200">{{ w.attendanceRate }}</td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
-                        ¥ {{ (w.estimatedValue || 0).toLocaleString() }}
-                      </td>
-                    </tr>
+              <table class="w-full text-left text-sm border-collapse select-none">
+              <thead>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
+                      </span>
+                    </div>
+                  </td>
 
-                    <!-- 周度下具体课次明细 -->
-                    <tr v-if="w.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
-                      <td colspan="7" class="p-3 pl-8">
-                        <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-black dark:text-stone-400 font-bold mb-1">【{{ w.weekLabel }}】具体授课考勤明细：</div>
-                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                            <div v-for="sess in (w.sessions || [])" :key="sess.id"
-                              class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
-                              <div>
-                                <div class="font-bold text-black dark:text-stone-200 flex items-center gap-1">
-                                  <span>{{ sess.theme }}</span>
-                                  <span class="text-[10px] text-black dark:text-stone-400 font-normal">({{ sess.className }})</span>
-                                </div>
-                                <div class="text-[10px] text-black dark:text-stone-400 font-mono mt-0.5">{{ sess.date }} · {{ sess.teacher }}</div>
-                              </div>
-                              <div class="text-right font-mono">
-                                <div class="font-bold text-emerald-400">{{ sess.consumedHours }} 节 (到课{{ sess.presentCount }}人)</div>
-                                <div v-if="sess.absentCount > 0" class="text-[10px] text-rose-400">{{ sess.absentCount }} 人请假</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
 
-                  <tr v-if="weeklyConsumptionList.length === 0">
-                    <td colspan="7" class="py-16 text-center text-black dark:text-stone-400 text-xs">
-                      暂无符合条件的周度课消数据
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                  <!-- 所属班级 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
+                    </span>
+                  </td>
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
+                  </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
+                </tr>
+
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
           </div>
 
           <!-- 维度 3: 🎨 班级横向消课汇总明细 -->
           <div v-if="consumptionPeriodType === 'class'" class="space-y-4">
             <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">班级名称</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">上课时段</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">任课老师</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">在读人数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">累计总消课</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">完成课次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[110px]">估算教学产值</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <tr v-for="c in classConsumptionAnalytics" :key="c.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                    <td class="py-3 px-4 font-bold whitespace-nowrap">
-                      <span @click="openClassDetail(c)" class="cursor-pointer hover:text-emerald-400 transition flex items-center gap-1" title="进入该班级二级主页">
-                        <span>{{ c.name }}</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400"></i>
+              <table class="w-full text-left text-sm border-collapse select-none">
+              <thead>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                       </span>
-                    </td>
-                    <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ c.schedule }}</td>
-                    <td class="py-3 px-4 text-black dark:text-stone-300 whitespace-nowrap">{{ c.teacher }}</td>
-                    <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ c.studentCount }} 人</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
-                      {{ c.totalConsumed }} 节
-                    </td>
-                    <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ c.totalSessions }} 堂</td>
-                    <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ c.attendanceRate }}</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right whitespace-nowrap">
-                      ¥ {{ (c.estimatedValue || 0).toLocaleString() }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </td>
+
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
+
+                  <!-- 所属班级 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
+                    </span>
+                  </td>
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
+                  </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
+                </tr>
+
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
           </div>
 
           <!-- 维度 4: 👶 学员个人消课总榜 -->
           <div v-if="consumptionPeriodType === 'student'" class="space-y-4">
             <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">累计消课</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">到课次数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">请假次数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">个人出勤率</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">出勤表现</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">快捷操作</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <tr v-for="s in studentConsumptionRanking" :key="s.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                    <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)">
-                      <span class="group-hover:text-emerald-400 transition">{{ s.name }} ↗</span>
-                    </td>
-                    <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ s.className }}</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
-                      {{ s.totalConsumed }} 节
-                    </td>
-                    <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200 whitespace-nowrap">{{ s.presentCount }} 次</td>
-                    <td class="py-3 px-4 font-mono font-bold text-rose-400 whitespace-nowrap">{{ s.leaveCount }} 次</td>
-                    <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ s.attendanceRate }}</td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span class="text-xs font-bold px-2.5 py-0.5 rounded border inline-block"
-                        :class="s.leaveCount >= 2 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'">
-                        {{ s.statusTag }}
+              <table class="w-full text-left text-sm border-collapse select-none">
+              <thead>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                       </span>
-                    </td>
-                    <td class="py-3 px-4 text-right whitespace-nowrap">
-                      <button @click="openStudentProfile(s)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400 font-medium">查看档案 ↗</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </div>
+                  </td>
+
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
+
+                  <!-- 所属班级 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
+                    </span>
+                  </td>
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
+                  </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
+                </tr>
+
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
           </div>
 
@@ -2060,71 +2318,98 @@
           </div>
 
           <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
+            <table class="w-full text-left text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">剩余课时</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">预警状态</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">推荐续费课包</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">预估续费金额</th>
-                  <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[130px]">快捷操作</th>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="stu in renewalWarningStudents" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(stu)" title="点击查看档案">
-                    <div class="flex items-center gap-2 whitespace-nowrap">
-                      <div class="w-6 h-6 rounded-md border border-black/10 dark:border-white/20 flex items-center justify-center font-bold text-xs group-hover:border-emerald-400 transition" style="background-color: var(--bg-surface-hover);">
-                        {{ stu.name.charAt(0) }}
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
                       </div>
-                      <span class="group-hover:text-emerald-400 transition flex items-center gap-1 font-bold">
-                        <span>{{ stu.name }}</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400"></i>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                       </span>
                     </div>
                   </td>
 
-                  <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ stu.className }}</td>
-                  <td class="py-3 px-4 font-black font-mono text-sm whitespace-nowrap"
-                    :class="stu.remainHours <= 0 ? 'text-rose-400' : 'text-amber-400'">
-                    {{ stu.remainHours }} 节
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
                   </td>
 
+                  <!-- 所属班级 -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="stu.remainHours <= 0 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
-                      {{ stu.urgencyText }}
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
                     </span>
                   </td>
 
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">
-                    {{ stu.parentName }} ({{ stu.parentPhone }})
-                  </td>
-
-                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap">
-                    {{ stu.suggestedPackage }}
-                  </td>
-
-                  <td class="py-3 px-4 font-mono font-bold text-emerald-400 whitespace-nowrap">
-                    ¥ {{ stu.estimatedAmount.toLocaleString() }}
-                  </td>
-
-                  <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                    <button @click="openRecharge(stu)" class="wf-btn-primary text-xs py-1 px-2.5">
-                      <span>录入续费</span>
-                    </button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400 font-medium">
-                      档案 ↗
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
                     </button>
                   </td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
                 </tr>
 
-                <tr v-if="renewalWarningStudents.length === 0">
-                  <td colspan="8" class="py-16 text-center text-black dark:text-stone-400 text-xs">
-                    太棒了！当前全校所有在读学员课时充足，暂无临期或耗尽学员。
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
                   </td>
                 </tr>
               </tbody>
@@ -2161,45 +2446,98 @@
           </div>
 
           <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
+            <table class="w-full text-left text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">课时变动</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">变动后结余</th>
-                  <th class="py-3.5 px-4 min-w-[150px]">详细业务说明</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="log in filteredHourLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ log.time }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === log.studentName) || { name: log.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
-                      {{ log.studentName }} ↗
-                    </span>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
+                      </span>
+                    </div>
                   </td>
+
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
+
+                  <!-- 所属班级 -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="log.change > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : log.change < 0 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
-                      {{ log.type }}
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
                     </span>
                   </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
-                    :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-black dark:text-stone-400'">
-                    {{ log.change > 0 ? '+' + log.change : log.change === 0 ? '0' : log.change }} 节
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
                   </td>
-                  <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
-                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ log.relatedInfo }}</td>
-                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap font-medium">{{ log.operator || '陈老师' }}</td>
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
+                  </td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
                 </tr>
 
-                <tr v-if="filteredHourLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-black dark:text-stone-400 text-xs">
-                    未检索到符合条件的课时流水记录
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
                   </td>
                 </tr>
               </tbody>
@@ -2237,47 +2575,98 @@
           </div>
 
           <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
+            <table class="w-full text-left text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">画币变动</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">变动后可用</th>
-                  <th class="py-3.5 px-4 min-w-[150px]">奖励原因与礼物明细</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
+                <tr class="border-b border-[#e2e2e0] dark:border-[#333] text-gray-600 dark:text-gray-400 font-bold text-xs uppercase tracking-wider" style="background-color: var(--bg-surface-subtle);">
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[140px]">学员姓名</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[90px]">年龄/性别</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[170px]">所属班级</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[120px]">课时余额</th>
+                  <th class="py-3 px-3 whitespace-nowrap min-w-[100px]">画币积分</th>
+                  <th class="py-3 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
+                  <th class="py-3 px-4 min-w-[140px]">备注说明</th>
+                  <th class="py-3 px-4 text-right whitespace-nowrap min-w-[190px]">快捷管理</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="plog in filteredPointLogs" :key="plog.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ plog.time }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === plog.studentName) || { name: plog.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
-                      {{ plog.studentName }} ↗
-                    </span>
+              <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]">
+                <tr v-for="s in currentClassStudentsList" :key="s.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222222] transition-colors">
+                  
+                  <!-- 学员姓名 (大号字体 · 头像与姓名) -->
+                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)" title="点击进入学员完整档案">
+                    <div class="flex items-center gap-2.5 whitespace-nowrap">
+                      <div class="w-7 h-7 rounded-md border border-[#e2e2e0] dark:border-[#444] bg-[#f7f7f5] dark:bg-[#262626] flex items-center justify-center font-bold text-xs text-black dark:text-white group-hover:border-black transition flex-shrink-0">
+                        {{ s.name.charAt(0) }}
+                      </div>
+                      <span class="group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-bold text-[15px] text-[#111827] dark:text-[#f3f4f6] whitespace-nowrap">
+                        <span>{{ s.name }}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
+                      </span>
+                    </div>
                   </td>
+
+                  <!-- 年龄/性别 -->
+                  <td class="py-3 px-3 text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">
+                    <span class="font-mono font-semibold">{{ s.age || '-' }}</span> 岁 · {{ s.gender || '女' }}
+                  </td>
+
+                  <!-- 所属班级 -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="plog.points > 0 ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-purple-500/10 text-purple-400 border-purple-500/30'">
-                      {{ plog.type }}
+                    <span class="font-semibold text-sm text-[#111827] dark:text-gray-200">{{ getClassById(s.classId).name }}</span>
+                  </td>
+
+                  <!-- 剩余课时 (Notion 显眼状态标签) -->
+                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
+                      余 {{ s.remainHours }} 节
                     </span>
                   </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
-                    :class="plog.points > 0 ? 'text-amber-400' : 'text-purple-400'">
-                    {{ plog.points > 0 ? '+' + plog.points : plog.points }} 分
+
+                  <!-- 画币积分 -->
+                  <td class="py-3 px-3 whitespace-nowrap">
+                    <button @click.stop="openIndividualPointModal(s, 'add')" 
+                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
+                      :title="'点击为【' + s.name + '】变更积分'">
+                      <span>⭐ {{ s.points || 0 }}</span>
+                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
+                    </button>
                   </td>
-                  <td class="py-3 px-4 font-mono font-bold text-amber-300 whitespace-nowrap">
-                    ⭐ {{ plog.balanceAfter }} 分
+
+                  <!-- 家长联系方式 -->
+                  <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <span class="font-semibold text-black dark:text-white">{{ s.parentName || '-' }}</span>
+                    <span v-if="s.parentPhone" class="text-gray-500 dark:text-gray-400 ml-1.5 font-mono text-xs">({{ s.parentPhone }})</span>
                   </td>
-                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ plog.reason }}</td>
-                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap font-medium">{{ plog.operator || '陈老师' }}</td>
+
+                  <!-- 备注 -->
+                  <td class="py-3 px-4 text-gray-600 dark:text-gray-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                    {{ s.notes || '-' }}
+                  </td>
+
+                  <!-- 快捷操作栏 (Notion 简洁工具动作) -->
+                  <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                    <button @click="openRecharge(s)" class="px-2 py-1 rounded text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition">
+                      续费
+                    </button>
+                    <button @click="openIndividualPointModal(s, 'add')" title="为学员变更积分" class="px-2 py-1 rounded text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      积分
+                    </button>
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      编辑
+                    </button>
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition">
+                      归档
+                    </button>
+                    <button @click="deleteStudent(s)" class="px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition">
+                      删除
+                    </button>
+                  </td>
+
                 </tr>
 
-                <tr v-if="filteredPointLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-black dark:text-stone-400 text-xs">
-                    未检索到符合条件的积分流水记录
+                <tr v-if="currentClassStudentsList.length === 0">
+                  <td colspan="8" class="py-12 text-center text-gray-500 text-sm">
+                    未找到符合条件的学员，点击右上角【录入新学员】建档
                   </td>
                 </tr>
               </tbody>
@@ -6064,11 +6453,19 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // ==========================================
     const selectedRosterClassId = ref('all');
     const rosterStudentSearch = ref('');
+    const rosterHourFilter = ref('all'); // 'all' | 'sufficient' | 'warning' | 'exhausted'
 
     const currentClassStudentsList = computed(() => {
       let list = [...activeStudents.value];
       if (selectedRosterClassId.value !== 'all') {
         list = list.filter(s => s.classId === selectedRosterClassId.value);
+      }
+      if (rosterHourFilter.value === 'sufficient') {
+        list = list.filter(s => Number(s.remainHours || 0) > 3);
+      } else if (rosterHourFilter.value === 'warning') {
+        list = list.filter(s => Number(s.remainHours || 0) > 0 && Number(s.remainHours || 0) <= 3);
+      } else if (rosterHourFilter.value === 'exhausted') {
+        list = list.filter(s => Number(s.remainHours || 0) <= 0);
       }
       if (rosterStudentSearch.value.trim()) {
         const q = rosterStudentSearch.value.trim().toLowerCase();

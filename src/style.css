@@ -1,34 +1,43 @@
 /* 
- * 想吃梨儿童美术 (Pear Kids Art) - 极简线框模式 (Outline Design System)
- * 彻底解决深色/浅色模式下的色彩错乱与对比度问题
+ * 想吃梨儿童美术 (Pear Kids Art) - Notion 高对比度生产力工具设计系统
+ * 纯粹、高对比、大字号、便于数据录入、观察与导出的工作台样式
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap');
 
-/* 彻底防止 Vue 挂载前出现插值表达式闪烁与弹窗显露 */
 [v-cloak] {
   display: none !important;
 }
 
 /* ============================================================ */
-/* ☀️ 1. 浅色模式 (Light Mode) */
+/* ☀️ 1. 浅色模式 - Notion High-Contrast Light Mode */
 /* ============================================================ */
 :root {
-  --bg-page: #f8f9fa;
+  --bg-page: #ffffff;
   --bg-header: #ffffff;
   --bg-surface: #ffffff;
-  --bg-surface-subtle: #f1f3f5;
-  --bg-surface-hover: #e9ecef;
-  --border-main: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --text-main: #000000;
-  --text-sub: #0f172a;
-  --text-muted: #1e293b;
+  --bg-surface-subtle: #f7f7f5;
+  --bg-surface-hover: #efefed;
+  --bg-surface-active: #e8e8e6;
+  
+  --border-main: #e2e2e0;
+  --border-subtle: #eeeeec;
+  --border-strong: #111827;
+  
+  --text-main: #111827;
+  --text-sub: #37352f;
+  --text-muted: #6b7280;
+  
+  --primary-color: #0f766e;
+  --primary-hover: #0d635c;
+  --primary-light: #f0fdf4;
+  --primary-border: #bbf7d0;
+
   color-scheme: light;
 }
 
 /* ============================================================ */
-/* 🌙 2. 深色模式 (Dark Mode - 1:1 还原用户参考图) */
+/* 🌙 2. 深色模式 - Notion Dark Mode */
 /* ============================================================ */
 html.dark,
 .dark,
@@ -38,11 +47,21 @@ body.dark {
   --bg-surface: #202020;
   --bg-surface-subtle: #262626;
   --bg-surface-hover: #2f2f2f;
-  --border-main: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.28);
+  --bg-surface-active: #3a3a3a;
+  
+  --border-main: #333333;
+  --border-subtle: #282828;
+  --border-strong: #666666;
+  
   --text-main: #f3f4f6;
-  --text-sub: #9ca3af;
-  --text-muted: #6b7280;
+  --text-sub: #d1d5db;
+  --text-muted: #9ca3af;
+  
+  --primary-color: #10e57a;
+  --primary-hover: #059669;
+  --primary-light: rgba(16, 229, 122, 0.12);
+  --primary-border: rgba(16, 229, 122, 0.3);
+
   color-scheme: dark;
 }
 
@@ -51,159 +70,238 @@ body.dark {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Plus Jakarta Sans', Roboto, Helvetica, Arial, "PingFang SC", "Noto Sans SC", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Plus Jakarta Sans', "Noto Sans SC", Roboto, Helvetica, Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
   background-color: var(--bg-page);
   color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* ============================================================ */
-/* 🌟 核心线框容器与卡片 */
+/* 🌟 核心卡片与容器 (Notion Blocks & Cards) */
 /* ============================================================ */
-.wf-card {
+.wf-card,
+.nt-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-main);
-  border-radius: 1rem;
+  border-radius: 8px;
   color: var(--text-main);
-  transition: all 0.15s ease;
+  transition: border-color 0.12s ease, background-color 0.12s ease;
 }
 
-.wf-card:hover {
-  border-color: var(--border-strong);
+.wf-card:hover,
+.nt-card:hover {
+  border-color: #b0b0ad;
 }
 
-.wf-card-interactive {
+html.dark .wf-card:hover,
+html.dark .nt-card:hover {
+  border-color: #555555;
+}
+
+.wf-card-interactive,
+.nt-card-interactive {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-main);
-  border-radius: 1rem;
+  border-radius: 8px;
   color: var(--text-main);
-  transition: all 0.15s ease;
   cursor: pointer;
+  transition: all 0.12s ease;
 }
 
-.wf-card-interactive:hover {
-  border-color: var(--border-strong);
-  background-color: var(--bg-surface-hover);
+.wf-card-interactive:hover,
+.nt-card-interactive:hover {
+  border-color: #90908c;
+  background-color: var(--bg-surface-subtle);
 }
 
 /* ============================================================ */
-/* 🌟 线框胶囊导航与按钮 (彻底修复深色下变成纯白的问题) */
+/* 🌟 Notion 风格分段导航与按钮 (Notion Tabs & Buttons) */
 /* ============================================================ */
-.wf-pill-container {
+.wf-pill-container,
+.nt-nav-container {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
+  gap: 4px;
+  padding: 3px;
   border: 1px solid var(--border-main);
-  border-radius: 9999px;
-  background-color: transparent;
+  border-radius: 8px;
+  background-color: var(--bg-surface-subtle);
 }
 
-.wf-pill-btn {
+.wf-pill-btn,
+.nt-nav-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 0.95rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-sub);
   border: 1px solid transparent;
   background: transparent;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.wf-pill-btn:hover {
+.wf-pill-btn:hover,
+.nt-nav-btn:hover {
   color: var(--text-main);
   background-color: var(--bg-surface-hover);
-  border-color: var(--border-main);
 }
 
-/* 激活标签 (深色下半透明高亮，浅色下纯白浮起) */
-.wf-pill-btn.active {
+.wf-pill-btn.active,
+.nt-nav-btn.active {
   color: var(--text-main);
-  border-color: var(--border-strong);
-  background-color: var(--bg-surface-subtle);
+  border-color: var(--border-main);
+  background-color: var(--bg-surface);
   font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-html.dark .wf-pill-btn.active {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
+html.dark .wf-pill-btn.active,
+html.dark .nt-nav-btn.active {
+  background-color: #2c2c2c;
+  border-color: #444444;
   color: #ffffff;
 }
 
-/* 线框描边按钮 (深色下为深底描边，不为纯白) */
-.wf-btn-outline {
+/* 经典线框按钮 (Notion Tool Button) */
+.wf-btn-outline,
+.nt-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-main);
   border: 1px solid var(--border-main);
   background-color: var(--bg-surface);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
   white-space: nowrap;
 }
 
-.wf-btn-outline:hover {
-  border-color: var(--border-strong);
+.wf-btn-outline:hover,
+.nt-btn:hover {
+  border-color: #a8a8a4;
   background-color: var(--bg-surface-hover);
 }
 
-/* 主操作按钮 (梨绿渐变) */
-.wf-btn-primary {
+html.dark .wf-btn-outline:hover,
+html.dark .nt-btn:hover {
+  border-color: #555555;
+  background-color: var(--bg-surface-hover);
+}
+
+/* 主操作按钮 (Notion High-Contrast Primary Button) */
+.wf-btn-primary,
+.nt-btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 1.15rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
-  font-weight: 800;
-  color: #070d09 !important;
-  background: linear-gradient(135deg, #10E57A 0%, #059669 100%);
-  border: 1px solid rgba(16, 229, 122, 0.5);
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff !important;
+  background-color: #111827;
+  border: 1px solid #111827;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 8px rgba(16, 229, 122, 0.2);
+  transition: all 0.12s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   white-space: nowrap;
 }
 
-.wf-btn-primary:hover {
-  opacity: 0.95;
+.wf-btn-primary:hover,
+.nt-btn-primary:hover {
+  background-color: #27272a;
+  border-color: #27272a;
   transform: translateY(-0.5px);
 }
 
-.wf-btn-primary:active {
-  transform: scale(0.97);
+html.dark .wf-btn-primary,
+html.dark .nt-btn-primary {
+  background-color: #10e57a;
+  border-color: #10e57a;
+  color: #070d09 !important;
+}
+
+html.dark .wf-btn-primary:hover,
+html.dark .nt-btn-primary:hover {
+  background-color: #34d399;
+  border-color: #34d399;
+}
+
+/* 导出专用按钮 (Export Action) */
+.nt-btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f766e;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.nt-btn-export:hover {
+  background-color: #dcfce7;
+  border-color: #86efac;
+}
+
+html.dark .nt-btn-export {
+  color: #10e57a;
+  background-color: rgba(16, 229, 122, 0.12);
+  border-color: rgba(16, 229, 122, 0.3);
 }
 
 /* ============================================================ */
-/* 🌟 线框输入框与下拉选择框 (彻底消除深色模式下变成纯白的问题) */
+/* 🌟 输入框与选择框 (Notion Inputs & Selects) */
 /* ============================================================ */
 .wf-input,
-.wf-select {
+.wf-select,
+.nt-input,
+.nt-select {
   border: 1px solid var(--border-main);
-  border-radius: 0.75rem;
+  border-radius: 6px;
   background-color: var(--bg-surface) !important;
   color: var(--text-main) !important;
-  font-size: 0.8125rem;
-  transition: all 0.15s ease;
+  font-size: 14px;
+  padding: 7px 12px;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .wf-input:focus,
-.wf-select:focus {
+.wf-select:focus,
+.nt-input:focus,
+.nt-select:focus {
   outline: none;
-  border-color: #10E57A;
+  border-color: #111827;
+  box-shadow: 0 0 0 1px #111827;
+}
+
+html.dark .wf-input:focus,
+html.dark .wf-select:focus,
+html.dark .nt-input:focus,
+html.dark .nt-select:focus {
+  border-color: #10e57a;
+  box-shadow: 0 0 0 1px #10e57a;
 }
 
 select {
@@ -218,152 +316,177 @@ select option {
 }
 
 /* ============================================================ */
-/* 🌟 考勤大表单元格样式 (Outline Status Pills) */
+/* 🌟 考勤大表单元格样式 (Notion Database Status Tags) */
 /* ============================================================ */
 .matrix-cell-present {
-  border: 1px solid rgba(16, 229, 122, 0.4);
-  background-color: rgba(16, 229, 122, 0.12);
-  color: #10E57A;
+  border: 1px solid #bbf7d0;
+  background-color: #f0fdf4;
+  color: #166534;
   font-weight: 700;
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.65rem;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px 8px;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 4px;
   transition: all 0.12s ease;
 }
 
-html:not(.dark) .matrix-cell-present {
-  background-color: #def7ec;
-  border-color: #bcf0da;
-  color: #03543f;
+html.dark .matrix-cell-present {
+  border: 1px solid rgba(16, 229, 122, 0.4);
+  background-color: rgba(16, 229, 122, 0.12);
+  color: #10e57a;
 }
 
 .matrix-cell-absent {
-  border: 1px solid rgba(244, 63, 94, 0.4);
-  background-color: rgba(244, 63, 94, 0.12);
-  color: #fb7185;
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #991b1b;
   font-weight: 700;
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.65rem;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px 8px;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 4px;
   transition: all 0.12s ease;
 }
 
-html:not(.dark) .matrix-cell-absent {
-  background-color: #fde8e8;
-  border-color: #fbd5d5;
-  color: #9b1c1c;
+html.dark .matrix-cell-absent {
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  background-color: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
 }
 
 .matrix-cell-holiday {
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  background-color: rgba(168, 85, 247, 0.12);
-  color: #c084fc;
+  border: 1px solid #e9d5ff;
+  background-color: #faf5ff;
+  color: #6b21a8;
   font-weight: 700;
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.65rem;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 4px 8px;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 4px;
   transition: all 0.12s ease;
 }
 
-html:not(.dark) .matrix-cell-holiday {
-  background-color: #f3e8ff;
-  border-color: #e9d5ff;
-  color: #6b21a8;
-}
-
-/* ============================================================ */
-/* 🌟 徽标样式 */
-/* ============================================================ */
-.wf-badge-green {
-  border: 1px solid rgba(16, 229, 122, 0.4);
-  background-color: rgba(16, 229, 122, 0.12);
-  color: #10E57A;
-  border-radius: 9999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.wf-badge-red {
-  border: 1px solid rgba(244, 63, 94, 0.4);
-  background-color: rgba(244, 63, 94, 0.12);
-  color: #fb7185;
-  border-radius: 9999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.wf-badge-yellow {
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  background-color: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border-radius: 9999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.wf-badge-purple {
+html.dark .matrix-cell-holiday {
   border: 1px solid rgba(168, 85, 247, 0.4);
   background-color: rgba(168, 85, 247, 0.12);
   color: #c084fc;
-  border-radius: 9999px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.75rem;
+}
+
+/* ============================================================ */
+/* 🌟 Notion 经典状态标签 (Badges) */
+/* ============================================================ */
+.wf-badge-green,
+.nt-tag-green {
+  border: 1px solid #bbf7d0;
+  background-color: #f0fdf4;
+  color: #166534;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
-.wf-badge-gold {
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  background-color: rgba(245, 158, 11, 0.12);
-  color: #f59e0b;
-  border-radius: 9999px;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
+.wf-badge-red,
+.nt-tag-red {
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wf-badge-yellow,
+.nt-tag-yellow {
+  border: 1px solid #fde68a;
+  background-color: #fffbeb;
+  color: #92400e;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wf-badge-purple,
+.nt-tag-purple {
+  border: 1px solid #e9d5ff;
+  background-color: #faf5ff;
+  color: #6b21a8;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wf-badge-gold,
+.nt-tag-gold {
+  border: 1px solid #fde68a;
+  background-color: #fffbeb;
+  color: #b45309;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: all 0.12s ease;
+  gap: 4px;
   white-space: nowrap;
-  flex-shrink: 0;
-  line-height: 1.2;
 }
 
-html:not(.dark) .wf-badge-gold {
-  background-color: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #b45309;
+html.dark .wf-badge-green {
+  border-color: rgba(16, 229, 122, 0.4);
+  background-color: rgba(16, 229, 122, 0.12);
+  color: #10e57a;
+}
+html.dark .wf-badge-red {
+  border-color: rgba(244, 63, 94, 0.4);
+  background-color: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
+}
+html.dark .wf-badge-yellow,
+html.dark .wf-badge-gold {
+  border-color: rgba(245, 158, 11, 0.4);
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+}
+html.dark .wf-badge-purple {
+  border-color: rgba(168, 85, 247, 0.4);
+  background-color: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
 }
 
-/* 快捷积分选项按钮 */
+/* 快捷积分选项 */
 .wf-reward-opt {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  border-radius: 0.75rem;
+  padding: 10px 14px;
+  border-radius: 6px;
   border: 1px solid var(--border-main);
   background-color: var(--bg-surface);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
 }
 
 .wf-reward-opt:hover {
-  border-color: #10E57A;
+  border-color: #111827;
   background-color: var(--bg-surface-hover);
 }
 
 .wf-reward-opt.selected {
-  border-color: #10E57A;
-  background-color: rgba(16, 229, 122, 0.1);
+  border-color: #111827;
+  background-color: var(--bg-surface-subtle);
+  font-weight: 700;
 }
 
 /* 礼物卡片 */
@@ -371,867 +494,70 @@ html:not(.dark) .wf-badge-gold {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1rem;
-  border-radius: 0.875rem;
+  padding: 14px;
+  border-radius: 8px;
   border: 1px solid var(--border-main);
   background-color: var(--bg-surface);
-  transition: all 0.15s ease;
+  transition: all 0.12s ease;
 }
 
 .wf-prize-card:hover {
-  border-color: #fbbf24;
-  transform: translateY(-1px);
-}
-
-/* 排行榜奖章 */
-.rank-badge-top1 {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fff;
-}
-.rank-badge-top2 {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
-  color: #fff;
-}
-.rank-badge-top3 {
-  background: linear-gradient(135deg, #b45309, #78350f);
-  color: #fff;
+  border-color: #111827;
 }
 
 /* 滚动条 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-main);
-  border-radius: 9999px;
+  background: #d4d4d2;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-strong);
+  background: #a8a8a4;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }
 
-
 /* ============================================================ */
-/* ☀️ 浅色模式全局高对比度黑字规则 (彻底消除浅灰字、白字不可读问题) */
+/* ☀️ 浅色模式全局高对比度规则 (墨黑高对比，严禁发灰不可读) */
 /* ============================================================ */
 html:not(.dark),
 body:not(.dark) {
-  color: #000000;
-}
-
-html:not(.dark) .text-stone-100,
-html:not(.dark) .text-stone-200,
-html:not(.dark) .text-stone-300,
-html:not(.dark) .text-stone-400,
-html:not(.dark) .text-stone-500,
-html:not(.dark) .text-stone-600,
-html:not(.dark) .text-gray-300,
-html:not(.dark) .text-gray-400,
-html:not(.dark) .text-gray-500,
-html:not(.dark) .text-neutral-300,
-html:not(.dark) .text-neutral-400,
-html:not(.dark) .text-neutral-500,
-html:not(.dark) .text-zinc-300,
-html:not(.dark) .text-zinc-400,
-html:not(.dark) .text-zinc-500 {
-  color: #000000 !important;
+  color: #111827;
 }
 
 html:not(.dark) th,
 html:not(.dark) td {
-  color: #000000 !important;
+  color: #111827 !important;
 }
 
 html:not(.dark) .wf-card,
 html:not(.dark) .wf-card-interactive {
-  color: #000000 !important;
+  color: #111827 !important;
 }
 
 html:not(.dark) input,
 html:not(.dark) select,
 html:not(.dark) textarea {
-  color: #000000 !important;
+  color: #111827 !important;
+  font-size: 14px;
 }
 
 html:not(.dark) input::placeholder,
 html:not(.dark) select::placeholder {
-  color: #4b5563 !important;
+  color: #6b7280 !important;
 }
 
-html:not(.dark) .font-mono {
-  font-weight: 600;
-}
-/* ============================================================ */
-/* 2026 工具工作台重构：Notion 高对比、信息优先、低装饰 */
-/* ============================================================ */
-:root {
-  --bg-page: #ffffff;
-  --bg-header: #ffffff;
-  --bg-surface: #ffffff;
-  --bg-surface-subtle: #f7f7f5;
-  --bg-surface-hover: #efefed;
-  --border-main: #dededb;
-  --border-strong: #b8b8b4;
-  --text-main: #191919;
-  --text-sub: #37352f;
-  --text-muted: #6f6f6b;
-  --pear-accent: #18c96e;
-  --pear-accent-hover: #12b861;
-}
-
-html.dark,
-.dark,
-body.dark {
-  --bg-page: #191919;
-  --bg-header: #202020;
-  --bg-surface: #202020;
-  --bg-surface-subtle: #2a2a2a;
-  --bg-surface-hover: #30302f;
-  --border-main: #3a3a38;
-  --border-strong: #5b5b57;
-  --text-main: #f7f7f5;
-  --text-sub: #e3e3df;
-  --text-muted: #a7a7a2;
-}
-
-html {
-  font-size: 16px;
-}
-
-body {
-  font-size: 15px;
-  line-height: 1.55;
-  letter-spacing: -0.005em;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid #191919;
-  outline-offset: 2px;
-}
-
-html.dark button:focus-visible,
-html.dark input:focus-visible,
-html.dark select:focus-visible,
-html.dark textarea:focus-visible,
-html.dark [tabindex]:focus-visible {
-  outline-color: #ffffff;
-}
-
-.wf-card,
-.wf-card-interactive {
-  border-radius: 8px;
-  box-shadow: none !important;
-}
-
-.wf-card-interactive:hover {
-  transform: none !important;
-}
-
-.wf-btn-primary,
-.wf-btn-outline,
-.wf-input,
-.wf-select {
-  min-height: 40px;
-  border-radius: 7px !important;
-  box-shadow: none !important;
-  font-size: 14px;
-}
-
-.wf-btn-primary,
-.wf-btn-outline {
-  padding: 0.55rem 0.85rem;
-  font-weight: 650;
-  transform: none !important;
-}
-
-.wf-btn-primary {
-  color: #111111 !important;
-  background: var(--pear-accent) !important;
-  border: 1px solid #111111 !important;
-}
-
-.wf-btn-primary:hover {
-  background: var(--pear-accent-hover) !important;
-}
-
-.wf-btn-outline {
-  color: var(--text-main) !important;
-  background: var(--bg-surface) !important;
-  border-color: var(--border-strong) !important;
-}
-
-.wf-btn-outline:hover {
-  background: var(--bg-surface-hover) !important;
-  border-color: var(--text-main) !important;
-}
-
-.wf-input,
-.wf-select {
-  color: var(--text-main);
-  background: var(--bg-surface);
-  border-color: var(--border-strong);
-}
-
-.wf-pill-container {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
-}
-
-.wf-pill-btn {
-  width: 100%;
-  min-height: 40px;
-  justify-content: flex-start;
-  border: 0;
-  border-radius: 6px;
-  padding: 0.55rem 0.7rem;
-  color: var(--text-sub);
-  font-size: 15px;
-  font-weight: 560;
-}
-
-.wf-pill-btn:hover {
-  border: 0;
-}
-
-.wf-pill-btn.active,
-html.dark .wf-pill-btn.active {
-  color: var(--text-main);
-  border: 0;
-  background: var(--bg-surface-hover);
-  font-weight: 720;
-}
-
-.notion-brand-mark {
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  background: var(--bg-surface);
-  font-size: 18px;
-}
-
-.workspace-title-row,
-.finance-heading-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.workspace-title-row h1,
-.finance-heading-row h2 {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 27px !important;
-  line-height: 1.2;
-  font-weight: 760;
-  letter-spacing: -0.035em;
-}
-
-.workspace-title-row p,
-.finance-heading-row p {
-  margin: 4px 0 0;
-  color: var(--text-muted) !important;
-  font-size: 14px !important;
-  line-height: 1.45;
-}
-
-.sync-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 32px;
-  padding: 0 9px;
-  color: var(--text-muted);
-  border: 1px solid var(--border-main);
-  border-radius: 6px;
-  background: var(--bg-surface);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.sync-state-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--pear-accent);
-}
-
-.notion-attendance-toolbar {
-  background: var(--bg-surface) !important;
-  padding: 22px 24px 16px !important;
-  border-bottom: 0 !important;
-}
-
-.attendance-toolbar-main {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-main);
-}
-
-.attendance-summary-strip {
-  display: grid;
-  grid-template-columns: 0.8fr 0.8fr 1fr 1.8fr;
-  color: var(--text-main);
-  background: var(--bg-surface-subtle);
-  border-top: 1px solid var(--border-main);
-  border-bottom: 1px solid var(--border-main);
-}
-
-.attendance-summary-strip > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  min-width: 0;
-  padding: 10px 18px;
-  border-right: 1px solid var(--border-main);
-}
-
-.attendance-summary-strip > div:last-child {
-  border-right: 0;
-}
-
-.attendance-summary-strip span {
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.attendance-summary-strip strong {
-  overflow: hidden;
-  color: var(--text-main);
-  font-size: 14px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.attendance-table-scroll {
-  height: calc(100vh - 238px) !important;
-  background: var(--bg-page) !important;
-  border-color: var(--border-strong) !important;
-}
-
-.attendance-matrix {
-  font-size: 14px !important;
-}
-
-.attendance-matrix th,
-.attendance-matrix td {
-  border-color: var(--border-main) !important;
-}
-
-.attendance-matrix thead th {
-  min-height: 48px;
-  padding-top: 11px !important;
-  padding-bottom: 11px !important;
-  background: var(--bg-surface-subtle) !important;
-  box-shadow: none !important;
-}
-
-.attendance-matrix tbody tr {
-  min-height: 48px;
-}
-
-.attendance-matrix tbody td {
-  background: var(--bg-surface) !important;
-}
-
-.attendance-matrix tbody tr:hover td {
-  background: #fafaf8 !important;
-}
-
-html.dark .attendance-matrix tbody tr:hover td {
-  background: #262625 !important;
-}
-
-.attendance-matrix .text-\[10px\],
-.attendance-matrix .text-\[11px\],
-.attendance-matrix .text-xs {
-  font-size: 13px !important;
-}
-
-.finance-workspace {
-  width: 100%;
-  max-width: none !important;
-  padding: 24px 28px 48px !important;
-}
-
-.finance-heading-row {
-  padding-bottom: 18px !important;
-  border-bottom-color: var(--border-main) !important;
-}
-
-.finance-kpi-band {
-  gap: 0 !important;
-  border-top: 1px solid var(--border-strong);
-  border-bottom: 1px solid var(--border-strong);
-  background: var(--bg-surface);
-}
-
-.finance-kpi-band > .wf-card-interactive {
-  min-height: 142px;
-  border: 0 !important;
-  border-right: 1px solid var(--border-main) !important;
-  border-radius: 0;
-  background: transparent !important;
-  padding: 18px !important;
-}
-
-.finance-kpi-band > .wf-card-interactive:last-child {
-  border-right: 0 !important;
-}
-
-.finance-kpi-band > .wf-card-interactive:hover {
-  background: var(--bg-surface-subtle) !important;
-}
-
-.finance-kpi-band .text-3xl {
-  color: var(--text-main) !important;
-  font-size: 27px !important;
-  letter-spacing: -0.035em;
-}
-
-.finance-workspace table {
-  font-size: 14px;
-}
-
-.finance-workspace th {
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  background: var(--bg-surface-subtle) !important;
-}
-
-.finance-workspace td {
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-}
-
-.recharge-drawer-backdrop {
-  justify-content: flex-end !important;
-  padding: 0 !important;
-  background: rgba(25, 25, 25, 0.28) !important;
-  backdrop-filter: none !important;
-}
-
-.recharge-drawer {
-  width: min(460px, 100vw) !important;
-  max-width: none !important;
-  height: 100vh;
-  max-height: 100vh !important;
-  margin: 0;
-  border-width: 0 0 0 1px;
-  border-radius: 0 !important;
-  overflow-y: auto;
-  box-shadow: -12px 0 30px rgba(0, 0, 0, 0.09) !important;
-}
-
-.attendance-cell-backdrop {
-  background: rgba(25, 25, 25, 0.28) !important;
-  backdrop-filter: none !important;
-}
-
-.attendance-cell-modal {
-  border-radius: 10px !important;
-}
-
-@media (min-width: 768px) {
-  .notion-app-shell {
-    display: block;
-    min-width: 0;
-    padding-left: 224px;
-  }
-
-  .notion-sidebar {
-    position: fixed !important;
-    inset: 0 auto 0 0 !important;
-    width: 224px;
-    height: 100vh;
-    border-right: 1px solid var(--border-main);
-    border-bottom: 0 !important;
-    background: var(--bg-surface-subtle) !important;
-  }
-
-  .notion-sidebar-inner {
-    height: 100vh !important;
-    padding: 18px 12px 14px !important;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 18px;
-  }
-
-  .notion-brand {
-    width: 100%;
-    padding: 0 6px 14px;
-    border-bottom: 1px solid var(--border-main);
-  }
-
-  .notion-brand .text-\[10px\] {
-    color: var(--text-muted) !important;
-    font-family: inherit !important;
-    font-size: 12px !important;
-    font-weight: 500;
-  }
-
-  .notion-primary-nav {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 3px;
-  }
-
-  .notion-sidebar-tools {
-    width: 100%;
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--border-main);
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .notion-sidebar-tools > * {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .notion-sidebar-tools > button:last-child {
-    width: 40px;
-    justify-content: center;
-  }
-
-  .notion-attendance-toolbar {
-    position: sticky !important;
-    top: 0 !important;
-  }
-}
-
-@media (max-width: 767px) {
-  body {
-    font-size: 15px;
-  }
-
-  .notion-app-shell {
-    min-height: 100vh;
-    padding-bottom: 72px;
-  }
-
-  .notion-sidebar {
-    position: sticky !important;
-    top: 0;
-    height: 64px;
-    border-bottom: 1px solid var(--border-main) !important;
-    background: var(--bg-surface) !important;
-  }
-
-  .notion-sidebar-inner {
-    height: 64px !important;
-    padding: 0 16px !important;
-  }
-
-  .notion-brand .flex-col > span,
-  .notion-brand .flex-col > .flex + span {
-    display: none !important;
-  }
-
-  .notion-sidebar-tools > .hidden {
-    display: none !important;
-  }
-
-  .notion-sidebar-tools {
-    margin-left: auto;
-  }
-
-  .notion-mobile-nav {
-    position: fixed;
-    inset: auto 0 0 0;
-    z-index: 80;
-    height: 68px;
-    padding: 6px 8px 8px !important;
-    border-top: 1px solid var(--border-strong) !important;
-    background: var(--bg-surface);
-  }
-
-  .notion-mobile-nav .wf-pill-btn {
-    min-height: 52px;
-    padding: 5px 3px;
-    justify-content: center;
-    border-radius: 6px;
-    font-size: 12px !important;
-  }
-
-  .notion-attendance-toolbar {
-    top: 64px !important;
-    padding: 16px !important;
-  }
-
-  .workspace-title-row h1,
-  .finance-heading-row h2 {
-    font-size: 25px !important;
-  }
-
-  .workspace-title-row p {
-    font-size: 13px !important;
-  }
-
-  .sync-state {
-    padding: 0 7px;
-  }
-
-  .attendance-toolbar-main {
-    display: block !important;
-    margin-top: 14px;
-    padding-top: 12px;
-  }
-
-  .attendance-toolbar-main > div:first-child {
-    justify-content: space-between;
-  }
-
-  .attendance-toolbar-main > div:last-child {
-    width: 100%;
-    margin-top: 12px;
-    padding-bottom: 2px;
-    overflow-x: auto;
-    justify-content: flex-start;
-    scrollbar-width: none;
-  }
-
-  .attendance-toolbar-main > div:last-child::-webkit-scrollbar {
-    display: none;
-  }
-
-  .attendance-toolbar-main .wf-btn-primary,
-  .attendance-toolbar-main .wf-btn-outline {
-    min-height: 42px;
-  }
-
-  .attendance-summary-strip {
-    grid-template-columns: repeat(4, minmax(126px, 1fr));
-    overflow-x: auto;
-  }
-
-  .attendance-summary-strip > div {
-    min-height: 48px;
-    padding: 8px 12px;
-    flex-direction: column;
-  }
-
-  .attendance-table-scroll {
-    height: calc(100vh - 323px) !important;
-    min-height: 320px;
-  }
-
-  .attendance-matrix th,
-  .attendance-matrix td {
-    min-width: 92px;
-  }
-
-  .attendance-matrix th:first-child,
-  .attendance-matrix td:first-child {
-    min-width: 155px;
-  }
-
-  .finance-workspace {
-    padding: 18px 14px 36px !important;
-  }
-
-  .finance-heading-row {
-    gap: 12px;
-  }
-
-  .finance-heading-row > div:last-child,
-  .finance-heading-row .wf-btn-primary {
-    width: 100%;
-  }
-
-  .finance-kpi-band {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  .finance-kpi-band > .wf-card-interactive {
-    min-height: 132px;
-    padding: 14px !important;
-    border-bottom: 1px solid var(--border-main) !important;
-  }
-
-  .finance-kpi-band > .wf-card-interactive:nth-child(2n) {
-    border-right: 0 !important;
-  }
-
-  .finance-kpi-band .text-3xl {
-    font-size: 22px !important;
-  }
-
-  .recharge-drawer-backdrop,
-  .attendance-cell-backdrop {
-    align-items: flex-end !important;
-    justify-content: stretch !important;
-    padding: 0 !important;
-  }
-
-  .recharge-drawer,
-  .attendance-cell-modal {
-    width: 100% !important;
-    max-width: none !important;
-    height: auto;
-    max-height: 90vh !important;
-    margin: 0;
-    border-width: 1px 0 0;
-    border-radius: 12px 12px 0 0 !important;
-    padding: 20px 16px calc(20px + env(safe-area-inset-bottom)) !important;
-    overflow-y: auto;
-  }
-}
-/* 移动端：避免桌面导航占用顶栏，并给第一位学员留出可见列 */
-.notion-primary-nav {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .notion-primary-nav {
-    display: flex;
-  }
-}
-
-@media (max-width: 767px) {
-  .attendance-matrix th:first-child,
-  .attendance-matrix td:first-child {
-    width: 132px !important;
-    min-width: 132px !important;
-    max-width: 132px !important;
-  }
-
-  .attendance-matrix th:nth-child(2),
-  .attendance-matrix td:nth-child(2) {
-    left: 132px !important;
-    width: 128px !important;
-    min-width: 128px !important;
-    max-width: 128px !important;
-  }
-
-  .attendance-matrix th:last-child,
-  .attendance-matrix td:last-child {
-    position: static !important;
-  }
-}
-.attendance-status-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
-}
-
-.attendance-status-options button {
-  min-height: 54px;
-  padding: 7px 5px;
-  color: var(--text-main);
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  background: var(--bg-surface);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.attendance-status-options button:hover {
-  background: var(--bg-surface-hover);
-}
-
-.attendance-status-options button.active {
-  color: #111111;
-  border-color: #111111;
-  background: var(--pear-accent);
-}
-
-.attendance-status-options small {
-  display: block;
-  margin-top: 2px;
-  color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 550;
-}
-
-.attendance-status-options button.active small {
-  color: #23352a;
-}
-html,
-body,
-#app,
-.notion-app-shell {
-  max-width: 100%;
-}
-
-@media (max-width: 767px) {
-  html,
-  body,
-  #app,
-  .notion-app-shell {
-    overflow-x: hidden;
-  }
-}
-.sync-state {
-  cursor: default;
-}
-
-.sync-state.sync-pending,
-.sync-state.sync-syncing,
-.sync-state.sync-loading {
-  color: #7a5a00;
-  border-color: #d8b45c;
-  background: #fffaf0;
-}
-
-.sync-state.sync-offline {
-  color: #a11d2c;
-  border-color: #e0a1aa;
-  background: #fff5f6;
-  cursor: pointer;
-}
-
-.sync-state.sync-offline:hover {
-  border-color: #a11d2c;
-}
-
-.sync-state-spinner {
-  color: #a87900;
-  font-size: 11px;
-  animation: pear-sync-spin 0.9s linear infinite;
-}
-
-.sync-state.sync-offline .sync-state-dot {
-  background: #d13c4c;
-}
-
-@keyframes pear-sync-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-html.dark .sync-state.sync-pending,
-html.dark .sync-state.sync-syncing,
-html.dark .sync-state.sync-loading {
-  color: #f2c95e;
-  border-color: #76642e;
-  background: #2c291f;
-}
-
-html.dark .sync-state.sync-offline {
-  color: #ff9aa7;
-  border-color: #7f3d46;
-  background: #302126;
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace !important;
+  font-variant-numeric: tabular-nums;
 }
