@@ -1,15 +1,15 @@
 <template>
-<div id="app" v-cloak class="min-h-screen flex flex-col justify-between">
+<div v-cloak class="notion-app-shell min-h-screen flex flex-col justify-between">
     
     <!-- ============================================================ -->
     <!-- 1. 🌟 固定通栏顶栏 (极简纯粹设计 · 四大核心Tab · 最高置顶 z-50) -->
     <!-- ============================================================ -->
-    <header class="sticky top-0 z-50 border-b border-black/[0.08] dark:border-white/10 w-full transition-colors"
+    <header class="notion-sidebar sticky top-0 z-50 border-b border-black/[0.08] dark:border-white/10 w-full transition-colors"
       style="background-color: var(--bg-surface);">
-      <div class="w-full px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
+      <div class="notion-sidebar-inner w-full px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
         
         <!-- 品牌标识 (🍐 徽标 + 想吃梨儿童美术) -->
-        <div class="flex items-center gap-3 cursor-pointer group select-none flex-shrink-0" @click="currentTab = 'attendance'">
+        <div class="notion-brand flex items-center gap-3 cursor-pointer group select-none flex-shrink-0" @click="currentTab = 'attendance'">
           <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center text-lg shadow-sm flex-shrink-0">
             🍐
           </div>
@@ -26,7 +26,7 @@
         </div>
 
         <!-- 🌟 原生四大主功能导航 (极简纯粹线框胶囊) -->
-        <nav class="hidden md:flex items-center wf-pill-container">
+        <nav class="notion-primary-nav hidden md:flex items-center wf-pill-container">
           
           <button @click="currentTab = 'attendance'"
             :class="currentTab === 'attendance' ? 'active' : ''"
@@ -55,7 +55,7 @@
         </nav>
 
         <!-- 右侧工具栏 -->
-        <div class="flex items-center gap-2">
+        <div class="notion-sidebar-tools flex items-center gap-2">
           <button @click="exportDataJSON" title="导出数据备份" class="wf-btn-outline text-xs hidden sm:flex">
             <i class="fa-solid fa-cloud-arrow-down text-emerald-400"></i>
             <span>备份</span>
@@ -79,7 +79,7 @@
       </div>
 
       <!-- 📱 移动端底栏导航 (极简精简版) -->
-      <div class="md:hidden flex px-3 pb-2 pt-1 border-t border-black/[0.04] dark:border-white/[0.08]">
+      <div class="notion-mobile-nav md:hidden flex px-3 pb-2 pt-1 border-t border-black/[0.04] dark:border-white/[0.08]">
         <div class="grid grid-cols-4 gap-1 w-full text-center">
           <button @click="currentTab = 'attendance'"
             :class="currentTab === 'attendance' ? 'active' : ''"
@@ -108,9 +108,19 @@
     <!-- ============================================================ -->
     <!-- 2. 🌟 固定通栏考勤工具条 (仅在 Tab 1 考勤大表显示 · 置顶 z-40) -->
     <!-- ============================================================ -->
-    <div v-if="currentTab === 'attendance'" class="sticky top-16 sm:top-20 z-40 w-full border-b border-black/[0.06] dark:border-white/[0.08] py-3.5 px-4 sm:px-6 transition-colors shadow-sm"
+    <div v-if="currentTab === 'attendance'" class="notion-attendance-toolbar sticky top-16 sm:top-20 z-40 w-full border-b border-black/[0.06] dark:border-white/[0.08] py-3.5 px-4 sm:px-6 transition-colors"
       style="background-color: var(--bg-surface);">
-      <div class="w-full flex items-center justify-between gap-6">
+      <div class="workspace-title-row">
+        <div>
+          <h1>考勤大表</h1>
+          <p>记录每次课程出勤、课消与备注</p>
+        </div>
+        <div class="sync-state" aria-live="polite">
+          <span class="sync-state-dot"></span>
+          <span>数据自动保存</span>
+        </div>
+      </div>
+      <div class="attendance-toolbar-main w-full flex items-center justify-between gap-6">
         
         <!-- 左侧：班级快速下拉切换器 -->
         <div class="flex items-center gap-3.5">
@@ -167,9 +177,16 @@
     </div>
 
     <!-- ============================================================ -->
+    <div class="attendance-summary-strip" v-if="currentTab === 'attendance'" aria-label="当前班级概况">
+      <div><span>在读学员</span><strong>{{ activeStudents.filter(s => s.classId === matrixClassId).length }}</strong></div>
+      <div><span>课程记录</span><strong>{{ matrixAttendanceRecords.length }}</strong></div>
+      <div><span>任课老师</span><strong>{{ getClassById(matrixClassId).teacher || '未设置' }}</strong></div>
+      <div><span>上课时间</span><strong>{{ getClassById(matrixClassId).schedule || '未设置' }}</strong></div>
+    </div>
+
     <!-- 主要内容区域 -->
     <!-- ============================================================ -->
-    <main class="flex-1 pb-0" @click="activeCellDropdownKey = null">
+    <main class="notion-workspace flex-1 pb-0" @click="activeCellDropdownKey = null">
       
       <!-- ======================================================== -->
       <!-- TAB 1: 📝 二维考勤总大表 (极简线框 · 紧凑排版 · 顺畅横向滑动) -->
@@ -177,8 +194,8 @@
       <section v-if="currentTab === 'attendance'" class="w-full">
         
         <!-- 表格水平滚动容器 (支持多学员流畅横向滑动，前两列固定) -->
-        <div class="overflow-x-auto h-[calc(100vh-130px)] overflow-y-auto w-full border-b border-black/10 dark:border-white/10" style="scrollbar-width: thin; background-color: var(--bg-page);">
-          <table class="w-max min-w-full text-center text-xs border-collapse select-none" style="background-color: var(--bg-page); table-layout: fixed;">
+        <div class="attendance-table-scroll overflow-x-auto h-[calc(100vh-130px)] overflow-y-auto w-full border-b border-black/10 dark:border-white/10" style="scrollbar-width: thin; background-color: var(--bg-page);">
+          <table class="attendance-matrix w-max min-w-full text-center text-xs border-collapse select-none" style="background-color: var(--bg-page); table-layout: fixed;">
             
             <!-- 表头 (紧凑高雅线框 · 课程与日期固定置顶与左置) -->
             <thead class="sticky top-0 z-30 shadow-sm border-b border-black/10 dark:border-white/15" style="background-color: var(--bg-surface);">
@@ -278,7 +295,7 @@
                 <td v-for="stu in matrixStudents" :key="stu.id" 
                   class="py-1 px-1 border-r border-black/[0.06] dark:border-white/10 relative transition-all text-center min-w-[92px] w-[92px]">
                   
-                  <div @click.stop="toggleCellDropdown(att.id, stu.id, $event)" 
+                  <div @click.stop="toggleCellDropdown(att.id, stu.id, $event, att, stu)"
                     class="cursor-pointer py-1 px-1.5 rounded-lg font-bold text-xs inline-flex items-center justify-center gap-1 min-w-[68px] transition select-none hover:scale-105 active:scale-95 shadow-sm"
                     :class="getMatrixCellClass(getStudentAttendanceCell(stu.id, att).status)"
                     :title="'点击修改【' + stu.name + '】出勤状态' + (getStudentAttendanceCell(stu.id, att).note ? ' (备注: ' + getStudentAttendanceCell(stu.id, att).note + ')' : '')">
@@ -1330,13 +1347,13 @@
       <!-- ======================================================== -->
       <!-- TAB 4: 💰 财务与收费管理中心 (统一高雅 · 极简线框设计系统) -->
       <!-- ======================================================== -->
-      <section v-if="currentTab === 'records'" class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      <section v-if="currentTab === 'records'" class="finance-workspace max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         
         <!-- 顶部通栏标题与全局概览 -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-black/10 dark:border-white/10 flex-wrap">
+        <div class="finance-heading-row flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-black/10 dark:border-white/10 flex-wrap">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-lg sm:text-xl font-bold">财务与课消管理中心</h2>
+              <h2 class="text-lg sm:text-xl font-bold">财务中心</h2>
               <span v-if="financeActiveKpi !== 'all'" @click="resetFinanceFilter"
                 class="cursor-pointer text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center gap-1">
                 <span>正在下钻筛选</span>
@@ -1349,13 +1366,13 @@
           <div class="flex items-center gap-2">
             <button @click="openRecharge({})" class="wf-btn-primary text-xs py-2 px-4 shadow-sm">
               <i class="fa-solid fa-plus-circle text-sm mr-1"></i>
-              <span>录入学员收费充值</span>
+              <span>录入缴费 / 课时调整</span>
             </button>
           </div>
         </div>
 
         <!-- 🌟 4 维核心财务 KPI 统计卡片 (统一标准高雅线框 · 纯粹协调) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="finance-kpi-band grid grid-cols-2 md:grid-cols-4 gap-4">
           
           <!-- 1. 本月收费入账 -->
           <div @click="selectFinanceKpi('month')"
@@ -2974,8 +2991,8 @@
     <!-- ============================================================ -->
     <!-- 模态弹窗 2: 续费充值 (含积分赠送) -->
     <!-- ============================================================ -->
-    <div v-if="showRechargeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div class="wf-card p-6 max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div v-if="showRechargeModal" class="recharge-drawer-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="recharge-drawer wf-card p-6 max-w-lg w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">学员收费录入 / 续费充值</h3>
           <button @click="showRechargeModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -3238,8 +3255,8 @@
     <!-- ============================================================ -->
     <!-- 模态弹窗 5: 考勤单元格备注编辑 -->
     <!-- ============================================================ -->
-    <div v-if="showCellEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div class="wf-card p-6 max-w-sm w-full space-y-4 shadow-2xl">
+    <div v-if="showCellEditModal" class="attendance-cell-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="attendance-cell-modal wf-card p-6 max-w-sm w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">学员单节课考勤备注</h3>
           <button @click="showCellEditModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -3252,14 +3269,23 @@
           </div>
 
           <div>
-            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">填写课堂表现或请假原因备注</label>
+            <label class="block text-black dark:text-stone-400 mb-2 font-semibold">本节考勤状态</label>
+            <div class="attendance-status-options">
+              <button type="button" @click="editingCell.currentStatus = '到课'" :class="{ active: editingCell.currentStatus === '到课' }">到课 <small>扣 1 课时</small></button>
+              <button type="button" @click="editingCell.currentStatus = '未到'" :class="{ active: editingCell.currentStatus === '未到' || editingCell.currentStatus === '请假' }">未到 / 请假 <small>不扣课时</small></button>
+              <button type="button" @click="editingCell.currentStatus = '放假'" :class="{ active: editingCell.currentStatus === '放假' }">放假 <small>不扣课时</small></button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">课堂表现或请假原因备注</label>
             <textarea v-model="editingCell.note" rows="3" placeholder="例: 表现非常积极，色彩搭配有创意..." class="w-full px-3 py-2 wf-input"></textarea>
           </div>
         </div>
 
         <div class="pt-2 flex gap-2">
           <button @click="showCellEditModal = false" class="wf-btn-outline flex-1 py-2 justify-center">取消</button>
-          <button @click="submitCellEdit" class="wf-btn-primary flex-1 py-2 justify-center">保存备注</button>
+          <button @click="submitCellEdit" class="wf-btn-primary flex-1 py-2 justify-center">保存考勤与备注</button>
         </div>
       </div>
     </div>
@@ -5076,8 +5102,12 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // 单元格精准下拉菜单 (响应式 Key: 'attId_stuId')
     const activeCellDropdownKey = ref(null);
 
-    const toggleCellDropdown = (attId, stuId, event) => {
+    const toggleCellDropdown = (attId, stuId, event, attendanceRecord, student) => {
       if (event) event.stopPropagation();
+      if (typeof window !== 'undefined' && window.innerWidth < 768 && attendanceRecord && student) {
+        openCellEdit(attendanceRecord, student);
+        return;
+      }
       const key = `${attId}_${stuId}`;
       activeCellDropdownKey.value = (activeCellDropdownKey.value === key ? null : key);
     };
