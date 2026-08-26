@@ -19,7 +19,7 @@
                 {{ studioInfo.name }}
               </span>
             </div>
-            <span class="text-[10px] text-stone-400 font-mono hidden md:inline">
+            <span class="text-[10px] text-black dark:text-stone-400 font-mono hidden md:inline">
               陈老师 · 美育教务工作台
             </span>
           </div>
@@ -116,7 +116,7 @@
         <div class="flex items-center gap-3.5">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#10E57A]"></span>
-            <span class="text-xs text-stone-400 font-bold uppercase tracking-wider">班级</span>
+            <span class="text-xs text-black dark:text-stone-400 font-bold uppercase tracking-wider">班级</span>
           </div>
 
           <div class="relative">
@@ -126,10 +126,10 @@
                 🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)
               </option>
             </select>
-            <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs pointer-events-none"></i>
+            <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs pointer-events-none"></i>
           </div>
 
-          <span class="text-xs text-stone-400 hidden lg:inline font-medium pl-2 border-l border-black/10 dark:border-white/10">
+          <span class="text-xs text-black dark:text-stone-400 hidden lg:inline font-medium pl-2 border-l border-black/10 dark:border-white/10">
             任课：<strong>{{ getClassById(matrixClassId).teacher }}</strong> · {{ getClassById(matrixClassId).schedule }}
           </span>
         </div>
@@ -186,18 +186,18 @@
                 <!-- 01 课程主题 (固定左侧第1列 · 紧凑单行绝对不折行) -->
                 <th class="py-2.5 pl-4 pr-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[155px] w-[155px] whitespace-nowrap sticky left-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   <div class="flex items-center gap-1.5 whitespace-nowrap">
-                    <span class="text-[10px] text-stone-400 font-mono font-normal">01</span>
+                    <span class="text-[10px] text-black dark:text-stone-400 font-mono font-normal">01</span>
                     <span class="text-xs font-black tracking-tight">课程主题</span>
-                    <span class="text-[9px] text-stone-400 font-normal ml-0.5">✏️</span>
+                    <span class="text-[9px] text-black dark:text-stone-400 font-normal ml-0.5">✏️</span>
                   </div>
                 </th>
 
                 <!-- 02 上课日期 (固定左侧第2列 · 紧凑单行) -->
                 <th class="py-2.5 px-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[140px] w-[140px] whitespace-nowrap sticky left-[155px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   <div class="flex items-center gap-1.5 whitespace-nowrap">
-                    <span class="text-[10px] text-stone-400 font-mono font-normal">02</span>
+                    <span class="text-[10px] text-black dark:text-stone-400 font-mono font-normal">02</span>
                     <span class="text-xs font-black tracking-tight">上课日期</span>
-                    <span class="text-[9px] text-stone-400 font-normal ml-0.5">📅</span>
+                    <span class="text-[9px] text-black dark:text-stone-400 font-normal ml-0.5">📅</span>
                   </div>
                 </th>
                 
@@ -209,9 +209,9 @@
                   <div class="flex flex-col items-center justify-center gap-0.5">
                     <!-- 顶部紧凑序号与姓名 -->
                     <div @click="openStudentProfile(stu)" 
-                      class="cursor-pointer group flex items-center justify-center gap-1 font-bold text-xs text-stone-900 dark:text-stone-100 hover:text-emerald-500 dark:hover:text-emerald-400 transition whitespace-nowrap" 
+                      class="cursor-pointer group flex items-center justify-center gap-1 font-bold text-xs text-stone-900 dark:text-black dark:text-stone-100 hover:text-emerald-500 dark:hover:text-emerald-400 transition whitespace-nowrap" 
                       :title="'#' + (idx + 1) + ' ' + stu.name + ' (点击查看档案)'">
-                      <span class="text-[9px] font-mono text-stone-400 font-normal">#{{ idx + 1 }}</span>
+                      <span class="text-[9px] font-mono text-black dark:text-stone-400 font-normal">#{{ idx + 1 }}</span>
                       <span>{{ stu.name }}</span>
                     </div>
                     
@@ -236,7 +236,7 @@
                 </th>
 
                 <!-- 操作列 (固定右侧) -->
-                <th class="py-2.5 px-2 w-16 min-w-[64px] text-center text-stone-400 text-xs font-normal sticky right-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                <th class="py-2.5 px-2 w-16 min-w-[64px] text-center text-black dark:text-stone-400 text-xs font-normal sticky right-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   操作
                 </th>
               </tr>
@@ -253,10 +253,10 @@
                     class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition whitespace-nowrap"
                     title="点击修改课程主题与上课日期">
                     <div class="flex items-center gap-1.5 truncate max-w-[125px]">
-                      <i class="fa-regular fa-file-lines text-stone-400 text-[11px] flex-shrink-0"></i>
-                      <span class="font-bold text-xs text-stone-900 dark:text-stone-100 group-hover:text-emerald-400 transition-colors truncate">{{ att.theme }}</span>
+                      <i class="fa-regular fa-file-lines text-black dark:text-stone-400 text-[11px] flex-shrink-0"></i>
+                      <span class="font-bold text-xs text-stone-900 dark:text-black dark:text-stone-100 group-hover:text-emerald-400 transition-colors truncate">{{ att.theme }}</span>
                     </div>
-                    <i class="fa-solid fa-pen text-[9px] text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
+                    <i class="fa-solid fa-pen text-[9px] text-black dark:text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
                   </div>
                 </td>
 
@@ -266,10 +266,10 @@
                     class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition whitespace-nowrap"
                     title="点击修改上课日期与课程主题">
                     <div class="flex items-center gap-1.5 truncate">
-                      <i class="fa-regular fa-calendar text-stone-400 text-[11px] flex-shrink-0"></i>
-                      <span class="font-mono text-xs text-stone-500 dark:text-stone-400 group-hover:text-emerald-400 transition-colors whitespace-nowrap">{{ att.date }}</span>
+                      <i class="fa-regular fa-calendar text-black dark:text-stone-400 text-[11px] flex-shrink-0"></i>
+                      <span class="font-mono text-xs text-black dark:text-stone-400 dark:text-black dark:text-stone-400 group-hover:text-emerald-400 transition-colors whitespace-nowrap">{{ att.date }}</span>
                     </div>
-                    <i class="fa-solid fa-pen text-[9px] text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
+                    <i class="fa-solid fa-pen text-[9px] text-black dark:text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
                   </div>
                 </td>
 
@@ -291,7 +291,7 @@
                     class="absolute z-50 top-full left-1/2 -translate-x-1/2 mt-1 w-48 p-2 rounded-xl border border-black/15 dark:border-white/20 shadow-2xl space-y-1 text-left backdrop-blur-xl"
                     style="background-color: var(--bg-surface);">
                     
-                    <div class="px-2 py-1 text-[10px] text-stone-400 font-mono border-b border-black/10 dark:border-white/10 flex justify-between items-center">
+                    <div class="px-2 py-1 text-[10px] text-black dark:text-stone-400 font-mono border-b border-black/10 dark:border-white/10 flex justify-between items-center">
                       <span>快速修改考勤</span>
                       <span class="font-bold text-emerald-400">{{ stu.name }}</span>
                     </div>
@@ -300,21 +300,21 @@
                       class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-500/20 text-[#10E57A] transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-500/20 border border-emerald-500/40' : ''">
                       <span class="flex items-center gap-1.5"><span>🟢</span> 到课</span>
-                      <span class="text-[10px] text-stone-400 font-mono">消课-1</span>
+                      <span class="text-[10px] text-black dark:text-stone-400 font-mono">消课-1</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '未到')"
                       class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-500/20 text-rose-400 transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-500/20 border border-rose-500/40' : ''">
                       <span class="flex items-center gap-1.5"><span>🔴</span> 未到/请假</span>
-                      <span class="text-[10px] text-stone-400 font-mono">不扣课</span>
+                      <span class="text-[10px] text-black dark:text-stone-400 font-mono">不扣课</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '放假')"
                       class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-purple-500/20 text-purple-400 transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-500/20 border border-purple-500/40' : ''">
                       <span class="flex items-center gap-1.5"><span>🟣</span> 全班放假</span>
-                      <span class="text-[10px] text-stone-400">休假</span>
+                      <span class="text-[10px] text-black dark:text-stone-400">休假</span>
                     </button>
 
                     <div class="border-t border-black/10 dark:border-white/10 my-1"></div>
@@ -328,7 +328,7 @@
 
                     <button @click.stop="openNoteFromDropdown(att, stu)" 
                       class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs hover:bg-black/5 dark:hover:bg-white/10 transition">
-                      <i class="fa-solid fa-pen text-[10px] text-stone-400"></i>
+                      <i class="fa-solid fa-pen text-[10px] text-black dark:text-stone-400"></i>
                       <span>填写 / 修改备注</span>
                     </button>
 
@@ -345,12 +345,12 @@
                 <!-- 操作列 (固定右侧 · 紧凑居中) -->
                 <td class="py-1 px-2 w-16 min-w-[64px] text-center whitespace-nowrap sticky right-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
                   <button @click="openEditAttendanceRow(att)" 
-                    class="text-stone-400 hover:text-emerald-400 p-1 transition text-xs"
+                    class="text-black dark:text-stone-400 hover:text-emerald-400 p-1 transition text-xs"
                     title="修改课程主题与上课日期">
                     <i class="fa-solid fa-pen text-[11px]"></i>
                   </button>
                   <button @click="deleteMatrixRow(att)" 
-                    class="text-stone-400 hover:text-rose-400 p-1 transition text-xs ml-0.5"
+                    class="text-black dark:text-stone-400 hover:text-rose-400 p-1 transition text-xs ml-0.5"
                     title="撤销/删除此节课 (自动退还消课)">
                     <i class="fa-regular fa-trash-can text-[11px]"></i>
                   </button>
@@ -359,7 +359,7 @@
               </tr>
 
               <tr v-if="matrixAttendanceRecords.length === 0">
-                <td :colspan="matrixStudents.length + 3" class="py-16 text-center text-stone-400 text-xs">
+                <td :colspan="matrixStudents.length + 3" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                   该班级暂无考勤历史，点击右上角【➕ 新增考勤】即可快速记录新课考勤
                 </td>
               </tr>
@@ -392,7 +392,7 @@
           </div>
 
           <!-- 右侧统计快捷标签 -->
-          <div class="text-xs text-stone-400 flex items-center gap-3">
+          <div class="text-xs text-black dark:text-stone-400 flex items-center gap-3">
             <span>全校在读：<strong>{{ kpiStats.totalStudents }}</strong> 人</span>
             <span>全校画币积分池：<strong class="text-amber-400 font-mono font-bold">{{ kpiStats.totalPoints }}</strong> 分</span>
           </div>
@@ -403,12 +403,12 @@
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="wf-card p-5">
-              <div class="text-xs text-stone-400 font-medium">在读小艺术家</div>
-              <div class="text-3xl font-black mt-1">{{ kpiStats.totalStudents }} <span class="text-xs font-normal text-stone-400">人</span></div>
+              <div class="text-xs text-black dark:text-stone-400 font-medium">在读小艺术家</div>
+              <div class="text-3xl font-black mt-1">{{ kpiStats.totalStudents }} <span class="text-xs font-normal text-black dark:text-stone-400">人</span></div>
             </div>
             <div class="wf-card p-5">
-              <div class="text-xs text-stone-400 font-medium">全校总剩余课时</div>
-              <div class="text-3xl font-black text-emerald-400 mt-1">{{ kpiStats.totalHours }} <span class="text-xs font-normal text-stone-400">节</span></div>
+              <div class="text-xs text-black dark:text-stone-400 font-medium">全校总剩余课时</div>
+              <div class="text-3xl font-black text-emerald-400 mt-1">{{ kpiStats.totalHours }} <span class="text-xs font-normal text-black dark:text-stone-400">节</span></div>
             </div>
             <div @click="rankingHourFilter = 'depleted'" class="wf-card-interactive p-5">
               <div class="text-xs text-rose-400 font-bold flex items-center gap-1.5">
@@ -430,9 +430,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
             <div class="flex items-center gap-3 flex-1 max-w-xl">
               <div class="relative flex-1">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="rankingSearchQuery" type="text" placeholder="搜索学员姓名或电话..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
 
               <div class="relative">
@@ -440,7 +440,7 @@
                   <option value="all">🌈 全部班级</option>
                   <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
             </div>
 
@@ -454,7 +454,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap">排序</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">学员姓名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">所在班级</th>
@@ -467,11 +467,11 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="(stu, idx) in rankingList" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono font-bold text-stone-400 whitespace-nowrap">#{{ (idx + 1).toString().padStart(2, '0') }}</td>
+                  <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-400 whitespace-nowrap">#{{ (idx + 1).toString().padStart(2, '0') }}</td>
                   <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(stu)">
                     <span class="group-hover:text-emerald-400 transition">{{ stu.name }} ↗</span>
                   </td>
-                  <td class="py-3 px-4 text-stone-400 whitespace-nowrap">{{ getClassById(stu.classId).name }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ getClassById(stu.classId).name }}</td>
                   <td class="py-3 px-4 font-bold font-mono text-sm whitespace-nowrap" :class="stu.remainHours <= 0 ? 'text-rose-400' : stu.remainHours <= 3 ? 'text-amber-400' : 'text-emerald-400'">
                     {{ stu.remainHours }} 节
                   </td>
@@ -481,12 +481,12 @@
                       <span class="text-[9px] opacity-75 ml-0.5">▾</span>
                     </button>
                   </td>
-                  <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">{{ stu.totalConsumed || 0 }} 节</td>
-                  <td class="py-3 px-4 font-mono text-stone-400 whitespace-nowrap">{{ stu.parentName }} ({{ stu.parentPhone }})</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ stu.totalConsumed || 0 }} 节</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ stu.parentName }} ({{ stu.parentPhone }})</td>
                   <td class="py-3 px-5 text-right space-x-2 whitespace-nowrap">
                     <button @click="openIndividualPointModal(stu, 'add')" class="text-xs text-amber-400 font-bold hover:underline">⭐ 变更积分</button>
                     <button @click="openRecharge(stu)" class="text-xs text-emerald-400 font-bold hover:underline">续费</button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-stone-400 hover:text-emerald-400">档案 ↗</button>
+                    <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400">档案 ↗</button>
                   </td>
                 </tr>
               </tbody>
@@ -504,12 +504,12 @@
             <!-- 🥈 亚军 -->
             <div class="wf-card p-6 flex flex-col justify-between items-center text-center order-2 md:order-1 border-stone-400/30 bg-stone-500/[0.04]">
               <div>
-                <div class="text-xs font-bold text-stone-400">🥈 荣耀亚军</div>
+                <div class="text-xs font-bold text-black dark:text-stone-400">🥈 荣耀亚军</div>
                 <div class="text-base font-black mt-0.5">{{ pointsRankingList[1].name }} ({{ pointsRankingList[1].className }})</div>
                 <div class="text-2xl font-black text-amber-400 mt-2 font-mono">
-                  ⭐ {{ pointsRankingList[1].points }} <span class="text-xs text-stone-400 font-normal">可用画币</span>
+                  ⭐ {{ pointsRankingList[1].points }} <span class="text-xs text-black dark:text-stone-400 font-normal">可用画币</span>
                 </div>
-                <div class="text-xs text-stone-400 mt-1">累计获得: {{ pointsRankingList[1].totalPointsEarned }} 分</div>
+                <div class="text-xs text-black dark:text-stone-400 mt-1">累计获得: {{ pointsRankingList[1].totalPointsEarned }} 分</div>
               </div>
               <div class="flex gap-2 w-full mt-4 pt-3 border-t border-black/10 dark:border-white/10">
                 <button @click="openIndividualPointModal(pointsRankingList[1], 'add')" class="wf-btn-primary flex-1 text-xs py-1.5 justify-center">
@@ -527,9 +527,9 @@
                 <div class="text-xs font-bold text-amber-400">👑 荣耀榜首 · 积分之星</div>
                 <div class="text-lg font-black mt-0.5 text-amber-400">{{ pointsRankingList[0].name }} ({{ pointsRankingList[0].className }})</div>
                 <div class="text-3xl font-black text-amber-400 mt-2 font-mono">
-                  ⭐ {{ pointsRankingList[0].points }} <span class="text-xs text-stone-400 font-normal">可用画币</span>
+                  ⭐ {{ pointsRankingList[0].points }} <span class="text-xs text-black dark:text-stone-400 font-normal">可用画币</span>
                 </div>
-                <div class="text-xs text-stone-300 mt-1">累计获得: {{ pointsRankingList[0].totalPointsEarned }} 分</div>
+                <div class="text-xs text-black dark:text-stone-300 mt-1">累计获得: {{ pointsRankingList[0].totalPointsEarned }} 分</div>
               </div>
               <div class="flex gap-2 w-full mt-4 pt-3 border-t border-amber-500/20">
                 <button @click="openIndividualPointModal(pointsRankingList[0], 'add')" class="wf-btn-primary flex-1 text-xs py-1.5 justify-center">
@@ -547,9 +547,9 @@
                 <div class="text-xs font-bold text-amber-600">🥉 荣耀季军</div>
                 <div class="text-base font-black mt-0.5">{{ pointsRankingList[2].name }} ({{ pointsRankingList[2].className }})</div>
                 <div class="text-2xl font-black text-amber-500 mt-2 font-mono">
-                  ⭐ {{ pointsRankingList[2].points }} <span class="text-xs text-stone-400 font-normal">可用画币</span>
+                  ⭐ {{ pointsRankingList[2].points }} <span class="text-xs text-black dark:text-stone-400 font-normal">可用画币</span>
                 </div>
-                <div class="text-xs text-stone-400 mt-1">累计获得: {{ pointsRankingList[2].totalPointsEarned }} 分</div>
+                <div class="text-xs text-black dark:text-stone-400 mt-1">累计获得: {{ pointsRankingList[2].totalPointsEarned }} 分</div>
               </div>
               <div class="flex gap-2 w-full mt-4 pt-3 border-t border-black/10 dark:border-white/10">
                 <button @click="openIndividualPointModal(pointsRankingList[2], 'add')" class="wf-btn-primary flex-1 text-xs py-1.5 justify-center">
@@ -567,9 +567,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
             <div class="flex items-center gap-3 flex-1 max-w-xl">
               <div class="relative flex-1">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="pointsSearchQuery" type="text" placeholder="搜索小画家姓名..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
 
               <div class="relative">
@@ -577,7 +577,7 @@
                   <option value="all">🌈 全部班级</option>
                   <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
 
               <div class="relative">
@@ -585,7 +585,7 @@
                   <option value="points">⭐ 按当前可用积分</option>
                   <option value="total">🏆 按累计总获得积分</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
             </div>
 
@@ -599,7 +599,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap">排名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">小艺术家</th>
                   <th class="py-3.5 px-4 whitespace-nowrap">所在班级</th>
@@ -614,9 +614,9 @@
                 <tr v-for="stu in pointsRankingList" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
                   <td class="py-3.5 px-4 font-mono font-bold">
                     <span v-if="stu.rank === 1" class="text-amber-400 font-black">🥇 01</span>
-                    <span v-else-if="stu.rank === 2" class="text-stone-300 font-black">🥈 02</span>
+                    <span v-else-if="stu.rank === 2" class="text-black dark:text-stone-300 font-black">🥈 02</span>
                     <span v-else-if="stu.rank === 3" class="text-amber-600 font-black">🥉 03</span>
-                    <span v-else class="text-stone-400">#{{ stu.rank.toString().padStart(2, '0') }}</span>
+                    <span v-else class="text-black dark:text-stone-400">#{{ stu.rank.toString().padStart(2, '0') }}</span>
                   </td>
 
                   <td class="py-3.5 px-4 cursor-pointer group" @click="openStudentProfile(stu)" title="点击查看个人档案">
@@ -629,22 +629,22 @@
                           <span>{{ stu.name }}</span>
                           <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity"></i>
                         </div>
-                        <div class="text-[10px] text-stone-400">{{ stu.age }}岁</div>
+                        <div class="text-[10px] text-black dark:text-stone-400">{{ stu.age }}岁</div>
                       </div>
                     </div>
                   </td>
 
                   <td class="py-3.5 px-4">
-                    <span class="text-xs text-stone-400 font-medium">{{ stu.className }}</span>
+                    <span class="text-xs text-black dark:text-stone-400 font-medium">{{ stu.className }}</span>
                   </td>
 
                   <td class="py-3.5 px-4">
                     <span class="font-black font-mono text-base text-amber-400">
-                      ⭐ {{ stu.points || 0 }} <span class="text-xs font-normal text-stone-400">分</span>
+                      ⭐ {{ stu.points || 0 }} <span class="text-xs font-normal text-black dark:text-stone-400">分</span>
                     </span>
                   </td>
 
-                  <td class="py-3.5 px-4 font-mono text-stone-300 font-bold">
+                  <td class="py-3.5 px-4 font-mono text-black dark:text-stone-300 font-bold">
                     {{ stu.totalPointsEarned || 0 }} 分
                   </td>
 
@@ -654,7 +654,7 @@
                     </span>
                   </td>
 
-                  <td class="py-3.5 px-4 hidden md:table-cell text-xs text-stone-400 font-mono">
+                  <td class="py-3.5 px-4 hidden md:table-cell text-xs text-black dark:text-stone-400 font-mono">
                     {{ stu.parentName }} ({{ stu.parentPhone }})
                   </td>
 
@@ -665,7 +665,7 @@
                     <button @click="openIndividualPointModal(stu, 'redeem')" class="wf-btn-outline text-xs py-1 px-2.5 text-amber-400 border-amber-500/30">
                       🎁 兑换
                     </button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-stone-400 hover:text-emerald-400 font-medium">
+                    <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400 font-medium">
                       档案 ↗
                     </button>
                   </td>
@@ -724,8 +724,8 @@
         <!-- 视图 1: 班级管理系统 (极简优雅卡片流) -->
         <div v-if="rosterSubTab === 'classes'" class="space-y-4">
           
-          <div class="flex items-center justify-between text-xs text-stone-400">
-            <div>正常开班：<strong class="text-stone-200">{{ activeClasses.length }}</strong> 班 · 在读学员：<strong class="text-stone-200">{{ activeStudents.length }}</strong> 人</div>
+          <div class="flex items-center justify-between text-xs text-black dark:text-stone-400">
+            <div>正常开班：<strong class="text-black dark:text-stone-200">{{ activeClasses.length }}</strong> 班 · 在读学员：<strong class="text-black dark:text-stone-200">{{ activeStudents.length }}</strong> 人</div>
             <button @click="exportClassAttendanceCSV('all')" class="text-emerald-400 hover:underline font-bold flex items-center gap-1">
               <i class="fa-solid fa-file-csv"></i>
               <span>导出全校考勤表</span>
@@ -745,7 +745,7 @@
                       <span>{{ cls.name }}</span>
                       <i class="fa-solid fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity"></i>
                     </h4>
-                    <p class="text-xs text-stone-400 font-mono mt-1">
+                    <p class="text-xs text-black dark:text-stone-400 font-mono mt-1">
                       {{ cls.schedule }} · {{ cls.classroom || '梨香画坊' }}
                     </p>
                   </div>
@@ -768,16 +768,16 @@
                       {{ stu.name.charAt(0) }}
                     </div>
                     <div v-if="activeStudents.filter(s => s.classId === cls.id).length > 6"
-                      class="w-7 h-7 rounded-full border-2 border-[var(--bg-surface)] flex items-center justify-center font-mono text-[10px] font-bold text-stone-400"
+                      class="w-7 h-7 rounded-full border-2 border-[var(--bg-surface)] flex items-center justify-center font-mono text-[10px] font-bold text-black dark:text-stone-400"
                       style="background-color: var(--bg-surface-subtle);">
                       +{{ activeStudents.filter(s => s.classId === cls.id).length - 6 }}
                     </div>
-                    <span v-if="activeStudents.filter(s => s.classId === cls.id).length === 0" class="text-xs text-stone-400 italic">
+                    <span v-if="activeStudents.filter(s => s.classId === cls.id).length === 0" class="text-xs text-black dark:text-stone-400 italic">
                       暂无在读学员
                     </span>
                   </div>
 
-                  <span class="text-xs text-stone-400 font-medium">
+                  <span class="text-xs text-black dark:text-stone-400 font-medium">
                     {{ cls.teacher || '陈老师' }}
                   </span>
                 </div>
@@ -806,7 +806,7 @@
                   <button @click="openEditClass(cls)" title="编辑班级" class="wf-btn-outline text-xs p-1.5">
                     <i class="fa-solid fa-pen"></i>
                   </button>
-                  <button @click="archiveClass(cls)" title="归档班级" class="wf-btn-outline text-xs p-1.5 text-stone-400 hover:text-amber-400">
+                  <button @click="archiveClass(cls)" title="归档班级" class="wf-btn-outline text-xs p-1.5 text-black dark:text-stone-400 hover:text-amber-400">
                     <i class="fa-solid fa-box-archive"></i>
                   </button>
                 </div>
@@ -831,13 +831,13 @@
                     🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)
                   </option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs pointer-events-none"></i>
               </div>
 
               <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="rosterStudentSearch" type="text" placeholder="搜索学员姓名/电话..."
-                  class="w-48 sm:w-56 pl-9 pr-3 py-1.5 wf-input text-xs placeholder:text-stone-400">
+                  class="w-48 sm:w-56 pl-9 pr-3 py-1.5 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
             </div>
 
@@ -856,7 +856,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">学员姓名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">年龄/性别</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所属班级</th>
@@ -884,13 +884,13 @@
                   </td>
 
                   <!-- 年龄/性别 (单行) -->
-                  <td class="py-3 px-4 text-stone-400 whitespace-nowrap">
+                  <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">
                     <span class="font-mono">{{ s.age }}</span>岁 · {{ s.gender }}
                   </td>
 
                   <!-- 所属班级 (单行高雅线框) -->
                   <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="font-bold text-stone-300">{{ getClassById(s.classId).name }}</span>
+                    <span class="font-bold text-black dark:text-stone-300">{{ getClassById(s.classId).name }}</span>
                   </td>
 
                   <!-- 剩余课时 (精致线框胶囊) -->
@@ -912,13 +912,13 @@
                   </td>
 
                   <!-- 家长联系方式 -->
-                  <td class="py-3 px-4 font-mono text-stone-400 whitespace-nowrap">
-                    <span class="text-stone-300 font-semibold">{{ s.parentName }}</span>
-                    <span class="text-stone-500 ml-1">({{ s.parentPhone }})</span>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 whitespace-nowrap">
+                    <span class="text-black dark:text-stone-300 font-semibold">{{ s.parentName }}</span>
+                    <span class="text-black dark:text-stone-400 ml-1">({{ s.parentPhone }})</span>
                   </td>
 
                   <!-- 备注 -->
-                  <td class="py-3 px-4 text-stone-400 text-xs truncate max-w-xs" :title="s.notes || ''">
+                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs truncate max-w-xs" :title="s.notes || ''">
                     {{ s.notes || '-' }}
                   </td>
 
@@ -930,10 +930,10 @@
                     <button @click="openRecharge(s)" class="px-2 py-1 rounded-lg text-xs text-emerald-400 hover:bg-emerald-500/10 font-bold transition">
                       续费
                     </button>
-                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded-lg text-xs text-stone-400 hover:text-stone-200 hover:bg-white/5 transition">
+                    <button @click="openEditStudent(s)" class="px-2 py-1 rounded-lg text-xs text-black dark:text-stone-400 hover:text-black dark:text-stone-200 hover:bg-white/5 transition">
                       编辑
                     </button>
-                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded-lg text-xs text-stone-400 hover:text-amber-400 hover:bg-amber-500/10 transition">
+                    <button @click="archiveStudent(s)" title="归档该学员" class="px-2 py-1 rounded-lg text-xs text-black dark:text-stone-400 hover:text-amber-400 hover:bg-amber-500/10 transition">
                       归档
                     </button>
                     <button @click="deleteStudent(s)" class="px-2 py-1 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition">
@@ -944,7 +944,7 @@
                 </tr>
 
                 <tr v-if="currentClassStudentsList.length === 0">
-                  <td colspan="8" class="py-12 text-center text-stone-400 text-xs">
+                  <td colspan="8" class="py-12 text-center text-black dark:text-stone-400 text-xs">
                     未找到在读学员，点击上方【录入新学员】添加
                   </td>
                 </tr>
@@ -959,18 +959,18 @@
           
           <div class="wf-card p-4 space-y-1">
             <h4 class="font-bold text-sm">🗄️ 教务历史归档库</h4>
-            <p class="text-xs text-stone-400">已结课班级与毕业学员档案安全存放，所有历史考勤、积分流水与账单永久留存，可随时一键恢复。</p>
+            <p class="text-xs text-black dark:text-stone-400">已结课班级与毕业学员档案安全存放，所有历史考勤、积分流水与账单永久留存，可随时一键恢复。</p>
           </div>
 
           <!-- 已归档班级 -->
           <div class="space-y-3">
-            <h4 class="font-bold text-xs text-stone-400 uppercase tracking-wider">已归档结课班级 ({{ archivedClasses.length }})</h4>
+            <h4 class="font-bold text-xs text-black dark:text-stone-400 uppercase tracking-wider">已归档结课班级 ({{ archivedClasses.length }})</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div v-for="cls in archivedClasses" :key="cls.id"
                 class="wf-card p-4 flex items-center justify-between">
                 <div>
-                  <h5 class="font-bold text-sm line-through text-stone-400">{{ cls.name }}</h5>
-                  <p class="text-xs text-stone-500 font-mono mt-0.5">归档时间: {{ cls.archivedAt }} · 老师: {{ cls.teacher }}</p>
+                  <h5 class="font-bold text-sm line-through text-black dark:text-stone-400">{{ cls.name }}</h5>
+                  <p class="text-xs text-black dark:text-stone-400 font-mono mt-0.5">归档时间: {{ cls.archivedAt }} · 老师: {{ cls.teacher }}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <button @click="unarchiveClass(cls)" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
@@ -982,7 +982,7 @@
                   </button>
                 </div>
               </div>
-              <div v-if="archivedClasses.length === 0" class="col-span-full py-6 text-center text-xs text-stone-400">
+              <div v-if="archivedClasses.length === 0" class="col-span-full py-6 text-center text-xs text-black dark:text-stone-400">
                 暂无已归档班级
               </div>
             </div>
@@ -990,11 +990,11 @@
 
           <!-- 已归档学员 -->
           <div class="space-y-3">
-            <h4 class="font-bold text-xs text-stone-400 uppercase tracking-wider">已毕业/归档学员 ({{ archivedStudents.length }})</h4>
+            <h4 class="font-bold text-xs text-black dark:text-stone-400 uppercase tracking-wider">已毕业/归档学员 ({{ archivedStudents.length }})</h4>
             <div class="overflow-x-auto w-full wf-card">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                     <th class="py-3 px-4">学员姓名</th>
                     <th class="py-3 px-4">原所在班级</th>
                     <th class="py-3 px-4">毕业/归档时间</th>
@@ -1007,11 +1007,11 @@
                 <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                   <tr v-for="stu in archivedStudents" :key="stu.id">
                     <td class="py-3 px-4 font-bold">{{ stu.name }}</td>
-                    <td class="py-3 px-4 text-stone-400">{{ getClassById(stu.classId).name }}</td>
-                    <td class="py-3 px-4 text-stone-400 font-mono">{{ stu.archivedAt || '-' }}</td>
+                    <td class="py-3 px-4 text-black dark:text-stone-400">{{ getClassById(stu.classId).name }}</td>
+                    <td class="py-3 px-4 text-black dark:text-stone-400 font-mono">{{ stu.archivedAt || '-' }}</td>
                     <td class="py-3 px-4 font-mono">{{ stu.totalConsumed || 0 }} 节</td>
                     <td class="py-3 px-4 font-mono text-amber-400">⭐ {{ stu.totalPointsEarned || 0 }} 分</td>
-                    <td class="py-3 px-4 text-stone-400 italic">{{ stu.notes || '-' }}</td>
+                    <td class="py-3 px-4 text-black dark:text-stone-400 italic">{{ stu.notes || '-' }}</td>
                     <td class="py-3 px-4 text-right space-x-2">
                       <button @click="unarchiveStudent(stu)" class="text-xs text-emerald-400 font-bold hover:underline">
                         恢复在读
@@ -1023,7 +1023,7 @@
                   </tr>
 
                   <tr v-if="archivedStudents.length === 0">
-                    <td colspan="7" class="py-6 text-center text-xs text-stone-400">
+                    <td colspan="7" class="py-6 text-center text-xs text-black dark:text-stone-400">
                       暂无已归档的学员
                     </td>
                   </tr>
@@ -1049,7 +1049,7 @@
               <span>返回班级列表</span>
             </button>
             <div class="h-4 w-[1px] bg-black/10 dark:border-white/10 hidden sm:block"></div>
-            <div class="text-xs text-stone-400 font-mono hidden sm:block">
+            <div class="text-xs text-black dark:text-stone-400 font-mono hidden sm:block">
               班级管理 / {{ selectedClassDetail.name }}
             </div>
           </div>
@@ -1091,14 +1091,14 @@
                   {{ classDetailStats.studentCount }}/{{ classDetailStats.capacity }} 人 ({{ classDetailStats.studentCount >= classDetailStats.capacity ? '已满班' : '可报读' }})
                 </span>
               </div>
-              <p class="text-xs text-stone-400 flex items-center gap-2 flex-wrap">
-                <span>时段：<strong class="text-stone-200">{{ selectedClassDetail.schedule }}</strong></span>
+              <p class="text-xs text-black dark:text-stone-400 flex items-center gap-2 flex-wrap">
+                <span>时段：<strong class="text-black dark:text-stone-200">{{ selectedClassDetail.schedule }}</strong></span>
                 <span>·</span>
                 <span>画坊：{{ selectedClassDetail.classroom || '梨香画坊' }}</span>
                 <span>·</span>
-                <span>主讲老师：<strong class="text-stone-200">{{ selectedClassDetail.teacher }}</strong></span>
+                <span>主讲老师：<strong class="text-black dark:text-stone-200">{{ selectedClassDetail.teacher }}</strong></span>
                 <span v-if="selectedClassDetail.notes">·</span>
-                <span v-if="selectedClassDetail.notes" class="italic text-stone-300">{{ selectedClassDetail.notes }}</span>
+                <span v-if="selectedClassDetail.notes" class="italic text-black dark:text-stone-300">{{ selectedClassDetail.notes }}</span>
               </p>
             </div>
           </div>
@@ -1107,42 +1107,42 @@
         <!-- 4 维班级指标卡 -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">班级在读人数</div>
+            <div class="text-xs text-black dark:text-stone-400">班级在读人数</div>
             <div class="text-3xl font-black font-mono"
               :class="classDetailStats.studentCount >= classDetailStats.capacity ? 'text-amber-400' : 'text-emerald-400'">
-              {{ classDetailStats.studentCount }} <span class="text-xs font-normal text-stone-400">/ {{ classDetailStats.capacity }} 人</span>
+              {{ classDetailStats.studentCount }} <span class="text-xs font-normal text-black dark:text-stone-400">/ {{ classDetailStats.capacity }} 人</span>
             </div>
-            <div class="text-[11px] text-stone-400 font-mono">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono">
               班级容量满载率：{{ ((classDetailStats.studentCount / classDetailStats.capacity) * 100).toFixed(0) }}%
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">本班累计消课</div>
+            <div class="text-xs text-black dark:text-stone-400">本班累计消课</div>
             <div class="text-3xl font-black font-mono text-emerald-400">
-              {{ classDetailStats.totalConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
+              {{ classDetailStats.totalConsumed }} <span class="text-xs font-normal text-black dark:text-stone-400">节</span>
             </div>
-            <div class="text-[11px] text-stone-400">
+            <div class="text-[11px] text-black dark:text-stone-400">
               已完成考勤：{{ classDetailStats.totalSessions }} 节课
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">班级平均出勤率</div>
+            <div class="text-xs text-black dark:text-stone-400">班级平均出勤率</div>
             <div class="text-3xl font-black font-mono text-[#10E57A]">
               {{ classDetailStats.attendanceRate }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono">
               全员到课情况良好
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">本班画币积分池</div>
+            <div class="text-xs text-black dark:text-stone-400">本班画币积分池</div>
             <div class="text-3xl font-black font-mono text-amber-400">
-              ⭐ {{ classDetailStats.pointsPool }} <span class="text-xs font-normal text-stone-400">分</span>
+              ⭐ {{ classDetailStats.pointsPool }} <span class="text-xs font-normal text-black dark:text-stone-400">分</span>
             </div>
-            <div class="text-[11px] text-stone-400">
+            <div class="text-[11px] text-black dark:text-stone-400">
               全员可用画币奖励总额
             </div>
           </div>
@@ -1183,7 +1183,7 @@
           <div v-if="classDetailSubTab === 'students'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">学员姓名</th>
                   <th class="py-4 px-4 whitespace-nowrap">年龄/性别</th>
                   <th class="py-4 px-4 whitespace-nowrap">剩余课时</th>
@@ -1209,7 +1209,7 @@
                     </div>
                   </td>
 
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ stu.age }}岁 · {{ stu.gender }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ stu.age }}岁 · {{ stu.gender }}</td>
                   <td class="py-3.5 px-4 font-bold font-mono whitespace-nowrap"
                     :class="stu.remainHours <= 0 ? 'text-rose-400' : stu.remainHours <= 3 ? 'text-amber-400' : 'text-[#10E57A]'">
                     {{ stu.remainHours }} 节
@@ -1222,19 +1222,19 @@
                     </button>
                   </td>
 
-                  <td class="py-3.5 px-4 font-mono text-stone-300 whitespace-nowrap">{{ stu.totalConsumed || 0 }} 节</td>
-                  <td class="py-3.5 px-4 font-mono text-stone-400 whitespace-nowrap">{{ stu.parentName }} ({{ stu.parentPhone }})</td>
-                  <td class="py-3.5 px-4 text-stone-400 text-xs italic">{{ stu.notes || '-' }}</td>
+                  <td class="py-3.5 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ stu.totalConsumed || 0 }} 节</td>
+                  <td class="py-3.5 px-4 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ stu.parentName }} ({{ stu.parentPhone }})</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 text-xs italic">{{ stu.notes || '-' }}</td>
                   <td class="py-3.5 px-5 text-right space-x-2 whitespace-nowrap">
                     <button @click="openIndividualPointModal(stu, 'add')" class="text-xs text-amber-400 font-bold hover:underline">⭐ 变更积分</button>
                     <button @click="openRecharge(stu)" class="text-xs text-emerald-400 font-bold hover:underline">续费</button>
-                    <button @click="openEditStudent(stu)" class="text-stone-400 hover:text-emerald-400">编辑</button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-stone-400 hover:text-emerald-400">档案 ↗</button>
+                    <button @click="openEditStudent(stu)" class="text-black dark:text-stone-400 hover:text-emerald-400">编辑</button>
+                    <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400">档案 ↗</button>
                   </td>
                 </tr>
 
                 <tr v-if="classDetailStudents.length === 0">
-                  <td colspan="8" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="8" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     该班级暂无在读学员，点击上方【添加学员到本班】录入学员
                   </td>
                 </tr>
@@ -1246,7 +1246,7 @@
           <div v-if="classDetailSubTab === 'attendance'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">上课日期</th>
                   <th class="py-4 px-4 whitespace-nowrap">课程绘画主题</th>
                   <th class="py-4 px-4 whitespace-nowrap">任课老师</th>
@@ -1258,20 +1258,20 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="att in classDetailAttendance" :key="att.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3.5 px-5 font-mono text-stone-400 whitespace-nowrap">{{ att.date }}</td>
-                  <td class="py-3.5 px-4 font-black text-sm text-stone-100 whitespace-nowrap">{{ att.theme }}</td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ att.teacher }}</td>
+                  <td class="py-3.5 px-5 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ att.date }}</td>
+                  <td class="py-3.5 px-4 font-black text-sm text-black dark:text-stone-100 whitespace-nowrap">{{ att.theme }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ att.teacher }}</td>
                   <td class="py-3.5 px-4 font-mono font-bold text-emerald-400 whitespace-nowrap">{{ att.presentCount || 0 }} 人</td>
                   <td class="py-3.5 px-4 font-mono font-bold text-rose-400 whitespace-nowrap">{{ att.leaveCount || 0 }} 人</td>
                   <td class="py-3.5 px-4 font-mono font-bold text-purple-400 whitespace-nowrap">{{ att.holidayCount || 0 }} 人</td>
                   <td class="py-3.5 px-5 text-right whitespace-nowrap">
                     <button @click="goToAttendanceForClass(selectedClassDetail.id)" class="text-xs text-emerald-400 font-bold hover:underline mr-3">在大表查看</button>
-                    <button @click="deleteMatrixRow(att)" class="text-stone-400 hover:text-rose-400 text-xs">撤销/删除</button>
+                    <button @click="deleteMatrixRow(att)" class="text-black dark:text-stone-400 hover:text-rose-400 text-xs">撤销/删除</button>
                   </td>
                 </tr>
 
                 <tr v-if="classDetailAttendance.length === 0">
-                  <td colspan="7" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="7" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     该班级暂无考勤历史课次
                   </td>
                 </tr>
@@ -1283,7 +1283,7 @@
           <div v-if="classDetailSubTab === 'logs'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">记录时间</th>
                   <th class="py-4 px-4 whitespace-nowrap">学员姓名</th>
                   <th class="py-4 px-4 whitespace-nowrap">流水类型</th>
@@ -1295,7 +1295,7 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="log in classDetailLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3.5 px-5 font-mono text-stone-400 whitespace-nowrap">{{ log.time }}</td>
+                  <td class="py-3.5 px-5 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ log.time }}</td>
                   <td class="py-3.5 px-4 font-bold whitespace-nowrap">{{ log.studentName }}</td>
                   <td class="py-3.5 px-4 whitespace-nowrap">
                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full inline-block"
@@ -1303,16 +1303,16 @@
                       {{ log.type }}
                     </span>
                   </td>
-                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-stone-400'">
+                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-black dark:text-stone-400'">
                     {{ log.change > 0 ? '+' + log.change : log.change === 0 ? '0' : log.change }} 节
                   </td>
-                  <td class="py-3.5 px-4 font-bold font-mono text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
-                  <td class="py-3.5 px-5 text-stone-300">{{ log.relatedInfo }}</td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ log.operator || '陈老师' }}</td>
+                  <td class="py-3.5 px-4 font-bold font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
+                  <td class="py-3.5 px-5 text-black dark:text-stone-300">{{ log.relatedInfo }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ log.operator || '陈老师' }}</td>
                 </tr>
 
                 <tr v-if="classDetailLogs.length === 0">
-                  <td colspan="7" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="7" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     该班级暂无消课流水记录
                   </td>
                 </tr>
@@ -1340,7 +1340,7 @@
                 <i class="fa-solid fa-xmark text-[9px]"></i>
               </span>
             </div>
-            <p class="text-xs text-stone-400 mt-0.5">实时基于具体考勤信息汇总周/月消课产值；收费充值与课消流水全链路留痕。</p>
+            <p class="text-xs text-black dark:text-stone-400 mt-0.5">实时基于具体考勤信息汇总周/月消课产值；收费充值与课消流水全链路留痕。</p>
           </div>
 
           <div class="flex items-center gap-2">
@@ -1358,17 +1358,17 @@
           <div @click="selectFinanceKpi('month')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">📅 本月收费入账</span>
+            <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-black dark:text-stone-300">📅 本月收费入账</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'month' ? '已下钻 ▾' : '当月实收 ↗' }}
               </span>
             </div>
             <div class="text-3xl font-black font-mono text-emerald-400">
               ¥ {{ financeStats.monthIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>当月入账 {{ financeStats.monthOrderCount }} 笔</span>
               <span class="text-[10px] text-emerald-400 font-bold hover:underline">查看明细 ↗</span>
             </div>
@@ -1378,19 +1378,19 @@
           <div @click="selectFinanceKpi('year')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'year' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">📈 本年累计营收</span>
+            <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-black dark:text-stone-300">📈 本年累计营收</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'year' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'year' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'year' ? '已下钻 ▾' : '年度拆解 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-stone-100">
+            <div class="text-3xl font-black font-mono text-black dark:text-stone-100">
               ¥ {{ financeStats.yearIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>本年累计 {{ financeStats.yearOrderCount }} 笔订单</span>
-              <span class="text-[10px] text-stone-300 font-bold hover:underline">月度趋势 ↗</span>
+              <span class="text-[10px] text-black dark:text-stone-300 font-bold hover:underline">月度趋势 ↗</span>
             </div>
           </div>
 
@@ -1398,19 +1398,19 @@
           <div @click="selectFinanceKpi('total')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'total' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">💎 机构累计总营收</span>
+            <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-black dark:text-stone-300">💎 机构累计总营收</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'total' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'total' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'total' ? '已下钻 ▾' : '历史总额 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-stone-100">
+            <div class="text-3xl font-black font-mono text-black dark:text-stone-100">
               ¥ {{ financeStats.totalIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>全校总消课 {{ consumptionSummaryKPI.totalAllConsumed }} 节</span>
-              <span class="text-[10px] text-stone-300 font-bold hover:underline">历史总账 ↗</span>
+              <span class="text-[10px] text-black dark:text-stone-300 font-bold hover:underline">历史总账 ↗</span>
             </div>
           </div>
 
@@ -1418,17 +1418,17 @@
           <div @click="selectFinanceKpi('renewal')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">⏳ 待续费预估收入</span>
+            <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-black dark:text-stone-300">⏳ 待续费预估收入</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'bg-amber-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'bg-amber-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">
                 {{ financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? '已展开 ▾' : '需提醒 ↗' }}
               </span>
             </div>
             <div class="text-3xl font-black font-mono text-amber-400">
               ¥ {{ financeStats.potentialRenewalIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>共有 <strong class="text-amber-400">{{ financeStats.warningCount }}</strong> 位学员待续费</span>
               <span class="text-[10px] text-amber-400 font-bold hover:underline">查看名单 ↗</span>
             </div>
@@ -1444,7 +1444,7 @@
                 <i class="fa-solid fa-chart-simple text-emerald-400"></i>
                 <span>{{ financeStats.currentYear }} 年度月度营收与收费进度拆解</span>
               </h4>
-              <p class="text-xs text-stone-400 mt-0.5">点击下方任意月份卡片，可直接快速过滤查看该月份的所有入账订单。</p>
+              <p class="text-xs text-black dark:text-stone-400 mt-0.5">点击下方任意月份卡片，可直接快速过滤查看该月份的所有入账订单。</p>
             </div>
 
             <button @click="selectedBreakdownYM = ''" class="wf-btn-outline text-xs py-1 px-2.5">
@@ -1459,7 +1459,7 @@
               class="wf-card p-3 cursor-pointer transition flex flex-col justify-between space-y-2">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-xs font-mono">{{ m.ym }}</span>
-                <span class="text-[10px] text-stone-400 font-mono">{{ m.count }}笔</span>
+                <span class="text-[10px] text-black dark:text-stone-400 font-mono">{{ m.count }}笔</span>
               </div>
               <div class="text-lg font-black font-mono text-emerald-400">
                 ¥{{ (m.total || 0).toLocaleString() }}
@@ -1479,7 +1479,7 @@
                 <i class="fa-solid fa-gem text-amber-400"></i>
                 <span>机构历年累计营收资产总账 ({{ yearlyRevenueHistory.length }} 年统计)</span>
               </h4>
-              <p class="text-xs text-stone-400 mt-0.5">机构历年累计总收费、累计总消课课时与全校消课总产值沉淀。</p>
+              <p class="text-xs text-black dark:text-stone-400 mt-0.5">机构历年累计总收费、累计总消课课时与全校消课总产值沉淀。</p>
             </div>
           </div>
 
@@ -1487,13 +1487,13 @@
             <div v-for="y in yearlyRevenueHistory" :key="y.year"
               class="wf-card p-4 flex flex-col justify-between space-y-2">
               <div class="flex items-center justify-between">
-                <span class="font-bold text-sm font-mono text-stone-200">{{ y.year }} 年度</span>
-                <span class="text-xs text-stone-400 font-mono">{{ y.count }} 笔订单</span>
+                <span class="font-bold text-sm font-mono text-black dark:text-stone-200">{{ y.year }} 年度</span>
+                <span class="text-xs text-black dark:text-stone-400 font-mono">{{ y.count }} 笔订单</span>
               </div>
               <div class="text-2xl font-black font-mono text-emerald-400">
                 ¥ {{ (y.total || 0).toLocaleString() }}
               </div>
-              <div class="text-xs text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/10 dark:border-white/10">
+              <div class="text-xs text-black dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/10 dark:border-white/10">
                 <span>充值总课时: {{ y.hours }} 节</span>
                 <span class="text-emerald-400">稳健增长</span>
               </div>
@@ -1576,9 +1576,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
             <div class="flex items-center gap-3 flex-1 max-w-2xl flex-wrap">
               <div class="relative flex-1 min-w-[220px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="financeSearchQuery" type="text" placeholder="搜索订单号 / 学员姓名 / 备注 / 经办人..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
 
               <div class="relative">
@@ -1589,7 +1589,7 @@
                   <option value="现金">现金</option>
                   <option value="银行转账">银行转账</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
 
               <!-- 当月/月份快速下钻标签 -->
@@ -1614,7 +1614,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">订单编号</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">缴费时间</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
@@ -1628,8 +1628,8 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="order in filteredPaymentOrders" :key="order.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ order.id }}</td>
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ order.payDate }}</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.id }}</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.payDate }}</td>
                   <td class="py-3 px-4 font-bold whitespace-nowrap">
                     <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
                       class="cursor-pointer hover:text-emerald-400 transition" title="点击查看个人档案">
@@ -1649,8 +1649,8 @@
                       {{ order.payMethod || '微信支付' }}
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ order.remark || '-' }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ order.remark || '-' }}</td>
                   <td class="py-3 px-4 text-right whitespace-nowrap">
                     <button @click="openReceiptModal(order)" class="wf-btn-outline text-xs py-1 px-2.5 text-emerald-400 border-emerald-500/30">
                       <i class="fa-solid fa-receipt mr-1"></i>
@@ -1660,7 +1660,7 @@
                 </tr>
 
                 <tr v-if="filteredPaymentOrders.length === 0">
-                  <td colspan="9" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="9" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     未检索到符合条件的学员缴费收费订单，点击上方【清除筛选】或切换月份
                   </td>
                 </tr>
@@ -1681,15 +1681,15 @@
             <!-- 本周教学消课 -->
             <div @click="consumptionPeriodType = 'week'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
               :class="consumptionPeriodType === 'week' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">📅 本周教学消课</span>
+              <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+                <span class="font-bold text-black dark:text-stone-300">📅 本周教学消课</span>
                 <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                  :class="consumptionPeriodType === 'week' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">周度</span>
+                  :class="consumptionPeriodType === 'week' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">周度</span>
               </div>
               <div class="text-2xl font-black font-mono text-emerald-400">
-                {{ consumptionSummaryKPI.thisWeekConsumed }} <span class="text-xs font-normal text-stone-400">节课时</span>
+                {{ consumptionSummaryKPI.thisWeekConsumed }} <span class="text-xs font-normal text-black dark:text-stone-400">节课时</span>
               </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
+              <div class="text-[11px] text-black dark:text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
                 <span>完成 {{ consumptionSummaryKPI.thisWeekSessions }} 堂课</span>
                 <span class="font-mono text-emerald-400 font-bold">出勤率 {{ consumptionSummaryKPI.thisWeekRate }}</span>
               </div>
@@ -1698,15 +1698,15 @@
             <!-- 本月累计消课 -->
             <div @click="consumptionPeriodType = 'month'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
               :class="consumptionPeriodType === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">🗓️ 本月累计消课</span>
+              <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+                <span class="font-bold text-black dark:text-stone-300">🗓️ 本月累计消课</span>
                 <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                  :class="consumptionPeriodType === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">月度</span>
+                  :class="consumptionPeriodType === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-black dark:text-stone-400 bg-white/5'">月度</span>
               </div>
               <div class="text-2xl font-black font-mono text-emerald-400">
-                {{ consumptionSummaryKPI.thisMonthConsumed }} <span class="text-xs font-normal text-stone-400">节课时</span>
+                {{ consumptionSummaryKPI.thisMonthConsumed }} <span class="text-xs font-normal text-black dark:text-stone-400">节课时</span>
               </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
+              <div class="text-[11px] text-black dark:text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
                 <span>完成 {{ consumptionSummaryKPI.thisMonthSessions }} 堂课</span>
                 <span class="font-mono text-emerald-400 font-bold">出勤率 {{ consumptionSummaryKPI.thisMonthRate }}</span>
               </div>
@@ -1714,30 +1714,30 @@
 
             <!-- 当月消课教学价值 -->
             <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">💎 当月消课教学价值</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-stone-400 bg-white/5">产值折算</span>
+              <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+                <span class="font-bold text-black dark:text-stone-300">💎 当月消课教学价值</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-black dark:text-stone-400 bg-white/5">产值折算</span>
               </div>
               <div class="text-2xl font-black font-mono text-amber-400">
                 ¥ {{ consumptionSummaryKPI.thisMonthValue.toLocaleString() }}
               </div>
-              <div class="text-[11px] text-stone-400 pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
+              <div class="text-[11px] text-black dark:text-stone-400 pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
                 按行业标准课消价值估算
               </div>
             </div>
 
             <!-- 机构累计总消课 -->
             <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">📈 机构累计总消课</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-stone-400 bg-white/5">总览</span>
+              <div class="text-xs text-black dark:text-stone-400 flex items-center justify-between">
+                <span class="font-bold text-black dark:text-stone-300">📈 机构累计总消课</span>
+                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-black dark:text-stone-400 bg-white/5">总览</span>
               </div>
-              <div class="text-2xl font-black font-mono text-stone-100">
-                {{ consumptionSummaryKPI.totalAllConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
+              <div class="text-2xl font-black font-mono text-black dark:text-stone-100">
+                {{ consumptionSummaryKPI.totalAllConsumed }} <span class="text-xs font-normal text-black dark:text-stone-400">节</span>
               </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
+              <div class="text-[11px] text-black dark:text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
                 <span>总到课 {{ consumptionSummaryKPI.totalAllPresentCount }} 人次</span>
-                <span class="text-stone-300">总出勤 {{ consumptionSummaryKPI.totalAllRate }}</span>
+                <span class="text-black dark:text-stone-300">总出勤 {{ consumptionSummaryKPI.totalAllRate }}</span>
               </div>
             </div>
 
@@ -1778,14 +1778,14 @@
                   <option value="all">🌈 全部班级课消</option>
                   <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
 
               <div class="relative">
                 <select v-model="consumptionSelectedMonth" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer font-mono">
                   <option v-for="m in availableMonths" :key="m" :value="m">{{ m }} 月度</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
             </div>
           </div>
@@ -1795,7 +1795,7 @@
             <div class="overflow-x-auto w-full wf-card">
               <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
                 <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">统计月份</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">总消课课时</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">授课堂数</th>
@@ -1809,19 +1809,19 @@
                 <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                   <template v-for="m in monthlyConsumptionList" :key="m.monthKey">
                     <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="m.expanded = !m.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-sm text-stone-100 flex items-center gap-2">
-                        <i :class="m.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-stone-400"></i>
+                      <td class="py-3 px-4 font-bold font-mono text-sm text-black dark:text-stone-100 flex items-center gap-2">
+                        <i :class="m.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-black dark:text-stone-400"></i>
                         <span>{{ m.monthLabel }}</span>
                         <span v-if="m.monthKey === currentYearMonth" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-normal">当月</span>
                       </td>
                       <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
                         {{ m.consumedHours }} 节
                       </td>
-                      <td class="py-3 px-4 font-mono text-stone-300">{{ m.sessionCount }} 堂</td>
-                      <td class="py-3 px-4 font-mono text-stone-400">{{ m.totalHeadcount }} 人次</td>
+                      <td class="py-3 px-4 font-mono text-black dark:text-stone-300">{{ m.sessionCount }} 堂</td>
+                      <td class="py-3 px-4 font-mono text-black dark:text-stone-400">{{ m.totalHeadcount }} 人次</td>
                       <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ m.presentCount }} 人次</td>
                       <td class="py-3 px-4 font-mono text-rose-400">{{ m.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-stone-200">{{ m.attendanceRate }}</td>
+                      <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200">{{ m.attendanceRate }}</td>
                       <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
                         ¥ {{ (m.estimatedValue || 0).toLocaleString() }}
                       </td>
@@ -1831,17 +1831,17 @@
                     <tr v-if="m.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
                       <td colspan="8" class="p-3 pl-8">
                         <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-stone-400 font-bold mb-1">【{{ m.monthLabel }}】各班级具体消课明细：</div>
+                          <div class="text-[11px] text-black dark:text-stone-400 font-bold mb-1">【{{ m.monthLabel }}】各班级具体消课明细：</div>
                           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                             <div v-for="cItem in (m.sessions || [])" :key="cItem.id"
                               class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
                               <div>
-                                <div class="font-bold text-stone-200">{{ cItem.theme }}</div>
-                                <div class="text-[10px] text-stone-400 font-mono mt-0.5">{{ cItem.className }} · {{ cItem.date }}</div>
+                                <div class="font-bold text-black dark:text-stone-200">{{ cItem.theme }}</div>
+                                <div class="text-[10px] text-black dark:text-stone-400 font-mono mt-0.5">{{ cItem.className }} · {{ cItem.date }}</div>
                               </div>
                               <div class="text-right font-mono">
                                 <div class="font-bold text-emerald-400">{{ cItem.consumedHours }} 节</div>
-                                <div class="text-[10px] text-stone-400">到课 {{ cItem.presentCount }} 人</div>
+                                <div class="text-[10px] text-black dark:text-stone-400">到课 {{ cItem.presentCount }} 人</div>
                               </div>
                             </div>
                           </div>
@@ -1851,7 +1851,7 @@
                   </template>
 
                   <tr v-if="monthlyConsumptionList.length === 0">
-                    <td colspan="8" class="py-16 text-center text-stone-400 text-xs">
+                    <td colspan="8" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                       暂无符合条件的月度课消考勤数据
                     </td>
                   </tr>
@@ -1865,7 +1865,7 @@
             <div class="overflow-x-auto w-full wf-card">
               <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
                 <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[160px]">周度区间</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">周消课课时</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">排课堂数</th>
@@ -1878,17 +1878,17 @@
                 <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                   <template v-for="w in weeklyConsumptionList" :key="w.weekKey">
                     <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="w.expanded = !w.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-stone-100 flex items-center gap-2">
-                        <i :class="w.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-stone-400"></i>
+                      <td class="py-3 px-4 font-bold font-mono text-black dark:text-stone-100 flex items-center gap-2">
+                        <i :class="w.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-black dark:text-stone-400"></i>
                         <span>{{ w.weekLabel }}</span>
                       </td>
                       <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
                         {{ w.consumedHours }} 节
                       </td>
-                      <td class="py-3 px-4 font-mono text-stone-300">{{ w.sessionCount }} 堂</td>
+                      <td class="py-3 px-4 font-mono text-black dark:text-stone-300">{{ w.sessionCount }} 堂</td>
                       <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ w.presentCount }} 人次</td>
                       <td class="py-3 px-4 font-mono text-rose-400">{{ w.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-stone-200">{{ w.attendanceRate }}</td>
+                      <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200">{{ w.attendanceRate }}</td>
                       <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
                         ¥ {{ (w.estimatedValue || 0).toLocaleString() }}
                       </td>
@@ -1898,16 +1898,16 @@
                     <tr v-if="w.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
                       <td colspan="7" class="p-3 pl-8">
                         <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-stone-400 font-bold mb-1">【{{ w.weekLabel }}】具体授课考勤明细：</div>
+                          <div class="text-[11px] text-black dark:text-stone-400 font-bold mb-1">【{{ w.weekLabel }}】具体授课考勤明细：</div>
                           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                             <div v-for="sess in (w.sessions || [])" :key="sess.id"
                               class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
                               <div>
-                                <div class="font-bold text-stone-200 flex items-center gap-1">
+                                <div class="font-bold text-black dark:text-stone-200 flex items-center gap-1">
                                   <span>{{ sess.theme }}</span>
-                                  <span class="text-[10px] text-stone-400 font-normal">({{ sess.className }})</span>
+                                  <span class="text-[10px] text-black dark:text-stone-400 font-normal">({{ sess.className }})</span>
                                 </div>
-                                <div class="text-[10px] text-stone-400 font-mono mt-0.5">{{ sess.date }} · {{ sess.teacher }}</div>
+                                <div class="text-[10px] text-black dark:text-stone-400 font-mono mt-0.5">{{ sess.date }} · {{ sess.teacher }}</div>
                               </div>
                               <div class="text-right font-mono">
                                 <div class="font-bold text-emerald-400">{{ sess.consumedHours }} 节 (到课{{ sess.presentCount }}人)</div>
@@ -1921,7 +1921,7 @@
                   </template>
 
                   <tr v-if="weeklyConsumptionList.length === 0">
-                    <td colspan="7" class="py-16 text-center text-stone-400 text-xs">
+                    <td colspan="7" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                       暂无符合条件的周度课消数据
                     </td>
                   </tr>
@@ -1935,7 +1935,7 @@
             <div class="overflow-x-auto w-full wf-card">
               <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
                 <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">班级名称</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">上课时段</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">任课老师</th>
@@ -1954,13 +1954,13 @@
                         <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400"></i>
                       </span>
                     </td>
-                    <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ c.schedule }}</td>
-                    <td class="py-3 px-4 text-stone-300 whitespace-nowrap">{{ c.teacher }}</td>
-                    <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">{{ c.studentCount }} 人</td>
+                    <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ c.schedule }}</td>
+                    <td class="py-3 px-4 text-black dark:text-stone-300 whitespace-nowrap">{{ c.teacher }}</td>
+                    <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ c.studentCount }} 人</td>
                     <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
                       {{ c.totalConsumed }} 节
                     </td>
-                    <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">{{ c.totalSessions }} 堂</td>
+                    <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ c.totalSessions }} 堂</td>
                     <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ c.attendanceRate }}</td>
                     <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right whitespace-nowrap">
                       ¥ {{ (c.estimatedValue || 0).toLocaleString() }}
@@ -1976,7 +1976,7 @@
             <div class="overflow-x-auto w-full wf-card">
               <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
                 <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                  <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
                     <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">累计消课</th>
@@ -1992,11 +1992,11 @@
                     <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)">
                       <span class="group-hover:text-emerald-400 transition">{{ s.name }} ↗</span>
                     </td>
-                    <td class="py-3 px-4 text-stone-400 whitespace-nowrap">{{ s.className }}</td>
+                    <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ s.className }}</td>
                     <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
                       {{ s.totalConsumed }} 节
                     </td>
-                    <td class="py-3 px-4 font-mono font-bold text-stone-200 whitespace-nowrap">{{ s.presentCount }} 次</td>
+                    <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-200 whitespace-nowrap">{{ s.presentCount }} 次</td>
                     <td class="py-3 px-4 font-mono font-bold text-rose-400 whitespace-nowrap">{{ s.leaveCount }} 次</td>
                     <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ s.attendanceRate }}</td>
                     <td class="py-3 px-4 whitespace-nowrap">
@@ -2006,7 +2006,7 @@
                       </span>
                     </td>
                     <td class="py-3 px-4 text-right whitespace-nowrap">
-                      <button @click="openStudentProfile(s)" class="text-xs text-stone-400 hover:text-emerald-400 font-medium">查看档案 ↗</button>
+                      <button @click="openStudentProfile(s)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400 font-medium">查看档案 ↗</button>
                     </td>
                   </tr>
                 </tbody>
@@ -2024,7 +2024,7 @@
           <!-- 统一筛选与概览栏 -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
             <div class="flex items-center gap-3">
-              <div class="text-xs text-stone-400 font-mono">
+              <div class="text-xs text-black dark:text-stone-400 font-mono">
                 待续费预警共 <strong class="text-amber-400 font-bold text-sm">{{ renewalWarningStudents.length }}</strong> 人 · 预估待入账 <strong class="text-emerald-400 font-bold text-sm">¥{{ (financeStats.potentialRenewalIncome || 0).toLocaleString() }}</strong>
               </div>
             </div>
@@ -2040,7 +2040,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">剩余课时</th>
@@ -2065,7 +2065,7 @@
                     </div>
                   </td>
 
-                  <td class="py-3 px-4 text-stone-400 whitespace-nowrap">{{ stu.className }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ stu.className }}</td>
                   <td class="py-3 px-4 font-black font-mono text-sm whitespace-nowrap"
                     :class="stu.remainHours <= 0 ? 'text-rose-400' : 'text-amber-400'">
                     {{ stu.remainHours }} 节
@@ -2078,11 +2078,11 @@
                     </span>
                   </td>
 
-                  <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-300 whitespace-nowrap">
                     {{ stu.parentName }} ({{ stu.parentPhone }})
                   </td>
 
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap">
+                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap">
                     {{ stu.suggestedPackage }}
                   </td>
 
@@ -2094,14 +2094,14 @@
                     <button @click="openRecharge(stu)" class="wf-btn-primary text-xs py-1 px-2.5">
                       <span>录入续费</span>
                     </button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-stone-400 hover:text-emerald-400 font-medium">
+                    <button @click="openStudentProfile(stu)" class="text-xs text-black dark:text-stone-400 hover:text-emerald-400 font-medium">
                       档案 ↗
                     </button>
                   </td>
                 </tr>
 
                 <tr v-if="renewalWarningStudents.length === 0">
-                  <td colspan="8" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="8" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     太棒了！当前全校所有在读学员课时充足，暂无临期或耗尽学员。
                   </td>
                 </tr>
@@ -2120,9 +2120,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
             <div class="flex items-center gap-3 flex-1 max-w-xl">
               <div class="relative flex-1 min-w-[200px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="recordsSearchQuery" type="text" placeholder="搜索学员姓名 / 课程主题 / 经办人..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
 
               <div class="relative">
@@ -2133,7 +2133,7 @@
                   <option value="续费充值入账">续费充值入账</option>
                   <option value="考勤撤销返还">考勤撤销返还</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
             </div>
           </div>
@@ -2141,7 +2141,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
@@ -2153,7 +2153,7 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="log in filteredHourLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ log.time }}</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ log.time }}</td>
                   <td class="py-3 px-4 font-bold whitespace-nowrap">
                     <span @click="openStudentProfile(students.find(s => s.name === log.studentName) || { name: log.studentName })" 
                       class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
@@ -2167,16 +2167,16 @@
                     </span>
                   </td>
                   <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
-                    :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-stone-400'">
+                    :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-black dark:text-stone-400'">
                     {{ log.change > 0 ? '+' + log.change : log.change === 0 ? '0' : log.change }} 节
                   </td>
-                  <td class="py-3 px-4 font-mono font-bold text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ log.relatedInfo }}</td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap font-medium">{{ log.operator || '陈老师' }}</td>
+                  <td class="py-3 px-4 font-mono font-bold text-black dark:text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ log.relatedInfo }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap font-medium">{{ log.operator || '陈老师' }}</td>
                 </tr>
 
                 <tr v-if="filteredHourLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-stone-400 text-xs">
+                  <td colspan="7" class="py-12 text-center text-black dark:text-stone-400 text-xs">
                     未检索到符合条件的课时流水记录
                   </td>
                 </tr>
@@ -2195,9 +2195,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
             <div class="flex items-center gap-3 flex-1 max-w-xl">
               <div class="relative flex-1 min-w-[200px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs"></i>
                 <input v-model="recordsSearchQuery" type="text" placeholder="搜索学员姓名 / 原因 / 礼物名称..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-black dark:text-stone-400">
               </div>
 
               <div class="relative">
@@ -2209,7 +2209,7 @@
                   <option value="积分直接校准">积分直接校准</option>
                   <option value="礼物兑换">礼物兑换</option>
                 </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
+                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-[10px] pointer-events-none"></i>
               </div>
             </div>
           </div>
@@ -2217,7 +2217,7 @@
           <div class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
                   <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
@@ -2229,7 +2229,7 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="plog in filteredPointLogs" :key="plog.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ plog.time }}</td>
+                  <td class="py-3 px-4 font-mono text-black dark:text-stone-400 text-xs whitespace-nowrap">{{ plog.time }}</td>
                   <td class="py-3 px-4 font-bold whitespace-nowrap">
                     <span @click="openStudentProfile(students.find(s => s.name === plog.studentName) || { name: plog.studentName })" 
                       class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
@@ -2249,12 +2249,12 @@
                   <td class="py-3 px-4 font-mono font-bold text-amber-300 whitespace-nowrap">
                     ⭐ {{ plog.balanceAfter }} 分
                   </td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ plog.reason }}</td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap font-medium">{{ plog.operator || '陈老师' }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-300 text-xs">{{ plog.reason }}</td>
+                  <td class="py-3 px-4 text-black dark:text-stone-400 text-xs whitespace-nowrap font-medium">{{ plog.operator || '陈老师' }}</td>
                 </tr>
 
                 <tr v-if="filteredPointLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-stone-400 text-xs">
+                  <td colspan="7" class="py-12 text-center text-black dark:text-stone-400 text-xs">
                     未检索到符合条件的积分流水记录
                   </td>
                 </tr>
@@ -2278,7 +2278,7 @@
               <span>返回{{ profilePreviousTab === 'attendance' ? '考勤大表' : profilePreviousTab === 'ranking' ? '课时积分榜' : profilePreviousTab === 'class_detail' ? '班级主页' : '班级学员' }}</span>
             </button>
             <div class="h-4 w-[1px] bg-black/10 dark:border-white/10 hidden sm:block"></div>
-            <div class="text-xs text-stone-400 font-mono hidden sm:block">
+            <div class="text-xs text-black dark:text-stone-400 font-mono hidden sm:block">
               学员成长档案 / {{ profileStudent.name }}
             </div>
           </div>
@@ -2324,12 +2324,12 @@
                   {{ profileStudent.status || '在读' }}
                 </span>
               </div>
-              <p class="text-xs text-stone-400 flex items-center gap-2 flex-wrap">
-                <span>班级：<strong class="text-stone-200">{{ getClassById(profileStudent.classId).name }}</strong></span>
+              <p class="text-xs text-black dark:text-stone-400 flex items-center gap-2 flex-wrap">
+                <span>班级：<strong class="text-black dark:text-stone-200">{{ getClassById(profileStudent.classId).name }}</strong></span>
                 <span>·</span>
-                <span>家长联系方式：<strong class="text-stone-200">{{ profileStudent.parentName }}</strong> ({{ profileStudent.parentPhone }})</span>
+                <span>家长联系方式：<strong class="text-black dark:text-stone-200">{{ profileStudent.parentName }}</strong> ({{ profileStudent.parentPhone }})</span>
                 <span v-if="profileStudent.notes">·</span>
-                <span v-if="profileStudent.notes" class="italic text-stone-300">习惯备注：{{ profileStudent.notes }}</span>
+                <span v-if="profileStudent.notes" class="italic text-black dark:text-stone-300">习惯备注：{{ profileStudent.notes }}</span>
               </p>
             </div>
           </div>
@@ -2339,45 +2339,45 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">当前剩余课时</div>
+            <div class="text-xs text-black dark:text-stone-400">当前剩余课时</div>
             <div class="text-3xl font-black font-mono"
               :class="profileStudent.remainHours <= 0 ? 'text-rose-400' : profileStudent.remainHours <= 3 ? 'text-amber-400' : 'text-emerald-400'">
-              {{ profileStudent.remainHours }} <span class="text-xs font-normal text-stone-400">节</span>
+              {{ profileStudent.remainHours }} <span class="text-xs font-normal text-black dark:text-stone-400">节</span>
             </div>
-            <div class="text-[11px] text-stone-400 font-mono">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono">
               {{ profileStudent.remainHours <= 0 ? '已耗尽，需续费' : profileStudent.remainHours <= 3 ? '预警期，待提醒续费' : '课时充足' }}
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400 items-center justify-between flex">
+            <div class="text-xs text-black dark:text-stone-400 items-center justify-between flex">
               <span>可用画币积分</span>
               <span @click="openIndividualPointModal(profileStudent, 'add')" class="text-[10px] text-amber-400 cursor-pointer hover:underline">变更 ✏️</span>
             </div>
             <div class="text-3xl font-black font-mono text-amber-400">
-              ⭐ {{ profileStudent.points || 0 }} <span class="text-xs font-normal text-stone-400">分</span>
+              ⭐ {{ profileStudent.points || 0 }} <span class="text-xs font-normal text-black dark:text-stone-400">分</span>
             </div>
-            <div class="text-[11px] text-stone-400">
+            <div class="text-[11px] text-black dark:text-stone-400">
               累计总获得：{{ profileStudent.totalPointsEarned || 0 }} 分
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">出勤率统计</div>
+            <div class="text-xs text-black dark:text-stone-400">出勤率统计</div>
             <div class="text-3xl font-black font-mono text-[#10E57A]">
               {{ profileStudentStats.attendanceRate }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono">
               到课 {{ profileStudentStats.presentCount }} 节 · 请假未到 {{ profileStudentStats.leaveCount }} 节
             </div>
           </div>
 
           <div class="wf-card p-5 space-y-1">
-            <div class="text-xs text-stone-400">累计消课与兑换</div>
+            <div class="text-xs text-black dark:text-stone-400">累计消课与兑换</div>
             <div class="text-3xl font-black font-mono text-emerald-400">
-              {{ profileStudent.totalConsumed || 0 }} <span class="text-xs font-normal text-stone-400">节</span>
+              {{ profileStudent.totalConsumed || 0 }} <span class="text-xs font-normal text-black dark:text-stone-400">节</span>
             </div>
-            <div class="text-[11px] text-stone-400">
+            <div class="text-[11px] text-black dark:text-stone-400">
               已兑换礼物：<strong class="text-amber-300">{{ profileStudent.redeemedCount || 0 }}</strong> 件
             </div>
           </div>
@@ -2419,7 +2419,7 @@
           <div v-if="profileSubTab === 'attendance'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">上课日期</th>
                   <th class="py-4 px-4 whitespace-nowrap">课程绘画主题</th>
                   <th class="py-4 px-4 whitespace-nowrap">所属班级</th>
@@ -2431,26 +2431,26 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="att in profileStudentAttendanceList" :key="att.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3.5 px-5 font-mono text-stone-400 whitespace-nowrap">{{ att.date }}</td>
-                  <td class="py-3.5 px-4 font-black text-sm text-stone-100 whitespace-nowrap">{{ att.theme }}</td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ att.className }}</td>
+                  <td class="py-3.5 px-5 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ att.date }}</td>
+                  <td class="py-3.5 px-4 font-black text-sm text-black dark:text-stone-100 whitespace-nowrap">{{ att.theme }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ att.className }}</td>
                   <td class="py-3.5 px-4 whitespace-nowrap">
                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full inline-block"
                       :class="att.status === '到课' ? 'wf-badge-green' : att.status === '未到' || att.status === '请假' ? 'wf-badge-red' : 'wf-badge-purple'">
                       {{ att.status }}
                     </span>
                   </td>
-                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="att.deductHours > 0 ? 'text-rose-400' : 'text-stone-400'">
+                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="att.deductHours > 0 ? 'text-rose-400' : 'text-black dark:text-stone-400'">
                     {{ att.deductHours > 0 ? '-' + att.deductHours + ' 节' : '0 节' }}
                   </td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ att.teacher }}</td>
-                  <td class="py-3.5 px-5 text-stone-300">
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ att.teacher }}</td>
+                  <td class="py-3.5 px-5 text-black dark:text-stone-300">
                     {{ att.note || '-' }}
                   </td>
                 </tr>
 
                 <tr v-if="profileStudentAttendanceList.length === 0">
-                  <td colspan="7" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="7" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     该学员暂无历史考勤课次记录
                   </td>
                 </tr>
@@ -2462,7 +2462,7 @@
           <div v-if="profileSubTab === 'points'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">记录时间</th>
                   <th class="py-4 px-4 whitespace-nowrap">变动类型</th>
                   <th class="py-4 px-4 whitespace-nowrap">画币变动</th>
@@ -2473,7 +2473,7 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="plog in profileStudentPointLogs" :key="plog.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3.5 px-5 font-mono text-stone-400 whitespace-nowrap">{{ plog.time }}</td>
+                  <td class="py-3.5 px-5 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ plog.time }}</td>
                   <td class="py-3.5 px-4 whitespace-nowrap">
                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full inline-block"
                       :class="plog.points > 0 ? 'wf-badge-gold' : 'wf-badge-purple'">
@@ -2487,12 +2487,12 @@
                   <td class="py-3.5 px-4 font-mono font-bold text-amber-300 whitespace-nowrap">
                     ⭐ {{ plog.balanceAfter }} 分
                   </td>
-                  <td class="py-3.5 px-5 text-stone-300">{{ plog.reason }}</td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ plog.operator || '陈老师' }}</td>
+                  <td class="py-3.5 px-5 text-black dark:text-stone-300">{{ plog.reason }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ plog.operator || '陈老师' }}</td>
                 </tr>
 
                 <tr v-if="profileStudentPointLogs.length === 0">
-                  <td colspan="6" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="6" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     暂无积分变动明细，点击右上角【变更画币积分】开始发放
                   </td>
                 </tr>
@@ -2504,7 +2504,7 @@
           <div v-if="profileSubTab === 'logs'" class="overflow-x-auto w-full wf-card">
             <table class="w-full text-left text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400" style="background-color: var(--bg-surface-subtle);">
+                <tr class="border-b border-black/10 dark:border-white/10 text-black dark:text-stone-400" style="background-color: var(--bg-surface-subtle);">
                   <th class="py-4 px-5 whitespace-nowrap">记录时间</th>
                   <th class="py-4 px-4 whitespace-nowrap">流水类型</th>
                   <th class="py-4 px-4 whitespace-nowrap">课时变动</th>
@@ -2515,23 +2515,23 @@
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
                 <tr v-for="log in profileStudentLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3.5 px-5 font-mono text-stone-400 whitespace-nowrap">{{ log.time }}</td>
+                  <td class="py-3.5 px-5 font-mono text-black dark:text-stone-400 whitespace-nowrap">{{ log.time }}</td>
                   <td class="py-3.5 px-4 font-bold whitespace-nowrap">
                     <span class="text-xs font-bold px-2.5 py-0.5 rounded-full inline-block"
                       :class="log.change > 0 ? 'wf-badge-green' : log.change < 0 ? 'wf-badge-red' : 'wf-badge-yellow'">
                       {{ log.type }}
                     </span>
                   </td>
-                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-stone-400'">
+                  <td class="py-3.5 px-4 font-mono font-bold whitespace-nowrap" :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-black dark:text-stone-400'">
                     {{ log.change > 0 ? '+' + log.change : log.change === 0 ? '0' : log.change }} 节
                   </td>
-                  <td class="py-3.5 px-4 font-bold font-mono text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
-                  <td class="py-3.5 px-5 text-stone-300">{{ log.relatedInfo }}</td>
-                  <td class="py-3.5 px-4 text-stone-400 whitespace-nowrap">{{ log.operator || '陈老师' }}</td>
+                  <td class="py-3.5 px-4 font-bold font-mono text-black dark:text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
+                  <td class="py-3.5 px-5 text-black dark:text-stone-300">{{ log.relatedInfo }}</td>
+                  <td class="py-3.5 px-4 text-black dark:text-stone-400 whitespace-nowrap">{{ log.operator || '陈老师' }}</td>
                 </tr>
 
                 <tr v-if="profileStudentLogs.length === 0">
-                  <td colspan="6" class="py-16 text-center text-stone-400 text-xs">
+                  <td colspan="6" class="py-16 text-center text-black dark:text-stone-400 text-xs">
                     该学员暂无课时变动流水
                   </td>
                 </tr>
@@ -2555,25 +2555,25 @@
             <i class="fa-solid fa-pen-to-square text-emerald-400"></i>
             <span>修改课程主题与上课日期</span>
           </h3>
-          <button @click="showEditAttendanceModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showEditAttendanceModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">课程绘画主题 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">课程绘画主题 *</label>
             <input v-model="editingAttendanceForm.theme" type="text" placeholder="例: 《梵高的星空》" class="w-full px-3 py-2 wf-input font-bold text-sm text-emerald-400">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">上课日期 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">上课日期 *</label>
             <input v-model="editingAttendanceForm.rawDate" type="date" class="w-full px-3 py-2 wf-input font-mono font-bold">
-            <div class="text-[11px] text-stone-400 font-mono mt-1">
+            <div class="text-[11px] text-black dark:text-stone-400 font-mono mt-1">
               保存后将格式化为：<strong class="text-emerald-400">{{ formatChineseDateWithWeekday(editingAttendanceForm.rawDate) }}</strong>
             </div>
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">任课主讲老师</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">任课主讲老师</label>
             <input v-model="editingAttendanceForm.teacher" type="text" placeholder="例: 陈老师" class="w-full px-3 py-2 wf-input">
           </div>
         </div>
@@ -2607,11 +2607,11 @@
               <span class="text-amber-400">⭐</span>
               <span>学员画币积分变更中心</span>
             </h3>
-            <p class="text-xs text-stone-400 mt-0.5">
+            <p class="text-xs text-black dark:text-stone-400 mt-0.5">
               正在操作学员：<strong class="text-emerald-400 font-bold text-sm">{{ individualPointForm.studentName }}</strong>
             </p>
           </div>
-          <button @click="showIndividualPointModal = false" class="text-stone-400 hover:text-white p-1">
+          <button @click="showIndividualPointModal = false" class="text-black dark:text-stone-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-sm"></i>
           </button>
         </div>
@@ -2625,7 +2625,7 @@
             </div>
           </div>
 
-          <div class="text-xl font-mono font-bold text-stone-400">➔</div>
+          <div class="text-xl font-mono font-bold text-black dark:text-stone-400">➔</div>
 
           <div class="text-right">
             <div class="text-[11px] text-emerald-400 font-medium">变更后预计结余</div>
@@ -2638,22 +2638,22 @@
         <!-- 4 种变更模式子切换标签 -->
         <div class="grid grid-cols-4 gap-1 p-1 rounded-xl border border-black/10 dark:border-white/10" style="background-color: var(--bg-surface-subtle);">
           <button @click="individualPointForm.actionType = 'add'"
-            :class="individualPointForm.actionType === 'add' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold' : 'text-stone-400'"
+            :class="individualPointForm.actionType === 'add' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold' : 'text-black dark:text-stone-400'"
             class="py-1.5 rounded-lg text-xs transition text-center">
             🟢 奖励加分
           </button>
           <button @click="individualPointForm.actionType = 'deduct'"
-            :class="individualPointForm.actionType === 'deduct' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold' : 'text-stone-400'"
+            :class="individualPointForm.actionType === 'deduct' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold' : 'text-black dark:text-stone-400'"
             class="py-1.5 rounded-lg text-xs transition text-center">
             🔴 扣除扣分
           </button>
           <button @click="individualPointForm.actionType = 'set'"
-            :class="individualPointForm.actionType === 'set' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40 font-bold' : 'text-stone-400'"
+            :class="individualPointForm.actionType === 'set' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40 font-bold' : 'text-black dark:text-stone-400'"
             class="py-1.5 rounded-lg text-xs transition text-center">
             ⚙️ 直接校准
           </button>
           <button @click="individualPointForm.actionType = 'redeem'"
-            :class="individualPointForm.actionType === 'redeem' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold' : 'text-stone-400'"
+            :class="individualPointForm.actionType === 'redeem' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold' : 'text-black dark:text-stone-400'"
             class="py-1.5 rounded-lg text-xs transition text-center">
             🎁 礼物兑换
           </button>
@@ -2665,7 +2665,7 @@
           <!-- 模式 1: 🟢 奖励加分 (快捷预设按钮 + 自定义点数) -->
           <div v-if="individualPointForm.actionType === 'add'" class="space-y-3">
             <div>
-              <label class="block text-stone-400 mb-1.5 font-semibold">快捷好习惯 / 表现奖励选项：</label>
+              <label class="block text-black dark:text-stone-400 mb-1.5 font-semibold">快捷好习惯 / 表现奖励选项：</label>
               <div class="grid grid-cols-2 gap-2">
                 <button v-for="opt in pointRewardOptions" :key="opt.id"
                   @click="onSelectRewardOption(opt)"
@@ -2683,12 +2683,12 @@
 
             <div class="grid grid-cols-2 gap-3 pt-1">
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">奖励画币分值 (+)*</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">奖励画币分值 (+)*</label>
                 <input v-model.number="individualPointForm.points" type="number" min="1" max="1000"
                   class="w-full px-3 py-2 wf-input text-emerald-400 font-bold font-mono text-sm">
               </div>
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">奖励原因说明 *</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">奖励原因说明 *</label>
                 <input v-model="individualPointForm.reason" type="text" placeholder="例: 主动收拾画具"
                   class="w-full px-3 py-2 wf-input">
               </div>
@@ -2703,12 +2703,12 @@
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">扣除画币分值 (-)*</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">扣除画币分值 (-)*</label>
                 <input v-model.number="individualPointForm.points" type="number" min="1" :max="individualPointForm.currentPoints"
                   class="w-full px-3 py-2 wf-input text-rose-400 font-bold font-mono text-sm">
               </div>
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">扣除原因说明 *</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">扣除原因说明 *</label>
                 <input v-model="individualPointForm.reason" type="text" placeholder="例: 损坏画具 / 课堂严重打闹"
                   class="w-full px-3 py-2 wf-input">
               </div>
@@ -2723,12 +2723,12 @@
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">校准后目标积分余额 *</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">校准后目标积分余额 *</label>
                 <input v-model.number="individualPointForm.targetPoints" type="number" min="0" max="99999"
                   class="w-full px-3 py-2 wf-input text-blue-400 font-bold font-mono text-sm">
               </div>
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">校准原因说明 *</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">校准原因说明 *</label>
                 <input v-model="individualPointForm.reason" type="text" placeholder="例: 期初画币盘点校准"
                   class="w-full px-3 py-2 wf-input">
               </div>
@@ -2737,7 +2737,7 @@
 
           <!-- 模式 4: 🎁 礼物兑换商场 -->
           <div v-if="individualPointForm.actionType === 'redeem'" class="space-y-3">
-            <label class="block text-stone-400 mb-1 font-semibold">选择要兑换的精美画画礼物：</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">选择要兑换的精美画画礼物：</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div v-for="prize in pointPrizes" :key="prize.id"
                 @click="individualPointForm.selectedPrize = prize; individualPointForm.reason = '兑换【' + prize.name + '】'"
@@ -2746,10 +2746,10 @@
                 <div class="text-2xl">{{ prize.icon }}</div>
                 <div class="flex-1">
                   <div class="font-bold text-xs">{{ prize.name }}</div>
-                  <div class="text-[10px] text-stone-400 mt-0.5">{{ prize.desc }}</div>
+                  <div class="text-[10px] text-black dark:text-stone-400 mt-0.5">{{ prize.desc }}</div>
                   <div class="flex items-center justify-between mt-1.5">
                     <span class="font-mono font-black text-amber-400 text-xs">⭐ {{ prize.cost }} 积分</span>
-                    <span class="text-[10px] text-stone-400 font-mono">库存 {{ prize.stock }}</span>
+                    <span class="text-[10px] text-black dark:text-stone-400 font-mono">库存 {{ prize.stock }}</span>
                   </div>
                 </div>
               </div>
@@ -2784,10 +2784,10 @@
             </div>
             <div>
               <h3 class="font-black text-base">想吃梨儿童美术 · 学员缴费电子收据</h3>
-              <p class="text-xs text-stone-400 font-mono mt-0.5">凭据单号：{{ selectedReceiptOrder.id }}</p>
+              <p class="text-xs text-black dark:text-stone-400 font-mono mt-0.5">凭据单号：{{ selectedReceiptOrder.id }}</p>
             </div>
           </div>
-          <button @click="showReceiptModal = false" class="text-stone-400 hover:text-white p-1">
+          <button @click="showReceiptModal = false" class="text-black dark:text-stone-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-base"></i>
           </button>
         </div>
@@ -2796,43 +2796,43 @@
           
           <div class="grid grid-cols-2 gap-4 p-4 rounded-xl border border-black/10 dark:border-white/10" style="background-color: var(--bg-surface-subtle);">
             <div>
-              <span class="text-stone-400 block mb-1">交费学员</span>
-              <strong class="text-base font-black text-stone-100">{{ selectedReceiptOrder.studentName }}</strong>
+              <span class="text-black dark:text-stone-400 block mb-1">交费学员</span>
+              <strong class="text-base font-black text-black dark:text-stone-100">{{ selectedReceiptOrder.studentName }}</strong>
             </div>
             <div>
-              <span class="text-stone-400 block mb-1">缴费实收金额</span>
+              <span class="text-black dark:text-stone-400 block mb-1">缴费实收金额</span>
               <strong class="text-xl font-black font-mono text-emerald-400">¥ {{ (selectedReceiptOrder.amount || 0).toLocaleString() }}</strong>
             </div>
           </div>
 
           <div class="space-y-2 border-b border-black/10 dark:border-white/10 pb-4">
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-stone-400">充值课时数</span>
+              <span class="text-black dark:text-stone-400">充值课时数</span>
               <span class="font-mono font-bold">{{ selectedReceiptOrder.hoursBought }} 节</span>
             </div>
             <div v-if="selectedReceiptOrder.hoursGift > 0" class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-stone-400">机构赠送课时</span>
+              <span class="text-black dark:text-stone-400">机构赠送课时</span>
               <span class="font-mono font-bold text-amber-400">+{{ selectedReceiptOrder.hoursGift }} 节</span>
             </div>
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-stone-400">支付结算方式</span>
+              <span class="text-black dark:text-stone-400">支付结算方式</span>
               <span class="font-bold">{{ selectedReceiptOrder.payMethod }}</span>
             </div>
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-stone-400">经办老师</span>
+              <span class="text-black dark:text-stone-400">经办老师</span>
               <span>{{ selectedReceiptOrder.operator || '陈老师' }}</span>
             </div>
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-stone-400">交费日期</span>
+              <span class="text-black dark:text-stone-400">交费日期</span>
               <span class="font-mono">{{ selectedReceiptOrder.payDate }}</span>
             </div>
             <div class="flex justify-between py-1">
-              <span class="text-stone-400">备注说明</span>
-              <span class="text-stone-300">{{ selectedReceiptOrder.remark || '正常续费充值' }}</span>
+              <span class="text-black dark:text-stone-400">备注说明</span>
+              <span class="text-black dark:text-stone-300">{{ selectedReceiptOrder.remark || '正常续费充值' }}</span>
             </div>
           </div>
 
-          <div class="text-[11px] text-stone-400 italic text-center">
+          <div class="text-[11px] text-black dark:text-stone-400 italic text-center">
             本收据由【想吃梨儿童美术教务系统】自动记账生成，所有消课与积分明细均可随时在线核验。
           </div>
 
@@ -2858,27 +2858,27 @@
       <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">添加班级考勤课次</h3>
-          <button @click="showAddMatrixRowModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showAddMatrixRowModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">上课班级</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">上课班级</label>
             <input type="text" :value="getClassById(matrixClassId).name" disabled class="w-full px-3 py-2 opacity-75 border border-black/10 dark:border-white/10 rounded-lg">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">课程绘画主题 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">课程绘画主题 *</label>
             <input v-model="newMatrixRowForm.theme" type="text" placeholder="例：《梵高的向日葵》" class="w-full px-3 py-2 wf-input font-bold">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">上课日期 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">上课日期 *</label>
             <input v-model="newMatrixRowForm.date" type="date" class="w-full px-3 py-2 wf-input font-mono">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">默认全员初始出勤状态</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">默认全员初始出勤状态</label>
             <select v-model="newMatrixRowForm.defaultStatus" class="w-full px-3 py-2 wf-select font-bold">
               <option value="到课">🟢 全员到课 (自动消课-1节)</option>
               <option value="未到">🔴 全员未到 (请假不扣课)</option>
@@ -2901,12 +2901,12 @@
       <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">补考勤 / 单独补课消课</h3>
-          <button @click="showAdhocAttendanceModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showAdhocAttendanceModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">选择学员 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">选择学员 *</label>
             <select v-model="adhocForm.studentId" class="w-full px-3 py-2 wf-select font-bold">
               <option value="">[请选择要补课的学员]</option>
               <option v-for="s in activeStudents" :key="s.id" :value="s.id">{{ s.name }} (余{{ s.remainHours }}节 · {{ getClassById(s.classId).name }})</option>
@@ -2915,12 +2915,12 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">补课日期 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">补课日期 *</label>
               <input v-model="adhocForm.date" type="date" class="w-full px-3 py-2 wf-input">
             </div>
 
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">出勤状态</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">出勤状态</label>
               <select v-model="adhocForm.status" class="w-full px-3 py-2 wf-select font-bold">
                 <option value="到课">🟢 补课到课 (消课)</option>
                 <option value="请假">🔴 请假 (不扣课)</option>
@@ -2930,14 +2930,14 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">扣减课时数</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">扣减课时数</label>
               <input v-model.number="adhocForm.deductHours" type="number" min="0" max="10" 
                 :disabled="adhocForm.status === '请假'"
                 class="w-full px-3 py-2 wf-input text-emerald-400 font-bold">
             </div>
 
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">临时参加班级</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">临时参加班级</label>
               <select v-model="adhocForm.targetClassId" class="w-full px-3 py-2 wf-select">
                 <option value="">[单独补课/加练]</option>
                 <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
@@ -2946,12 +2946,12 @@
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">课题名称</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">课题名称</label>
             <input v-model="adhocForm.theme" type="text" placeholder="例：《水彩写生特训》" class="w-full px-3 py-2 wf-input">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">具体上课原因备注 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">具体上课原因备注 *</label>
             <textarea v-model="adhocForm.remark" rows="2" placeholder="例：上周六请假，本次单独补课..." class="w-full px-3 py-2 wf-input"></textarea>
           </div>
 
@@ -2971,33 +2971,33 @@
       <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">学员续费充值</h3>
-          <button @click="showRechargeModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showRechargeModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">充值学员</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值学员</label>
             <input type="text" :value="rechargeForm.studentName" disabled class="w-full px-3 py-2 opacity-75 border border-black/10 dark:border-white/10 rounded-lg font-bold">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">充值课时数</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值课时数</label>
               <input v-model.number="rechargeForm.hoursBought" type="number" class="w-full px-3 py-2 wf-input text-emerald-400 font-bold">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">赠送课时</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">赠送课时</label>
               <input v-model.number="rechargeForm.hoursGift" type="number" class="w-full px-3 py-2 wf-input">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">实收金额 (元)</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">实收金额 (元)</label>
               <input v-model.number="rechargeForm.amount" type="number" class="w-full px-3 py-2 wf-input text-emerald-400 font-bold">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">支付方式</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">支付方式</label>
               <select v-model="rechargeForm.payMethod" class="w-full px-3 py-2 wf-select">
                 <option>微信支付</option>
                 <option>支付宝</option>
@@ -3013,7 +3013,7 @@
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">缴费说明备注</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">缴费说明备注</label>
             <input v-model="rechargeForm.remark" type="text" placeholder="例: 续费48课时大课包" class="w-full px-3 py-2 wf-input">
           </div>
         </div>
@@ -3032,17 +3032,17 @@
       <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">{{ isEditStudent ? '编辑学员档案' : '录入新学员' }}</h3>
-          <button @click="showStudentModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showStudentModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">姓名 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">姓名 *</label>
               <input v-model="studentForm.name" type="text" placeholder="例: 张小梨" class="w-full px-3 py-2 wf-input font-bold">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">性别</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">性别</label>
               <select v-model="studentForm.gender" class="w-full px-3 py-2 wf-select">
                 <option>女</option>
                 <option>男</option>
@@ -3052,11 +3052,11 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">年龄 (岁)</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">年龄 (岁)</label>
               <input v-model.number="studentForm.age" type="number" min="2" max="18" class="w-full px-3 py-2 wf-input">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">所在班级 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">所在班级 *</label>
               <select v-model="studentForm.classId" class="w-full px-3 py-2 wf-select font-bold">
                 <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
               </select>
@@ -3065,11 +3065,11 @@
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">家长姓名</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">家长姓名</label>
               <input v-model="studentForm.parentName" type="text" placeholder="例: 张妈妈" class="w-full px-3 py-2 wf-input">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">家长联系电话 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">家长联系电话 *</label>
               <input v-model="studentForm.parentPhone" type="text" placeholder="例: 13900000000" class="w-full px-3 py-2 wf-input font-mono">
             </div>
           </div>
@@ -3078,18 +3078,18 @@
             <div class="font-bold text-[11px] text-emerald-400">初始课时与赠送画币</div>
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">初始购买课时</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">初始购买课时</label>
                 <input v-model.number="studentForm.initialHours" type="number" min="0" class="w-full px-3 py-1.5 wf-input text-emerald-400 font-bold">
               </div>
               <div>
-                <label class="block text-stone-400 mb-1 font-semibold">新生赠送画币</label>
+                <label class="block text-black dark:text-stone-400 mb-1 font-semibold">新生赠送画币</label>
                 <input v-model.number="studentForm.initialPoints" type="number" min="0" class="w-full px-3 py-1.5 wf-input text-amber-400 font-bold font-mono">
               </div>
             </div>
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">学员绘画特点与习惯备注</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">学员绘画特点与习惯备注</label>
             <textarea v-model="studentForm.notes" rows="2" placeholder="例: 色彩感知力强，喜欢水彩与手作..." class="w-full px-3 py-2 wf-input"></textarea>
           </div>
         </div>
@@ -3108,39 +3108,39 @@
       <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">{{ isEditClass ? '编辑班级档案' : '开设新班级' }}</h3>
-          <button @click="showClassModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showClassModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">班级名称 *</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">班级名称 *</label>
             <input v-model="classForm.name" type="text" placeholder="例: 周六上午 · 启蒙感官探索A班 (3-5岁)" class="w-full px-3 py-2 wf-input font-bold">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">任课主讲老师 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">任课主讲老师 *</label>
               <input v-model="classForm.teacher" type="text" placeholder="例: 陈老师" class="w-full px-3 py-2 wf-input">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">班级满额人数</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">班级满额人数</label>
               <input v-model.number="classForm.capacity" type="number" min="1" max="30" class="w-full px-3 py-2 wf-input font-mono font-bold">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">授课画坊教室</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">授课画坊教室</label>
               <input v-model="classForm.classroom" type="text" placeholder="例: 梨香一号画坊" class="w-full px-3 py-2 wf-input">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">上课常规时段 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">上课常规时段 *</label>
               <input v-model="classForm.schedule" type="text" placeholder="例: 每周六 09:30 - 11:00" class="w-full px-3 py-2 wf-input">
             </div>
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">教学大纲方向与备注</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">教学大纲方向与备注</label>
             <textarea v-model="classForm.notes" rows="2" placeholder="例: 针对低幼段综合材料探索与色彩感知..." class="w-full px-3 py-2 wf-input"></textarea>
           </div>
         </div>
@@ -3159,17 +3159,17 @@
       <div class="wf-card p-6 max-w-sm w-full space-y-4 shadow-2xl">
         <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
           <h3 class="font-bold text-base">学员单节课考勤备注</h3>
-          <button @click="showCellEditModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showCellEditModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <span class="text-stone-400">学员：</span>
+            <span class="text-black dark:text-stone-400">学员：</span>
             <strong class="text-emerald-400 font-bold text-sm">{{ editingCell.studentName }}</strong>
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">填写课堂表现或请假原因备注</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">填写课堂表现或请假原因备注</label>
             <textarea v-model="editingCell.note" rows="3" placeholder="例: 表现非常积极，色彩搭配有创意..." class="w-full px-3 py-2 wf-input"></textarea>
           </div>
         </div>
@@ -3191,17 +3191,17 @@
             <i class="fa-solid fa-star"></i>
             <span>为全班发放集体画币奖励</span>
           </h3>
-          <button @click="showBatchPointModal = false" class="text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          <button @click="showBatchPointModal = false" class="text-black dark:text-stone-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div class="space-y-3 text-xs">
           <div>
-            <label class="block text-stone-400 mb-1 font-semibold">奖励班级</label>
+            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">奖励班级</label>
             <input type="text" :value="getClassById(batchPointForm.classId || matrixClassId).name" disabled class="w-full px-3 py-2 opacity-75 border border-black/10 dark:border-white/10 rounded-lg font-bold">
           </div>
 
           <div>
-            <label class="block text-stone-400 mb-1.5 font-semibold">快捷奖励理由：</label>
+            <label class="block text-black dark:text-stone-400 mb-1.5 font-semibold">快捷奖励理由：</label>
             <div class="grid grid-cols-2 gap-2">
               <button v-for="opt in pointRewardOptions" :key="opt.id"
                 @click="batchPointForm.points = opt.points; batchPointForm.reason = '全班 ' + opt.name"
@@ -3219,12 +3219,12 @@
 
           <div class="grid grid-cols-2 gap-3 pt-1">
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">每人奖励画币 (+)*</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">每人奖励画币 (+)*</label>
               <input v-model.number="batchPointForm.points" type="number" min="1" max="1000"
                 class="w-full px-3 py-2 wf-input text-amber-400 font-bold font-mono">
             </div>
             <div>
-              <label class="block text-stone-400 mb-1 font-semibold">集体奖励说明 *</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">集体奖励说明 *</label>
               <input v-model="batchPointForm.reason" type="text" placeholder="例: 全班课堂卫生优秀集体加分"
                 class="w-full px-3 py-2 wf-input">
             </div>
@@ -4943,7 +4943,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       } else if (status === '放假') {
         return 'matrix-cell-holiday';
       }
-      return 'text-stone-400 text-xs';
+      return 'text-black dark:text-stone-400 text-xs';
     };
 
     // 辅助格式化日期为友好中文格式 (含星期)

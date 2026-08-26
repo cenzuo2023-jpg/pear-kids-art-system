@@ -17,13 +17,13 @@
   --bg-page: #f8f9fa;
   --bg-header: #ffffff;
   --bg-surface: #ffffff;
-  --bg-surface-subtle: #f3f4f6;
-  --bg-surface-hover: #e5e7eb;
-  --border-main: #e5e7eb;
-  --border-strong: #d1d5db;
-  --text-main: #111827;
-  --text-sub: #4b5563;
-  --text-muted: #9ca3af;
+  --bg-surface-subtle: #f1f3f5;
+  --bg-surface-hover: #e9ecef;
+  --border-main: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-main: #000000;
+  --text-sub: #0f172a;
+  --text-muted: #1e293b;
   color-scheme: light;
 }
 
@@ -411,4 +411,56 @@ html:not(.dark) .wf-badge-gold {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-strong);
+}
+
+
+/* ============================================================ */
+/* ☀️ 浅色模式全局高对比度黑字规则 (彻底消除浅灰字、白字不可读问题) */
+/* ============================================================ */
+html:not(.dark),
+body:not(.dark) {
+  color: #000000;
+}
+
+html:not(.dark) .text-stone-100,
+html:not(.dark) .text-stone-200,
+html:not(.dark) .text-stone-300,
+html:not(.dark) .text-stone-400,
+html:not(.dark) .text-stone-500,
+html:not(.dark) .text-stone-600,
+html:not(.dark) .text-gray-300,
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-gray-500,
+html:not(.dark) .text-neutral-300,
+html:not(.dark) .text-neutral-400,
+html:not(.dark) .text-neutral-500,
+html:not(.dark) .text-zinc-300,
+html:not(.dark) .text-zinc-400,
+html:not(.dark) .text-zinc-500 {
+  color: #000000 !important;
+}
+
+html:not(.dark) th,
+html:not(.dark) td {
+  color: #000000 !important;
+}
+
+html:not(.dark) .wf-card,
+html:not(.dark) .wf-card-interactive {
+  color: #000000 !important;
+}
+
+html:not(.dark) input,
+html:not(.dark) select,
+html:not(.dark) textarea {
+  color: #000000 !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) select::placeholder {
+  color: #4b5563 !important;
+}
+
+html:not(.dark) .font-mono {
+  font-weight: 600;
 }
