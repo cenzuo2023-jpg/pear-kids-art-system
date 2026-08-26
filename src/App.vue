@@ -3876,7 +3876,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         studioInfo: source.studioInfo && typeof source.studioInfo === 'object' ? source.studioInfo : fallback.studioInfo,
         classes: Array.isArray(source.classes) ? source.classes : fallback.classes,
         students: Array.isArray(source.students) ? source.students : fallback.students,
-        attendanceHistory: Array.isArray(source.attendanceHistory) ? source.attendanceHistory : fallback.attendanceHistory,
+        attendanceHistory: (Array.isArray(source.attendanceHistory) ? source.attendanceHistory : fallback.attendanceHistory).filter(a => !a.date || a.date <= '2026-08-31'),
         hourLogs: Array.isArray(source.hourLogs) ? source.hourLogs : fallback.hourLogs,
         paymentOrders: Array.isArray(source.paymentOrders) ? source.paymentOrders : fallback.paymentOrders,
         pointRewardOptions: Array.isArray(source.pointRewardOptions) ? source.pointRewardOptions : fallback.pointRewardOptions,
@@ -4040,7 +4040,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           joinDate: row.join_date,
           createdAt: row.created_at
         })),
-        attendanceHistory: (tables.attendance_records || []).map(row => ({
+        attendanceHistory: (tables.attendance_records || []).filter(row => !row.date || row.date <= '2026-08-31').map(row => ({
           id: row.id,
           date: row.date,
           theme: row.theme,
