@@ -1345,7 +1345,7 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <button @click="openRecharge(activeStudents[0] || {})" class="wf-btn-primary text-xs py-2 px-4 shadow-sm">
+            <button @click="openRecharge({})" class="wf-btn-primary text-xs py-2 px-4 shadow-sm">
               <i class="fa-solid fa-plus-circle text-sm mr-1"></i>
               <span>录入学员收费充值</span>
             </button>
@@ -1605,7 +1605,7 @@
               </span>
             </div>
 
-            <button @click="openRecharge(activeStudents[0] || {})" class="wf-btn-primary text-xs py-2 px-3.5 whitespace-nowrap">
+            <button @click="openRecharge({})" class="wf-btn-primary text-xs py-2 px-3.5 whitespace-nowrap">
               <i class="fa-solid fa-plus-circle text-xs mr-1"></i>
               <span>新收费录入</span>
             </button>
@@ -2978,7 +2978,12 @@
         <div class="space-y-3 text-xs">
           <div>
             <label class="block text-black dark:text-stone-400 mb-1 font-semibold">充值学员</label>
-            <input type="text" :value="rechargeForm.studentName" disabled class="w-full px-3 py-2 opacity-75 border border-black/10 dark:border-white/10 rounded-lg font-bold">
+            <select v-model="rechargeForm.studentId" class="w-full px-3 py-2 wf-select font-bold">
+              <option value="" disabled>请选择充值学员...</option>
+              <option v-for="stu in activeStudents" :key="stu.id" :value="stu.id">
+                {{ stu.name }} ({{ getClassById(stu.classId)?.name || '未分配' }})
+              </option>
+            </select>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
