@@ -2800,10 +2800,16 @@
             </button>
           </div>
 
-          <button v-if="profileSubTab === 'attendance'" @click="exportStudentAttendanceCSV(profileStudent)" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
-            <i class="fa-solid fa-file-csv mr-1"></i>
-            <span>导出个人考勤表 CSV</span>
-          </button>
+          <div v-if="profileSubTab === 'attendance'" class="flex items-center gap-2">
+            <button @click="exportStudentAttendanceCSV(profileStudent)" class="nt-btn-export text-xs sm:text-sm">
+              <i class="fa-solid fa-file-excel mr-1 text-xs"></i>
+              <span>导出 CSV 表格</span>
+            </button>
+            <button @click="printStudentAttendancePDF(profileStudent)" class="nt-btn text-xs sm:text-sm text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+              <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i>
+              <span>导出/打印 PDF 清单</span>
+            </button>
+          </div>
         </div>
 
         <!-- 详细数据明细表格 (全屏通栏展示 · 无高度截断限制 · 充足呼吸感) -->
@@ -5942,7 +5948,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         `"${(a.note || '').replace(/"/g, '""')}"`
       ]);
 
-      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('
+
 ');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -5952,6 +5959,300 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       a.click();
       URL.revokeObjectURL(url);
       showToast(`🍐 学员【${stu.name}】个人考勤表已成功导出！`);
+    };
+
+    const printStudentAttendancePDF = (student) => {
+      const targetStudent = student || profileStudent.value;
+      if (!targetStudent) {
+        showToast('未选择学员', 'warning');
+        return;
+      }
+      const stu = targetStudent;
+      const sId = stu.id;
+      const cls = getClassById(stu.classId || stu.class_id);
+      const studio = studioInfo.value || { name: '想吃梨儿童美术', teacher: '陈老师', phone: '' };
+
+      // 提取该学员所有排课出勤记录
+      const attList = [];
+      (attendanceHistory.value || []).forEach(att => {
+        if (att.details && Array.isArray(att.details)) {
+          const detail = att.details.find(d => (d.studentId === sId || d.student_id === sId));
+          if (detail) {
+            const st = normalizeAttendanceStatus(detail.status);
+            attList.push({
+              date: att.date || '',
+              theme: att.theme || '美育主题创作课',
+              className: att.className || cls.name,
+              teacher: att.teacher || cls.teacher || '陈老师',
+              status: st,
+              deductHours: detail.deductHours !== undefined ? detail.deductHours : (st === '到课' ? 1 : 0),
+              note: detail.note || detail.reason || ''
+            });
+          }
+        }
+      });
+
+      attList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      const presentCount = attList.filter(a => a.status === '到课').length;
+      const leaveCount = attList.filter(a => a.status === '未到' || a.status === '请假').length;
+      const totalLessons = presentCount + leaveCount;
+      const rate = totalLessons > 0 ? ((presentCount / totalLessons) * 100).toFixed(0) + '%' : '100%';
+      const todayStr = new Date().toISOString().slice(0, 10);
+
+      // 生成整洁高雅的 A4 PDF 打印文档
+      const rowsHtml = attList.length > 0 ? attList.map((a, idx) => {
+        const badgeClass = a.status === '到课' ? 'badge-green' : a.status === '请假' || a.status === '未到' ? 'badge-yellow' : 'badge-purple';
+        return `<tr>
+          <td style="text-align:center; font-family:monospace; font-weight:600; color:#6b7280;">#${String(idx + 1).padStart(2, '0')}</td>
+          <td style="font-family:monospace; font-weight:600; white-space:nowrap;">${a.date}</td>
+          <td style="font-weight:700; color:#111827;">${a.theme}</td>
+          <td>${a.className}</td>
+          <td style="text-align:center;"><span class="badge ${badgeClass}">${a.status}</span></td>
+          <td style="text-align:center; font-family:monospace; font-weight:700; color:${a.deductHours > 0 ? '#b91c1c' : '#4b5563'};">${a.deductHours > 0 ? '-' + a.deductHours + '节' : '0节'}</td>
+          <td style="text-align:center;">${a.teacher}</td>
+          <td style="color:#4b5563; font-size:12px;">${a.note || '-'}</td>
+        </tr>`;
+      }).join('') : `<tr><td colspan="8" style="text-align:center; padding:30px; color:#9ca3af;">暂无考勤历史记录</td></tr>`;
+
+      const printHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>想吃梨_【${stu.name}】学员课程出勤与消课成长档案_${todayStr}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 12mm 15mm 12mm;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Noto Sans SC", sans-serif;
+      color: #111827;
+      background: #ffffff;
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 0;
+    }
+    .print-container { max-width: 100%; margin: 0 auto; }
+    .header-box {
+      border-bottom: 2px solid #111827;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #111827; }
+    .brand-sub { font-size: 11px; font-weight: 600; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .doc-badge { text-align: right; font-family: monospace; font-size: 12px; color: #6b7280; }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+    .info-item span { color: #6b7280; font-size: 11px; display: block; margin-bottom: 2px; }
+    .info-item strong { color: #111827; font-weight: 700; }
+
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #ffffff;
+    }
+    .stat-card .label { font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 4px; }
+    .stat-card .value { font-size: 20px; font-weight: 900; font-family: monospace; color: #111827; }
+    .stat-card.green .value { color: #15803d; }
+    .stat-card.amber .value { color: #b45309; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+    }
+    th {
+      background: #f3f4f6;
+      color: #374151;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 8px;
+      border: 1px solid #e5e7eb;
+      font-size: 12px;
+    }
+    td {
+      padding: 7px 8px;
+      border: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+    tr:nth-child(even) { background-color: #fafafa; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-yellow { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+    .summary-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+      padding: 8px 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .footer-box {
+      border-top: 1px dashed #d1d5db;
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .sign-area { text-align: right; }
+    .sign-line { display: inline-block; width: 140px; border-bottom: 1px solid #111827; margin-left: 6px; }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-container">
+    
+    <!-- 表头与品牌 -->
+    <div class="header-box">
+      <div>
+        <div class="brand-title">🍐 ${studio.name || '想吃梨儿童美术'}</div>
+        <div class="brand-sub">PEAR KIDS ART · 学员课程出勤与课消成长档案</div>
+      </div>
+      <div class="doc-badge">
+        <div>打印日期: <strong>${todayStr}</strong></div>
+        <div>档案编号: STU-${stu.id.slice(-6).toUpperCase()}</div>
+      </div>
+    </div>
+
+    <!-- 学员信息条 -->
+    <div class="info-grid">
+      <div class="info-item"><span>学员姓名</span><strong>${stu.name} (${stu.gender || '女'} · ${stu.age || '-'}岁)</strong></div>
+      <div class="info-item"><span>所在班级</span><strong>${cls.name}</strong></div>
+      <div class="info-item"><span>任课教师</span><strong>${cls.teacher || '陈老师'}</strong></div>
+      <div class="info-item"><span>家长联系</span><strong>${stu.parentName || '-'} ${stu.parentPhone ? '(' + stu.parentPhone + ')' : ''}</strong></div>
+    </div>
+
+    <!-- 4 维核心课时统计 -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="label">累计购课总量</div>
+        <div class="value">${stu.totalPurchased || (Number(stu.remainHours || 0) + Number(stu.totalConsumed || 0))} <span style="font-size:12px; font-weight:normal;">节</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">累计出勤消课</div>
+        <div class="value">${stu.totalConsumed || presentCount} <span style="font-size:12px; font-weight:normal;">节</span></div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">当前剩余课时</div>
+        <div class="value">${stu.remainHours} <span style="font-size:12px; font-weight:normal;">节</span></div>
+      </div>
+      <div class="stat-card amber">
+        <div class="label">历史出勤率 / 画币</div>
+        <div class="value" style="font-size:18px;">${rate} <span style="font-size:12px; color:#b45309;">(⭐${stu.points || 0})</span></div>
+      </div>
+    </div>
+
+    <!-- 考勤明细大表 -->
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44px; text-align:center;">序号</th>
+          <th style="width:90px;">上课日期</th>
+          <th>课程绘画主题</th>
+          <th style="width:110px;">所在班级</th>
+          <th style="width:68px; text-align:center;">出勤状态</th>
+          <th style="width:72px; text-align:center;">课时消课</th>
+          <th style="width:68px; text-align:center;">主讲师</th>
+          <th>考勤备注与课堂表现</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+
+    <!-- 课消总结 -->
+    <div class="summary-text">
+      📊 <strong>课消总结：</strong>截止目前，学员【${stu.name}】累计已出勤并消课 <strong>${presentCount}</strong> 课时，请假 <strong>${leaveCount}</strong> 课时，当前可用课时余额为 <strong style="color:#15803d;">${stu.remainHours}</strong> 课时。
+    </div>
+
+    <!-- 页脚与家长签字联 -->
+    <div class="footer-box">
+      <div>
+        <div><strong>说明事项：</strong>1. 本工作室标准课时为90分钟/节；2. 如对考勤课消记录有任何疑问，请随时联系陈老师。</div>
+        <div style="margin-top:2px;">想吃梨儿童美术工作室 · 用美育陪伴每一个孩子的成长与热爱</div>
+      </div>
+      <div class="sign-area">
+        <div>家长确认签字：<span class="sign-line"></span></div>
+        <div style="margin-top:4px;">确认日期：____年__月__日</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>`;
+
+      // 开启纯净打印/另存为 PDF 窗口
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(printHtml);
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+        }, 300);
+      } else {
+        // Fallback: 创建隐藏 iframe 打印
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        document.body.appendChild(iframe);
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(printHtml);
+        doc.close();
+        setTimeout(() => {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 400);
+      }
     };
 
     // ==========================================
