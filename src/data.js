@@ -1,34 +1,226 @@
 /**
- * 想吃梨儿童美术 - 机构初始数据配置 (纯净空白版 · 准备录入真实数据)
+ * 想吃梨儿童美术 - 真实录入名册数据
  */
 
 export const DEFAULT_INITIAL_DATA = {
-  // 画室基本资料
   studioInfo: {
-    name: "想吃梨儿童美术",
-    teacher: "陈老师",
-    slogan: "Contemporary Art for Young Creatives",
-    phone: "",
-    address: "",
-    warningThreshold: 3 // 预警阈值 (剩余<=3节时黄色预警，<=0红色预警)
-  },
-
-  // 🌟 班级档案列表 (初始为空)
-  classes: [],
-
-  // 🌟 学员档案名册 (初始为空)
-  students: [],
-
-  // 🌟 考勤大表历史 (初始为空)
+    "id": "00000000-0000-0000-0000-000000000000",
+    "name": "想吃梨儿童美术",
+    "teacher": "陈老师",
+    "slogan": "Contemporary Art for Young Creatives",
+    "phone": "138-8888-6666",
+    "address": "杭州市西湖区文创艺术园区 🍐 梨香画坊",
+    "warning_threshold": 3
+},
+  classes: [
+    {
+        "id": "cls_101",
+        "name": "周六上午 · 启蒙感官探索A班 (3-5岁)",
+        "teacher": "陈老师",
+        "schedule": "每周六 09:30 - 11:00",
+        "classroom": "🍐 梨香一号画坊",
+        "capacity": 8,
+        "status": "active",
+        "createdAt": "2025-01-01",
+        "notes": ""
+    },
+    {
+        "id": "cls_102",
+        "name": "周六下午 · 少儿当代水彩班 (6-8岁)",
+        "teacher": "陈老师",
+        "schedule": "每周六 14:00 - 15:30",
+        "classroom": "🍐 水彩阳光画廊",
+        "capacity": 8,
+        "status": "active",
+        "createdAt": "2025-01-01",
+        "notes": ""
+    }
+],
+  students: [
+    {
+        "id": "stu_01",
+        "name": "张瑞希",
+        "gender": "女",
+        "age": 4,
+        "classId": "cls_101",
+        "parentName": "张妈妈",
+        "parentPhone": "13912345601",
+        "remainHours": 0,
+        "totalPurchased": 48,
+        "totalConsumed": 48,
+        "points": 135,
+        "totalPointsEarned": 135,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "色彩感觉好，喜欢大画幅泼彩"
+    },
+    {
+        "id": "stu_02",
+        "name": "梅依朵",
+        "gender": "女",
+        "age": 4,
+        "classId": "cls_101",
+        "parentName": "梅爸爸",
+        "parentPhone": "13912345602",
+        "remainHours": 3,
+        "totalPurchased": 48,
+        "totalConsumed": 45,
+        "points": 160,
+        "totalPointsEarned": 160,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "动手能力强，专注度高"
+    },
+    {
+        "id": "stu_03",
+        "name": "叶琪乐",
+        "gender": "男",
+        "age": 5,
+        "classId": "cls_101",
+        "parentName": "叶妈妈",
+        "parentPhone": "13912345603",
+        "remainHours": 3,
+        "totalPurchased": 48,
+        "totalConsumed": 45,
+        "points": 120,
+        "totalPointsEarned": 120,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "想象力丰富，喜欢几何结构"
+    },
+    {
+        "id": "stu_04",
+        "name": "查昕妍",
+        "gender": "女",
+        "age": 4,
+        "classId": "cls_101",
+        "parentName": "查妈妈",
+        "parentPhone": "13912345604",
+        "remainHours": 8,
+        "totalPurchased": 48,
+        "totalConsumed": 40,
+        "points": 110,
+        "totalPointsEarned": 110,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "喜欢调配马卡龙色系"
+    },
+    {
+        "id": "stu_05",
+        "name": "李瑾瑜",
+        "gender": "女",
+        "age": 5,
+        "classId": "cls_101",
+        "parentName": "李爸爸",
+        "parentPhone": "13912345605",
+        "remainHours": 16,
+        "totalPurchased": 48,
+        "totalConsumed": 32,
+        "points": 195,
+        "totalPointsEarned": 195,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "对植物与自然界纹理很敏锐"
+    },
+    {
+        "id": "stu_06",
+        "name": "陈念涵",
+        "gender": "女",
+        "age": 5,
+        "classId": "cls_101",
+        "parentName": "陈妈妈",
+        "parentPhone": "13912345606",
+        "remainHours": 1,
+        "totalPurchased": 48,
+        "totalConsumed": 47,
+        "points": 140,
+        "totalPointsEarned": 140,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "临期急需续费提醒"
+    },
+    {
+        "id": "stu_07",
+        "name": "查依诺",
+        "gender": "女",
+        "age": 4,
+        "classId": "cls_101",
+        "parentName": "查爸爸",
+        "parentPhone": "13912345607",
+        "remainHours": 12,
+        "totalPurchased": 48,
+        "totalConsumed": 36,
+        "points": 95,
+        "totalPointsEarned": 95,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "喜欢撕纸拼贴画"
+    },
+    {
+        "id": "stu_08",
+        "name": "刘子嘉",
+        "gender": "男",
+        "age": 5,
+        "classId": "cls_101",
+        "parentName": "刘妈妈",
+        "parentPhone": "13912345608",
+        "remainHours": 20,
+        "totalPurchased": 48,
+        "totalConsumed": 28,
+        "points": 85,
+        "totalPointsEarned": 85,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "表现欲强，画风豪放"
+    },
+    {
+        "id": "stu_09",
+        "name": "王梓萌",
+        "gender": "女",
+        "age": 7,
+        "classId": "cls_102",
+        "parentName": "王妈妈",
+        "parentPhone": "13912345609",
+        "remainHours": 18,
+        "totalPurchased": 48,
+        "totalConsumed": 30,
+        "points": 175,
+        "totalPointsEarned": 175,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "水彩湿画法掌握优秀"
+    },
+    {
+        "id": "stu_10",
+        "name": "赵宇轩",
+        "gender": "男",
+        "age": 8,
+        "classId": "cls_102",
+        "parentName": "赵爸爸",
+        "parentPhone": "13912345610",
+        "remainHours": 0,
+        "totalPurchased": 48,
+        "totalConsumed": 48,
+        "points": 210,
+        "totalPointsEarned": 210,
+        "redeemedCount": 0,
+        "status": "在读",
+        "joinDate": "2025-01-01",
+        "notes": "课时已耗尽，已通知家长续费"
+    }
+],
   attendanceHistory: [],
-
-  // 🌟 课时流水总账 (初始为空)
   hourLogs: [],
-
-  // 🌟 收费订单明细 (初始为空)
   paymentOrders: [],
-
-  // 🌟 积分快捷奖励预设选项 (保留实用快捷模板)
   pointRewardOptions: [
     { id: 'opt_1', name: '课堂专注认真', points: 5, icon: '🌟', color: 'emerald' },
     { id: 'opt_2', name: '色彩创意出众', points: 10, icon: '🎨', color: 'purple' },
@@ -37,10 +229,13 @@ export const DEFAULT_INITIAL_DATA = {
     { id: 'opt_5', name: '全勤积极打卡', points: 5, icon: '💯', color: 'emerald' },
     { id: 'opt_6', name: '互助友爱分享', points: 5, icon: '🤝', color: 'rose' }
   ],
-
-  // 🌟 积分礼物兑换商场 (初始为空，可随时自定义添加)
-  pointPrizes: [],
-
-  // 🌟 积分变动与兑换明细流水 (初始为空)
+  pointPrizes: [
+    { id: 'prz_1', name: '专业高品质油画棒礼盒 (24色)', cost: 100, stock: 12, icon: '🖍️', desc: '细腻软糯，专业重彩油画棒' },
+    { id: 'prz_2', name: '梦幻纯棉水彩画本 (A4加厚)', cost: 60, stock: 20, icon: '📖', desc: '300g纯棉水彩纸，显色透亮' },
+    { id: 'prz_3', name: '小艺术家尼龙画笔6支套装', cost: 50, stock: 15, icon: '🖌️', desc: '勾线、平头、圆头齐全' },
+    { id: 'prz_4', name: '🍐 想吃梨定制可爱帆布画袋', cost: 80, stock: 8, icon: '👜', desc: '耐磨厚实，装画板画具超便携' },
+    { id: 'prz_5', name: '超轻彩泥粘土创作盲盒', cost: 40, stock: 25, icon: '🎁', desc: '安全无毒不粘手手作泥' },
+    { id: 'prz_6', name: '课后美味冰淇淋甜品券', cost: 20, stock: 50, icon: '🍦', desc: '课后甜蜜能量补给' }
+  ],
   pointLogs: []
 };
