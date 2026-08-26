@@ -350,7 +350,7 @@
                     <button @click="openEditAttendanceRow(att)" class="p-1 text-gray-500 hover:text-black dark:hover:text-white transition" title="编辑整行考勤">
                       <i class="fa-solid fa-pen text-xs"></i>
                     </button>
-                    <button @click="deleteAttendanceRow(att)" class="p-1 text-gray-400 hover:text-rose-600 transition" title="删除该次排课">
+                    <button @click="deleteMatrixRow(att)" class="p-1 text-gray-400 hover:text-rose-600 transition" title="删除该次排课">
                       <i class="fa-regular fa-trash-can text-xs"></i>
                     </button>
                   </div>
@@ -2959,11 +2959,8 @@
           </div>
 
           <div>
-            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">上课日期 *</label>
-            <input v-model="editingAttendanceForm.rawDate" type="date" class="w-full px-3 py-2 wf-input font-mono font-bold">
-            <div class="text-[11px] text-black dark:text-stone-400 font-mono mt-1">
-              保存后将格式化为：<strong class="text-emerald-400">{{ formatChineseDateWithWeekday(editingAttendanceForm.rawDate) }}</strong>
-            </div>
+            <label class="block text-gray-700 dark:text-gray-300 mb-1 font-semibold">上课日期 *</label>
+            <input v-model="editingAttendanceForm.rawDate" type="date" class="w-full px-3 py-2 nt-input font-mono font-bold text-sm">
           </div>
 
           <div>
@@ -6077,13 +6074,18 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const openEditAttendanceRow = (att) => {
       if (!att) return;
-      const iso = dateToISO(att.date);
+      const rawDate = att.date || '';
+      let isoDate = rawDate;
+      const m = String(rawDate).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+      if (m) {
+        isoDate = `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+      }
       editingAttendanceForm.id = att.id;
-      editingAttendanceForm.classId = att.classId;
-      editingAttendanceForm.theme = att.theme;
-      editingAttendanceForm.rawDate = iso;
-      editingAttendanceForm.date = att.date;
-      editingAttendanceForm.teacher = att.teacher || getClassById(att.classId).teacher || '陈老师';
+      editingAttendanceForm.classId = att.classId || att.class_id;
+      editingAttendanceForm.theme = att.theme || '';
+      editingAttendanceForm.rawDate = isoDate;
+      editingAttendanceForm.date = isoDate;
+      editingAttendanceForm.teacher = att.teacher || getClassById(editingAttendanceForm.classId).teacher || '陈老师';
       showEditAttendanceModal.value = true;
     };
 
@@ -6096,22 +6098,22 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       const oldTheme = att.theme;
       const oldDate = att.date;
       const newTheme = editingAttendanceForm.theme.trim() || '美育主题创作课';
-      const newFormattedDate = formatChineseDateWithWeekday(editingAttendanceForm.rawDate);
+      const newDate = editingAttendanceForm.rawDate || att.date;
 
       att.theme = newTheme;
-      att.date = newFormattedDate;
+      att.date = newDate;
       att.teacher = editingAttendanceForm.teacher || '陈老师';
 
       // 联动更新关联流水文本说明
       hourLogs.value.forEach(l => {
-        if (l.relatedInfo && (l.relatedInfo.includes(oldTheme) || l.relatedInfo.includes(oldDate))) {
-          l.relatedInfo = l.relatedInfo.replace(oldTheme, newTheme).replace(oldDate, newFormattedDate);
+        if (l.reason && (l.reason.includes(oldTheme) || l.reason.includes(oldDate))) {
+          l.reason = l.reason.replace(oldTheme, newTheme).replace(oldDate, newDate);
         }
       });
 
       saveData();
       showEditAttendanceModal.value = false;
-      showToast(`🍐 已成功更新课程《${newTheme}》与上课日期为 ${newFormattedDate}！`);
+      showToast(`🍐 已成功更新课程《${newTheme}》与上课日期为 ${newDate}！`);
     };
 
     const showCellEditModal = ref(false);
@@ -6330,6 +6332,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       saveData();
     };
 
+    const deleteAttendanceRow = (att) => deleteMatrixRow(att);
     const deleteMatrixRow = (att) => {
       if (!confirm(`确定要删除【${att.date} 《${att.theme}》】这节课吗？\n删除后该节课所有到课学员的课时将自动全额退还！`)) {
         return;
