@@ -5175,6 +5175,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         applyCellStatusChange(att, stu, status || editingCell.currentStatus, editingCell.note);
       }
       showCellEditModal.value = false;
+      saveData();
     };
 
     const applyCellStatusChange = (attendanceRecord, student, newStatus, customNote = '') => {
@@ -5357,6 +5358,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       inlineNewRow.defaultStatus = newMatrixRowForm.defaultStatus;
       submitInlineNewRow();
       showAddMatrixRowModal.value = false;
+      saveData();
     };
 
     const deleteMatrixRow = (att) => {
@@ -5914,6 +5916,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       saveData();
       showRechargeModal.value = false;
       showToast(`🎉 ${rechargeMode.value === 'new' ? '新生建档入账成功' : '续费充值成功'}！【${targetStudent.name}】增加 ${addHours} 课时，当前剩余 ${targetStudent.remainHours} 节`);
+      saveData();
     };
 
     // ==========================================
@@ -6018,6 +6021,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       }
       saveData();
       showStudentModal.value = false;
+      saveData();
     };
 
     const deleteStudent = (s) => {
@@ -6083,6 +6087,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       }
       saveData();
       showClassModal.value = false;
+      saveData();
     };
 
     const deleteClass = (cls) => {
