@@ -5948,6 +5948,17 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       return activeStudents.value.filter(s => (s.classId === matrixClassId.value || s.class_id === matrixClassId.value));
     });
 
+    const normalizeAttendanceStatus = (rawStatus) => {
+      if (!rawStatus) return '--';
+      const s = String(rawStatus).trim();
+      if (s === 'NaT' || s === 'nan' || s === 'NaN' || s === 'null' || s === 'undefined' || s === '' || s === '--') return '--';
+      if (s === '到课' || s === '出勤' || s === '到') return '到课';
+      if (s === '请假' || s === '假') return '请假';
+      if (s === '未到' || s === '旷课' || s === '缺勤') return '未到';
+      if (s === '放假' || s === '休假') return '放假';
+      return s;
+    };
+
     const matrixAttendanceRecords = computed(() => {
       if (!matrixClassId.value) return [];
       const targetId = matrixClassId.value;
@@ -5960,10 +5971,11 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           if (Array.isArray(a.details)) {
             for (let j = 0; j < a.details.length; j++) {
               const d = a.details[j];
+              const st = normalizeAttendanceStatus(d.status);
               detailMap[d.studentId || d.student_id] = {
-                status: d.status || '--',
+                status: st,
                 note: d.note || d.reason || '',
-                deductHours: d.deductHours || 0
+                deductHours: d.deductHours || (st === '到课' ? 1 : 0)
               };
             }
           }
@@ -5990,10 +6002,11 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       if (!item) {
         return { status: '--', note: '', deductHours: 0 };
       }
+      const st = normalizeAttendanceStatus(item.status);
       return {
-        status: item.status || '--',
+        status: st,
         note: item.note || item.reason || '',
-        deductHours: item.deductHours || 0
+        deductHours: item.deductHours || (st === '到课' ? 1 : 0)
       };
     };
 
@@ -6005,7 +6018,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       } else if (status === '放假') {
         return 'matrix-cell-holiday';
       }
-      return 'text-black dark:text-stone-400 text-xs';
+      return 'text-gray-400 bg-gray-50 dark:bg-[#252525] border border-[#e2e2e0] dark:border-[#333]';
     };
 
     // 辅助格式化日期为友好中文格式 (含星期)
