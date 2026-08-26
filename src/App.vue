@@ -159,7 +159,7 @@
           </button>
 
           <!-- 导出大表 -->
-          <button @click="exportAttendanceMatrixCSV(matrixClassId)" class="nt-btn-export text-xs sm:text-sm">
+          <button @click="openExportModal('matrix', null, matrixClassId)" class="nt-btn-export text-xs sm:text-sm">
             <i class="fa-solid fa-file-excel text-xs"></i>
             <span>导出大表 CSV</span>
           </button>
@@ -2801,11 +2801,11 @@
           </div>
 
           <div v-if="profileSubTab === 'attendance'" class="flex items-center gap-2">
-            <button @click="exportStudentAttendanceCSV(profileStudent)" class="nt-btn-export text-xs sm:text-sm">
+            <button @click="openExportModal('student_csv', profileStudent)" class="nt-btn-export text-xs sm:text-sm">
               <i class="fa-solid fa-file-excel mr-1 text-xs"></i>
-              <span>导出 CSV 表格</span>
+              <span>导出考勤 CSV</span>
             </button>
-            <button @click="printStudentAttendancePDF(profileStudent)" class="nt-btn text-xs sm:text-sm text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+            <button @click="openExportModal('student_pdf', profileStudent)" class="nt-btn text-xs sm:text-sm text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/30">
               <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i>
               <span>导出/打印 PDF 清单</span>
             </button>
@@ -2988,6 +2988,105 @@
             <button @click="submitEditAttendanceRow" class="wf-btn-primary py-2 px-4 justify-center">保存修改</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 🌟 全局考勤导出时间范围选择器模态窗 (Notion Date Range Export) -->
+    <!-- ============================================================ -->
+    <div v-if="showExportAttendanceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="nt-card p-6 max-w-lg w-full space-y-4 shadow-2xl" style="background-color: var(--bg-surface);">
+        
+        <!-- 弹窗顶栏 -->
+        <div class="flex items-center justify-between border-b border-[#e2e2e0] dark:border-[#333] pb-3">
+          <div>
+            <h3 class="font-bold text-base flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-emerald-600"></i>
+              <span>选择导出考勤时间范围</span>
+            </h3>
+            <p class="text-xs text-gray-500 mt-0.5">
+              {{ exportModalConfig.title }}
+            </p>
+          </div>
+          <button @click="showExportAttendanceModal = false" class="text-gray-400 hover:text-black dark:hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <!-- 快捷时间范围预设 (Notion Filter Pills) -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-gray-600 dark:text-gray-400">快捷时间段：</label>
+          <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+            <button @click="applyExportPreset('all')"
+              :class="exportModalConfig.presetRange === 'all' ? 'bg-[#111827] text-white dark:bg-[#10e57a] dark:text-black font-bold' : 'nt-btn text-gray-700 dark:text-gray-300'"
+              class="py-1.5 px-2 rounded-md text-xs transition text-center">
+              全部历史
+            </button>
+            <button @click="applyExportPreset('this_month')"
+              :class="exportModalConfig.presetRange === 'this_month' ? 'bg-[#111827] text-white dark:bg-[#10e57a] dark:text-black font-bold' : 'nt-btn text-gray-700 dark:text-gray-300'"
+              class="py-1.5 px-2 rounded-md text-xs transition text-center">
+              本月
+            </button>
+            <button @click="applyExportPreset('last_month')"
+              :class="exportModalConfig.presetRange === 'last_month' ? 'bg-[#111827] text-white dark:bg-[#10e57a] dark:text-black font-bold' : 'nt-btn text-gray-700 dark:text-gray-300'"
+              class="py-1.5 px-2 rounded-md text-xs transition text-center">
+              上月
+            </button>
+            <button @click="applyExportPreset('last_3_months')"
+              :class="exportModalConfig.presetRange === 'last_3_months' ? 'bg-[#111827] text-white dark:bg-[#10e57a] dark:text-black font-bold' : 'nt-btn text-gray-700 dark:text-gray-300'"
+              class="py-1.5 px-2 rounded-md text-xs transition text-center">
+              近3个月
+            </button>
+            <button @click="applyExportPreset('this_year')"
+              :class="exportModalConfig.presetRange === 'this_year' ? 'bg-[#111827] text-white dark:bg-[#10e57a] dark:text-black font-bold' : 'nt-btn text-gray-700 dark:text-gray-300'"
+              class="py-1.5 px-2 rounded-md text-xs transition text-center">
+              本年度
+            </button>
+          </div>
+        </div>
+
+        <!-- 精准起止日期选择 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">开始日期 (含)</label>
+            <input v-model="exportModalConfig.startDate" @change="exportModalConfig.presetRange = 'custom'" type="date" 
+              class="w-full px-3 py-2 nt-input font-mono text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">结束日期 (含)</label>
+            <input v-model="exportModalConfig.endDate" @change="exportModalConfig.presetRange = 'custom'" type="date" 
+              class="w-full px-3 py-2 nt-input font-mono text-sm">
+          </div>
+        </div>
+
+        <!-- 导出范围与符合条数实时统计预览 -->
+        <div class="p-3 rounded-lg border border-[#e2e2e0] dark:border-[#333] bg-[#f7f7f5] dark:bg-[#222] text-xs text-gray-600 dark:text-gray-300 flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-emerald-600 text-xs"></i>
+            <span>选定区间：<strong>{{ exportModalConfig.startDate || '不限' }}</strong> 至 <strong>{{ exportModalConfig.endDate || '不限' }}</strong></span>
+          </div>
+          <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400">符合 {{ filteredExportRecordsCount }} 次排课记录</span>
+        </div>
+
+        <!-- 底部导出格式选择与确认 -->
+        <div class="pt-3 border-t border-[#e2e2e0] dark:border-[#333] flex items-center justify-between gap-2 flex-wrap">
+          <button @click="showExportAttendanceModal = false" class="nt-btn py-1.5 px-3">
+            取消
+          </button>
+          <div class="flex items-center gap-2">
+            <button @click="executeExport('csv')" class="nt-btn-export py-1.5 px-3 font-bold">
+              <i class="fa-solid fa-file-excel mr-1 text-xs"></i>
+              <span>确认导出 CSV 表格</span>
+            </button>
+            <button v-if="exportModalConfig.mode === 'student' || exportModalConfig.mode === 'student_pdf' || exportModalConfig.mode === 'student_csv'" 
+              @click="executeExport('pdf')" 
+              class="nt-btn py-1.5 px-3 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-500/30 hover:bg-blue-50 dark:hover:bg-blue-950/30 font-bold">
+              <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i>
+              <span>生成/打印 A4 PDF</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -5900,7 +5999,107 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       return pointLogs.value.filter(l => l.studentId === profileStudent.value.id);
     });
 
-    const exportStudentAttendanceCSV = (student) => {
+        // ==========================================
+    // 🌟 考勤导出时间范围筛选引擎 (Date Range Filter)
+    // ==========================================
+    const showExportAttendanceModal = ref(false);
+    const exportModalConfig = reactive({
+      mode: 'student', // 'student' | 'student_csv' | 'student_pdf' | 'matrix'
+      title: '',
+      targetStudent: null,
+      targetClassId: '',
+      presetRange: 'all', // 'all' | 'this_month' | 'last_month' | 'last_3_months' | 'this_year' | 'custom'
+      startDate: '',
+      endDate: ''
+    });
+
+    const openExportModal = (mode, student = null, classId = '') => {
+      exportModalConfig.mode = mode;
+      exportModalConfig.targetStudent = student || profileStudent.value;
+      exportModalConfig.targetClassId = classId || matrixClassId.value;
+      exportModalConfig.presetRange = 'all';
+      exportModalConfig.startDate = '';
+      exportModalConfig.endDate = '';
+
+      if (mode.startsWith('student') && exportModalConfig.targetStudent) {
+        exportModalConfig.title = `正在导出学员【${exportModalConfig.targetStudent.name}】的个人课程出勤明细`;
+      } else {
+        const cls = getClassById(exportModalConfig.targetClassId);
+        exportModalConfig.title = `正在导出班级【${cls.name}】的二维考勤大表`;
+      }
+      showExportAttendanceModal.value = true;
+    };
+
+    const applyExportPreset = (preset) => {
+      exportModalConfig.presetRange = preset;
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = now.getMonth(); // 0-indexed
+
+      if (preset === 'all') {
+        exportModalConfig.startDate = '';
+        exportModalConfig.endDate = '';
+      } else if (preset === 'this_month') {
+        const firstDay = `${y}-${String(m + 1).padStart(2, '0')}-01`;
+        const lastDay = new Date(y, m + 1, 0).toISOString().slice(0, 10);
+        exportModalConfig.startDate = firstDay;
+        exportModalConfig.endDate = lastDay;
+      } else if (preset === 'last_month') {
+        const prevM = m === 0 ? 11 : m - 1;
+        const prevY = m === 0 ? y - 1 : y;
+        const firstDay = `${prevY}-${String(prevM + 1).padStart(2, '0')}-01`;
+        const lastDay = new Date(prevY, prevM + 1, 0).toISOString().slice(0, 10);
+        exportModalConfig.startDate = firstDay;
+        exportModalConfig.endDate = lastDay;
+      } else if (preset === 'last_3_months') {
+        const d = new Date(now);
+        d.setMonth(d.getMonth() - 3);
+        exportModalConfig.startDate = d.toISOString().slice(0, 10);
+        exportModalConfig.endDate = now.toISOString().slice(0, 10);
+      } else if (preset === 'this_year') {
+        exportModalConfig.startDate = `${y}-01-01`;
+        exportModalConfig.endDate = `${y}-12-31`;
+      }
+    };
+
+    const filteredExportRecordsCount = computed(() => {
+      const start = exportModalConfig.startDate;
+      const end = exportModalConfig.endDate;
+      const targetId = exportModalConfig.targetClassId;
+      const targetStu = exportModalConfig.targetStudent;
+
+      let list = attendanceHistory.value || [];
+      if (exportModalConfig.mode.startsWith('student') && targetStu) {
+        list = list.filter(att => {
+          if (!att.details) return false;
+          return att.details.some(d => d.studentId === targetStu.id || d.student_id === targetStu.id);
+        });
+      } else if (targetId && targetId !== 'all') {
+        list = list.filter(att => att.classId === targetId || att.class_id === targetId);
+      }
+
+      if (start) list = list.filter(a => a.date >= start);
+      if (end) list = list.filter(a => a.date <= end);
+      return list.length;
+    });
+
+    const executeExport = (format) => {
+      showExportAttendanceModal.value = false;
+      const start = exportModalConfig.startDate;
+      const end = exportModalConfig.endDate;
+
+      if (exportModalConfig.mode.startsWith('student')) {
+        if (format === 'pdf') {
+          printStudentAttendancePDF(exportModalConfig.targetStudent, start, end);
+        } else {
+          exportStudentAttendanceCSV(exportModalConfig.targetStudent, start, end);
+        }
+      } else {
+        exportAttendanceMatrixCSV(exportModalConfig.targetClassId, start, end);
+      }
+    };
+
+    const exportStudentAttendanceCSV = (student, filterStartDate = "", filterEndDate = "") => {
       const targetStudent = student || profileStudent.value;
       if (!targetStudent) {
         showToast('未选择学员', 'warning');
@@ -5929,15 +6128,20 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         }
       });
 
-      attList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      // 按时间范围过滤
+      let finalAttList = attList;
+      if (filterStartDate) finalAttList = finalAttList.filter(a => a.date >= filterStartDate);
+      if (filterEndDate) finalAttList = finalAttList.filter(a => a.date <= filterEndDate);
 
-      if (!attList.length) {
+      finalAttList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      if (!finalAttList.length) {
         showToast(`学员【${stu.name}】暂无历史排课出勤记录`, 'warning');
         return;
       }
 
       const headers = ['学员姓名', '上课日期', '课程绘画主题', '所在班级', '出勤状态', '消课课时', '任课主讲老师', '出勤与请假备注说明'];
-      const rows = attList.map(a => [
+      const rows = finalAttList.map(a => [
         `"${stu.name.replace(/"/g, '""')}"`,
         `	${a.date}`,
         `"${(a.theme || '').replace(/"/g, '""')}"`,
@@ -5959,7 +6163,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       showToast(`🍐 学员【${stu.name}】个人考勤表已成功导出！`);
     };
 
-    const printStudentAttendancePDF = (student) => {
+    const printStudentAttendancePDF = (student, filterStartDate = "", filterEndDate = "") => {
       const targetStudent = student || profileStudent.value;
       if (!targetStudent) {
         showToast('未选择学员', 'warning');
@@ -5990,16 +6194,22 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         }
       });
 
-      attList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      // 按时间范围过滤
+      let finalAttList = attList;
+      if (filterStartDate) finalAttList = finalAttList.filter(a => a.date >= filterStartDate);
+      if (filterEndDate) finalAttList = finalAttList.filter(a => a.date <= filterEndDate);
 
-      const presentCount = attList.filter(a => a.status === '到课').length;
+      finalAttList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      const presentCount = finalAttList.filter(a => a.status === '到课').length;
+      const leaveCount = finalAttList.filter(a => a.status === '未到' || a.status === '请假').length;
       const leaveCount = attList.filter(a => a.status === '未到' || a.status === '请假').length;
       const totalLessons = presentCount + leaveCount;
       const rate = totalLessons > 0 ? ((presentCount / totalLessons) * 100).toFixed(0) + '%' : '100%';
       const todayStr = new Date().toISOString().slice(0, 10);
 
       // 生成整洁高雅的 A4 PDF 打印文档
-      const rowsHtml = attList.length > 0 ? attList.map((a, idx) => {
+      const rowsHtml = finalAttList.length > 0 ? finalAttList.map((a, idx) => {
         const badgeClass = a.status === '到课' ? 'badge-green' : a.status === '请假' || a.status === '未到' ? 'badge-yellow' : 'badge-purple';
         return `<tr>
           <td style="text-align:center; font-family:monospace; font-weight:600; color:#6b7280;">#${String(idx + 1).padStart(2, '0')}</td>
@@ -6695,11 +6905,13 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       showToast('🔄 课次已删除，学员课时已全额退还！', 'info');
     };
 
-    const exportAttendanceMatrixCSV = (classId) => {
+    const exportAttendanceMatrixCSV = (classId, filterStartDate = "", filterEndDate = "") => {
       const targetId = classId || matrixClassId.value;
       const cls = getClassById(targetId);
       const stuList = activeStudents.value.filter(s => s.classId === targetId);
-      const attList = attendanceHistory.value.filter(a => a.classId === targetId);
+      let attList = attendanceHistory.value.filter(a => a.classId === targetId || a.class_id === targetId);
+      if (filterStartDate) attList = attList.filter(a => a.date >= filterStartDate);
+      if (filterEndDate) attList = attList.filter(a => a.date <= filterEndDate);
 
       if (!stuList.length || !attList.length) {
         showToast('该班级暂无足够的考勤记录可导出矩阵表', 'warning');
