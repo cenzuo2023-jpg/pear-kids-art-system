@@ -6020,7 +6020,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       showStudentModal.value = false;
     };
 
-    const deleteStudentconst deleteStudent = (s) => {
+    const deleteStudent = (s) => {
       if (confirm(`确定要彻底删除学员【${s.name}】吗？\n建议优先使用「归档」功能，归档后可随时恢复。彻底删除将无法找回！`)) {
         students.value = students.value.filter(item => item.id !== s.id);
         if (profileStudent.value && profileStudent.value.id === s.id) {
