@@ -3261,6 +3261,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
 import { DEFAULT_INITIAL_DATA } from './data.js';
+import { supabase } from './lib/supabase.js';
 
     const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     const THEME_KEY = 'XIANGCHILI_THEME';
@@ -3325,76 +3326,117 @@ import { DEFAULT_INITIAL_DATA } from './data.js';
       showToast(isDarkMode.value ? '已切换至深色线框模式 🌙' : '已切换至浅色模式 ☀️', 'info', 1500);
     };
 
-    const loadData = () => {
-      const savedTheme = localStorage.getItem(THEME_KEY);
-      if (savedTheme) {
-        isDarkMode.value = (savedTheme === 'dark');
-      }
-      applyTheme();
+    
+const loadData = async () => {
+  try {
+    const [
+      { data: studio },
+      { data: cls },
+      { data: stu },
+      { data: att },
+      { data: fin },
+      { data: prz },
+      { data: plog },
+      { data: popt }
+    ] = await Promise.all([
+      supabase.from('studio_info').select('*'),
+      supabase.from('classes').select('*'),
+      supabase.from('students').select('*'),
+      supabase.from('attendance_records').select('*'),
+      supabase.from('finance_logs').select('*'),
+      supabase.from('point_prizes').select('*'),
+      supabase.from('point_logs').select('*'),
+      supabase.from('point_reward_options').select('*')
+    ]);
 
-      try {
-        const savedData = localStorage.getItem(STORAGE_KEY);
-        if (savedData) {
-          const parsed = JSON.parse(savedData);
-          if (parsed.studioInfo) studioInfo.value = parsed.studioInfo;
-          if (parsed.classes && Array.isArray(parsed.classes)) classes.value = parsed.classes;
-          if (parsed.students && Array.isArray(parsed.students)) {
-            // 兼容性：确保所有学员都有积分属性
-            students.value = parsed.students.map(s => ({
-              ...s,
-              points: s.points !== undefined ? Number(s.points) : 100,
-              totalPointsEarned: s.totalPointsEarned !== undefined ? Number(s.totalPointsEarned) : 100,
-              redeemedCount: s.redeemedCount !== undefined ? Number(s.redeemedCount) : 0
-            }));
+    if (!studio || studio.length === 0) {
+      console.log('Database empty, seeding default data...');
+      // Seed data
+      await supabase.from('studio_info').insert([{ id: '00000000-0000-0000-0000-000000000000', ...DEFAULT_INITIAL_DATA.studioInfo }]);
+      await supabase.from('classes').insert(DEFAULT_INITIAL_DATA.classes.map(c => ({...c, created_at: c.createdAt || new Date().toISOString(), archived_at: c.archivedAt || null})));
+      
+      const stus = DEFAULT_INITIAL_DATA.students.map(s => {
+          return {
+              id: s.id, name: s.name, gender: s.gender, age: s.age, class_id: s.classId, parent_name: s.parentName,
+              parent_phone: s.parentPhone, remain_hours: s.remainHours, total_purchased: s.totalPurchased,
+              total_consumed: s.totalConsumed, points: s.points, total_points_earned: s.totalPointsEarned,
+              redeemed_count: s.redeemedCount, status: s.status, join_date: s.joinDate, notes: s.notes
           }
-          if (parsed.attendanceHistory && Array.isArray(parsed.attendanceHistory)) attendanceHistory.value = parsed.attendanceHistory;
-          if (parsed.hourLogs && Array.isArray(parsed.hourLogs)) hourLogs.value = parsed.hourLogs;
-          if (parsed.paymentOrders && Array.isArray(parsed.paymentOrders)) paymentOrders.value = parsed.paymentOrders;
-          if (parsed.pointRewardOptions && Array.isArray(parsed.pointRewardOptions)) {
-            pointRewardOptions.value = parsed.pointRewardOptions;
-          } else {
-            pointRewardOptions.value = DEFAULT_DEFAULT_INITIAL_DATA.pointRewardOptions;
-          }
-          if (parsed.pointPrizes && Array.isArray(parsed.pointPrizes)) {
-            pointPrizes.value = parsed.pointPrizes;
-          } else {
-            pointPrizes.value = DEFAULT_DEFAULT_INITIAL_DATA.pointPrizes;
-          }
-          if (parsed.pointLogs && Array.isArray(parsed.pointLogs)) {
-            pointLogs.value = parsed.pointLogs;
-          } else {
-            pointLogs.value = DEFAULT_DEFAULT_INITIAL_DATA.pointLogs;
-          }
-        } else {
-          // 首次默认值初始化
-          students.value = DEFAULT_DEFAULT_INITIAL_DATA.students;
-          pointRewardOptions.value = DEFAULT_DEFAULT_INITIAL_DATA.pointRewardOptions;
-          pointPrizes.value = DEFAULT_DEFAULT_INITIAL_DATA.pointPrizes;
-          pointLogs.value = DEFAULT_DEFAULT_INITIAL_DATA.pointLogs;
-        }
+      });
+      await supabase.from('students').insert(stus);
+      
+      if (DEFAULT_INITIAL_DATA.attendanceHistory) await supabase.from('attendance_records').insert(DEFAULT_INITIAL_DATA.attendanceHistory.map(a => ({date: a.date, theme: a.theme, class_id: a.classId, details: a.details})));
+      if (DEFAULT_INITIAL_DATA.financeLogs) await supabase.from('finance_logs').insert(DEFAULT_INITIAL_DATA.financeLogs.map(f => ({id: f.id, type: f.type, date: f.date, amount: f.amount, student_id: f.studentId, student_name: f.studentName, description: f.description, hours: f.hours, operator: f.operator})));
+      if (DEFAULT_INITIAL_DATA.pointPrizes) await supabase.from('point_prizes').insert(DEFAULT_INITIAL_DATA.pointPrizes.map(p => ({id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc})));
+      if (DEFAULT_INITIAL_DATA.pointRewardOptions) await supabase.from('point_reward_options').insert(DEFAULT_INITIAL_DATA.pointRewardOptions);
+      if (DEFAULT_INITIAL_DATA.pointLogs) await supabase.from('point_logs').insert(DEFAULT_INITIAL_DATA.pointLogs.map(p => ({id: p.id, student_id: p.studentId, student_name: p.studentName, type: p.type, points: p.points, balance_after: p.balanceAfter, reason: p.reason, operator: p.operator, time: p.time})));
+      
+      alert('初始化数据已成功写入数据库！请刷新页面。');
+      window.location.reload();
+      return;
+    }
 
-        // 确保 matrixClassId 指向有效开班
-        const available = activeClasses.value;
-        if (!matrixClassId.value || !available.some(c => c.id === matrixClassId.value)) {
-          matrixClassId.value = available[0]?.id || classes.value[0]?.id || '';
-        }
-      } catch (err) {
-        console.error('加载本地数据失败:', err);
-      }
-    };
+    studioInfo.value = studio[0] || DEFAULT_INITIAL_DATA.studioInfo;
+    
+    // Map back from snake_case to camelCase for the frontend UI logic
+    classes.value = cls.map(c => ({...c, createdAt: c.created_at, archivedAt: c.archived_at}));
+    students.value = stu.map(s => ({
+        ...s, classId: s.class_id, parentName: s.parent_name, parentPhone: s.parent_phone, remainHours: s.remain_hours,
+        totalPurchased: s.total_purchased, totalConsumed: s.total_consumed, totalPointsEarned: s.total_points_earned,
+        redeemedCount: s.redeemed_count, joinDate: s.join_date
+    }));
+    attendanceHistory.value = att.map(a => ({id: a.id, date: a.date, theme: a.theme, classId: a.class_id, details: a.details}));
+    financeLogs.value = fin.map(f => ({id: f.id, type: f.type, date: f.date, amount: f.amount, studentId: f.student_id, studentName: f.student_name, description: f.description, hours: f.hours, operator: f.operator}));
+    pointPrizes.value = prz.map(p => ({id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc: p.desc_text}));
+    pointLogs.value = plog.map(p => ({id: p.id, studentId: p.student_id, studentName: p.student_name, type: p.type, points: p.points, balanceAfter: p.balance_after, reason: p.reason, operator: p.operator, time: p.time}));
+    pointRewardOptions.value = popt;
 
-    const saveData = () => {
-      const payload = {
-        studioInfo: studioInfo.value,
-        classes: classes.value,
-        students: students.value,
-        attendanceHistory: attendanceHistory.value,
-        hourLogs: hourLogs.value,
-        paymentOrders: paymentOrders.value,
-        pointRewardOptions: pointRewardOptions.value,
-        pointPrizes: pointPrizes.value,
-        pointLogs: pointLogs.value
-      };
+  } catch (e) {
+    console.error('加载数据库失败:', e);
+    alert('连接数据库失败，已降级为本地缓存模式。');
+    // Fallback to local storage logic here if needed...
+  }
+};
+
+
+    
+let saveTimeout = null;
+const saveData = () => {
+  // Debounce to prevent spamming the database
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(async () => {
+    try {
+      await supabase.from('studio_info').upsert([{ id: studioInfo.value.id || '00000000-0000-0000-0000-000000000000', ...studioInfo.value }]);
+      
+      // mapped back to snake_case for DB
+      const clsDb = classes.value.map(c => ({id: c.id, name: c.name, teacher: c.teacher, schedule: c.schedule, classroom: c.classroom, capacity: c.capacity, status: c.status, created_at: c.createdAt || new Date().toISOString(), archived_at: c.archivedAt, notes: c.notes}));
+      if(clsDb.length) await supabase.from('classes').upsert(clsDb);
+      
+      const stuDb = students.value.map(s => ({id: s.id, name: s.name, gender: s.gender, age: s.age, class_id: s.classId, parent_name: s.parentName, parent_phone: s.parentPhone, remain_hours: s.remainHours, total_purchased: s.totalPurchased, total_consumed: s.totalConsumed, points: s.points, total_points_earned: s.totalPointsEarned, redeemed_count: s.redeemedCount, status: s.status, join_date: s.joinDate, notes: s.notes}));
+      if(stuDb.length) await supabase.from('students').upsert(stuDb);
+
+      const attDb = attendanceHistory.value.map(a => ({id: a.id, date: a.date, theme: a.theme, class_id: a.classId, details: a.details}));
+      if(attDb.length) await supabase.from('attendance_records').upsert(attDb);
+
+      const finDb = financeLogs.value.map(f => ({id: f.id, type: f.type, date: f.date, amount: f.amount, student_id: f.studentId, student_name: f.studentName, description: f.description, hours: f.hours, operator: f.operator}));
+      if(finDb.length) await supabase.from('finance_logs').upsert(finDb);
+
+      const przDb = pointPrizes.value.map(p => ({id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc}));
+      if(przDb.length) await supabase.from('point_prizes').upsert(przDb);
+
+      const poptDb = pointRewardOptions.value.map(p => ({id: p.id, name: p.name, points: p.points, icon: p.icon, color: p.color}));
+      if(poptDb.length) await supabase.from('point_reward_options').upsert(poptDb);
+
+      const plogDb = pointLogs.value.map(p => ({id: p.id, student_id: p.studentId, student_name: p.studentName, type: p.type, points: p.points, balance_after: p.balanceAfter, reason: p.reason, operator: p.operator, time: p.time}));
+      if(plogDb.length) await supabase.from('point_logs').upsert(plogDb);
+
+      console.log('✅ Synchronized with Supabase DB');
+    } catch (e) {
+      console.error('❌ Failed to sync to Supabase:', e);
+    }
+  }, 1000);
+};
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     };
 
