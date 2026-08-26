@@ -4909,6 +4909,12 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // 7. 二维考勤总表 (单元格下拉修改考勤 & 奖励积分)
     // ==========================================
     const matrixClassId = ref(activeClasses.value[0]?.id || classes.value[0]?.id || '');
+    watch(activeClasses, (newVal) => {
+      if (!matrixClassId.value && newVal.length > 0) {
+        matrixClassId.value = newVal[0].id;
+      }
+    }, { immediate: true });
+
 
     const matrixStudents = computed(() => {
       if (!matrixClassId.value) return [];
