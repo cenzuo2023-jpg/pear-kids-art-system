@@ -50,3 +50,5 @@
 - **Tailwind CSS** + 自定义 Wireframe 极简线框设计系统
 - **FontAwesome 6** 图标库
 - **LocalStorage / JSON** 数据本地持久化与一键备份还原
+
+<!-- Trigger Vercel Build -->
