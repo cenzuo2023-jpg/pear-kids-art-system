@@ -3075,7 +3075,7 @@
           <!-- 缴费说明与经办日期 -->
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">交费日期</label>
+              <label class="block text-black dark:text-stone-400 mb-1 font-semibold">📅 缴费时间 / 日期 <span class="text-emerald-400">*</span></label>
               <input v-model="rechargeForm.payDate" type="date" class="w-full px-3 py-2 wf-input font-mono">
             </div>
             <div>
