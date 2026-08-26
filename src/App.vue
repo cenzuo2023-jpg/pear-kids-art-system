@@ -106,84 +106,67 @@
     </header>
 
     <!-- ============================================================ -->
-    <!-- 2. 🌟 固定通栏考勤工具条 (仅在 Tab 1 考勤大表显示 · 置顶 z-40) -->
-    <!-- ============================================================ -->
-    <div v-if="currentTab === 'attendance'" class="notion-attendance-toolbar sticky top-16 sm:top-20 z-40 w-full border-b border-black/[0.06] dark:border-white/[0.08] py-3.5 px-4 sm:px-6 transition-colors"
-      style="background-color: var(--bg-surface);">
-      <div class="workspace-title-row">
-        <div>
-          <h1>考勤大表</h1>
-          <p>记录每次课程出勤、课消与备注</p>
-        </div>
-        <button type="button" class="sync-state" :class="'sync-' + syncStatus" aria-live="polite"
-          :title="syncErrorMessage || syncStatusLabel" @click="syncStatus === 'offline' ? retryCloudSync() : null">
-          <i v-if="syncStatus === 'syncing' || syncStatus === 'loading'" class="fa-solid fa-rotate sync-state-spinner"></i>
-          <span v-else class="sync-state-dot"></span>
-          <span>{{ syncStatusLabel }}</span>
-        </button>
-      </div>
-      <div class="attendance-toolbar-main w-full flex items-center justify-between gap-6">
+    <!-- 2. 🌟 固定通栏考勤工具条 (极简 Notion 工具栏 · 无多余重叠文字) -->
+    <div v-if="currentTab === 'attendance'" class="sticky top-14 sm:top-16 z-40 w-full border-b border-[#e2e2e0] dark:border-[#333] py-2 px-4 sm:px-6 transition-colors shadow-sm"
+      style="background-color: var(--bg-surface-subtle);">
+      <div class="w-full flex items-center justify-between gap-4 flex-wrap">
         
-        <!-- 左侧：班级快速下拉切换器 -->
-        <div class="flex items-center gap-3.5">
+        <!-- 左侧：班级快速下拉切换器与任课信息 -->
+        <div class="flex items-center gap-3 flex-wrap">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-[#10E57A]"></span>
-            <span class="text-xs text-black dark:text-stone-400 font-bold uppercase tracking-wider">班级</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider">班级</span>
           </div>
 
           <div class="relative">
             <select v-model="matrixClassId" 
-              class="appearance-none pl-4 pr-9 py-2 wf-select text-xs sm:text-sm font-bold cursor-pointer shadow-sm">
+              class="appearance-none pl-3 pr-8 py-1.5 nt-select text-sm font-bold cursor-pointer shadow-sm">
               <option v-for="c in activeClasses" :key="c.id" :value="c.id">
                 🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)
               </option>
             </select>
-            <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-black dark:text-stone-400 text-xs pointer-events-none"></i>
+            <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
           </div>
 
-          <span class="text-xs text-black dark:text-stone-400 hidden lg:inline font-medium pl-2 border-l border-black/10 dark:border-white/10">
-            任课：<strong>{{ getClassById(matrixClassId).teacher }}</strong> · {{ getClassById(matrixClassId).schedule }}
+          <span class="text-xs text-gray-600 dark:text-gray-400 hidden sm:inline font-medium pl-2 border-l border-[#e2e2e0] dark:border-[#333]">
+            任课：<strong class="text-[#111827] dark:text-[#f3f4f6]">{{ getClassById(matrixClassId).teacher || '未设置' }}</strong> · {{ getClassById(matrixClassId).schedule || '未设置' }}
+          </span>
+
+          <span class="text-xs text-gray-500 font-mono hidden md:inline">
+            (共 {{ matrixAttendanceRecords.length }} 次排课记录)
           </span>
         </div>
 
-        <!-- 右侧：精简有力的线框操作按钮组 -->
-        <div class="flex items-center gap-2.5 flex-shrink-0">
+        <!-- 右侧：精简有力的操作按钮组 + 导出 -->
+        <div class="flex items-center gap-2 flex-wrap flex-shrink-0">
           
-          <!-- 🌟 全班一键奖积分 -->
-          <button @click="openBatchPointReward(matrixClassId)" class="wf-btn-outline text-amber-400 border-amber-500/30 hover:border-amber-400 whitespace-nowrap">
-            <i class="fa-solid fa-star text-amber-400"></i>
+          <!-- 全班一键奖积分 -->
+          <button @click="openBatchPointReward(matrixClassId)" class="nt-btn text-xs sm:text-sm text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-500/30">
+            <i class="fa-solid fa-star text-amber-500 text-xs"></i>
             <span>全班奖积分</span>
           </button>
 
-          <!-- 新增考勤 -->
-          <button @click="openAddMatrixRow" class="wf-btn-primary whitespace-nowrap">
-            <i class="fa-solid fa-plus-circle text-sm"></i>
+          <!-- 新增排课考勤 -->
+          <button @click="openAddMatrixRow" class="nt-btn-primary text-xs sm:text-sm">
+            <i class="fa-solid fa-plus text-xs"></i>
             <span>新增考勤</span>
           </button>
 
           <!-- 补录考勤 -->
-          <button @click="openAdhocAttendanceModal('')" class="wf-btn-outline whitespace-nowrap">
-            <i class="fa-solid fa-user-clock text-emerald-400"></i>
+          <button @click="openAdhocAttendanceModal('')" class="nt-btn text-xs sm:text-sm text-emerald-700 dark:text-emerald-400">
+            <i class="fa-regular fa-clock text-xs"></i>
             <span>补考勤</span>
           </button>
 
           <!-- 导出大表 -->
-          <button @click="exportAttendanceMatrixCSV(matrixClassId)" class="wf-btn-outline whitespace-nowrap text-emerald-400 border-emerald-500/30 hover:border-emerald-400">
-            <i class="fa-solid fa-file-csv"></i>
-            <span>导出大表</span>
+          <button @click="exportAttendanceMatrixCSV(matrixClassId)" class="nt-btn-export text-xs sm:text-sm">
+            <i class="fa-solid fa-file-excel text-xs"></i>
+            <span>导出大表 CSV</span>
           </button>
 
         </div>
 
       </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <div class="attendance-summary-strip" v-if="currentTab === 'attendance'" aria-label="当前班级概况">
-      <div><span>在读学员</span><strong>{{ activeStudents.filter(s => s.classId === matrixClassId).length }}</strong></div>
-      <div><span>课程记录</span><strong>{{ matrixAttendanceRecords.length }}</strong></div>
-      <div><span>任课老师</span><strong>{{ getClassById(matrixClassId).teacher || '未设置' }}</strong></div>
-      <div><span>上课时间</span><strong>{{ getClassById(matrixClassId).schedule || '未设置' }}</strong></div>
     </div>
 
     <!-- 主要内容区域 -->
@@ -196,56 +179,58 @@
       <section v-if="currentTab === 'attendance'" class="w-full">
         
         <!-- 表格水平滚动容器 (支持多学员流畅横向滑动，前两列固定) -->
-        <div class="attendance-table-scroll overflow-x-auto h-[calc(100vh-130px)] overflow-y-auto w-full border-b border-black/10 dark:border-white/10" style="scrollbar-width: thin; background-color: var(--bg-page);">
-          <table class="attendance-matrix w-max min-w-full text-center text-xs border-collapse select-none" style="background-color: var(--bg-page); table-layout: fixed;">
+        <div class="attendance-table-scroll w-full border-b border-[#e2e2e0] dark:border-[#333]" 
+          style="overflow-x: auto !important; overflow-y: auto !important; max-width: 100vw; height: calc(100vh - 125px); -webkit-overflow-scrolling: touch; background-color: var(--bg-page);">
+          <table class="attendance-matrix text-center text-sm border-collapse select-none" 
+            style="width: max-content; min-width: 100%; border-spacing: 0; background-color: var(--bg-page);">
             
-            <!-- 表头 (紧凑高雅线框 · 课程与日期固定置顶与左置) -->
-            <thead class="sticky top-0 z-30 shadow-sm border-b border-black/10 dark:border-white/15" style="background-color: var(--bg-surface);">
+            <!-- 表头 (14px 粗体 · 课程与日期固定置顶与左置) -->
+            <thead class="sticky top-0 z-30 shadow-sm border-b border-[#e2e2e0] dark:border-[#333]" style="background-color: var(--bg-surface);">
               <tr class="font-bold select-none">
-                <!-- 01 课程主题 (固定左侧第1列 · 紧凑单行绝对不折行) -->
-                <th class="py-2.5 pl-4 pr-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[155px] w-[155px] whitespace-nowrap sticky left-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                <!-- 01 课程主题 (固定左侧第1列 · 160px 宽 · 绝不挤压) -->
+                <th class="py-3 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   <div class="flex items-center gap-1.5 whitespace-nowrap">
-                    <span class="text-[10px] text-black dark:text-stone-400 font-mono font-normal">01</span>
-                    <span class="text-xs font-black tracking-tight">课程主题</span>
-                    <span class="text-[9px] text-black dark:text-stone-400 font-normal ml-0.5">✏️</span>
+                    <span class="text-xs text-gray-500 font-mono font-bold">01</span>
+                    <span class="text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]">课程主题</span>
+                    <span class="text-xs text-gray-400 ml-0.5">✏️</span>
                   </div>
                 </th>
 
-                <!-- 02 上课日期 (固定左侧第2列 · 紧凑单行) -->
-                <th class="py-2.5 px-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[140px] w-[140px] whitespace-nowrap sticky left-[155px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
-                  <div class="flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-500 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
-                    <span class="text-[10px] text-black dark:text-stone-400 font-mono font-normal">02</span>
-                    <span class="text-xs font-black tracking-tight">上课日期</span>
-                    <i class="fa-solid fa-sort text-[10px] opacity-40 group-hover:opacity-100 transition" :class="attendanceSortOrder === 'desc' ? 'fa-sort-down text-emerald-500 opacity-100' : 'fa-sort-up text-emerald-500 opacity-100'"></i>
-                    <span class="text-[9px] text-black dark:text-stone-400 font-normal ml-0.5">📅</span>
+                <!-- 02 上课日期 (固定左侧第2列 · 145px 宽 · 带排序) -->
+                <th class="py-3 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                  <div class="flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-600 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
+                    <span class="text-xs text-gray-500 font-mono font-bold">02</span>
+                    <span class="text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]">上课日期</span>
+                    <i class="fa-solid fa-sort text-xs opacity-50 group-hover:opacity-100 transition text-gray-600" :class="attendanceSortOrder === 'desc' ? 'fa-sort-down text-emerald-600 opacity-100' : 'fa-sort-up text-emerald-600 opacity-100'"></i>
+                    <span class="text-xs text-gray-400 ml-0.5">📅</span>
                   </div>
                 </th>
                 
-                <!-- 🌟 学员列 (紧凑优雅排版：#序号 + 姓名 + 剩余课时与积分微胶囊 · 宽度适中可横向平滑滚动) -->
+                <!-- 🌟 学员列 (固定宽度 110px · 16人横排可顺畅横向滚动 · 绝对不截断) -->
                 <th v-for="(stu, idx) in matrixStudents" :key="'name_' + stu.id" 
-                  class="py-2 px-1.5 border-r border-black/[0.06] dark:border-white/10 min-w-[92px] w-[92px] whitespace-nowrap z-20" 
+                  class="py-2.5 px-2 border-r border-[#e2e2e0] dark:border-[#333] min-w-[110px] w-[110px] whitespace-nowrap z-20" 
                   style="background-color: var(--bg-surface);">
                   
-                  <div class="flex flex-col items-center justify-center gap-0.5">
-                    <!-- 顶部紧凑序号与姓名 -->
+                  <div class="flex flex-col items-center justify-center gap-1">
+                    <!-- 序号与学员姓名 -->
                     <div @click="openStudentProfile(stu)" 
-                      class="cursor-pointer group flex items-center justify-center gap-1 font-bold text-xs text-stone-900 dark:text-black dark:text-stone-100 hover:text-emerald-500 dark:hover:text-emerald-400 transition whitespace-nowrap" 
+                      class="cursor-pointer group flex items-center justify-center gap-1 font-bold text-sm text-[#111827] dark:text-[#f3f4f6] hover:text-emerald-600 transition whitespace-nowrap" 
                       :title="'#' + (idx + 1) + ' ' + stu.name + ' (点击查看档案)'">
-                      <span class="text-[9px] font-mono text-black dark:text-stone-400 font-normal">#{{ idx + 1 }}</span>
-                      <span>{{ stu.name }}</span>
+                      <span class="text-xs font-mono text-gray-400 font-normal">#{{ idx + 1 }}</span>
+                      <span class="text-[14px]">{{ stu.name }}</span>
                     </div>
                     
-                    <!-- 底部微型状态胶囊群 (紧密横排) -->
-                    <div class="flex items-center justify-center gap-1 font-mono text-[9px] leading-none whitespace-nowrap mt-0.5">
+                    <!-- 剩余课时与积分微标签 -->
+                    <div class="flex items-center justify-center gap-1 font-mono text-xs leading-none whitespace-nowrap">
                       <!-- 剩余课时 -->
-                      <span :class="stu.remainHours <= 0 ? 'text-rose-500 bg-rose-500/10 border-rose-500/30' : stu.remainHours <= 3 ? 'text-amber-500 bg-amber-500/10 border-amber-500/30' : 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30'"
-                        class="px-1 py-0.5 rounded border font-bold">
+                      <span :class="stu.remainHours <= 0 ? 'nt-tag-red' : stu.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
+                        class="px-1.5 py-0.5 rounded font-bold font-mono">
                         余{{ stu.remainHours }}
                       </span>
 
                       <!-- 画币积分 -->
                       <button @click.stop="openIndividualPointModal(stu, 'add')" 
-                        class="px-1 py-0.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:border-amber-400 transition cursor-pointer font-bold flex items-center gap-0.5" 
+                        class="nt-tag-gold hover:border-amber-400 transition cursor-pointer font-bold flex items-center gap-0.5" 
                         :title="'点击为【' + stu.name + '】变更积分'">
                         <span>⭐</span>
                         <span>{{ stu.points || 0 }}</span>
@@ -255,135 +240,129 @@
 
                 </th>
 
-                <!-- 操作列 (固定右侧) -->
-                <th class="py-2.5 px-2 w-16 min-w-[64px] text-center text-black dark:text-stone-400 text-xs font-normal sticky right-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                <!-- 操作列 (固定最右侧) -->
+                <th class="py-3 px-2 w-16 min-w-[64px] text-center text-gray-500 text-xs font-semibold sticky right-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   操作
                 </th>
               </tr>
             </thead>
 
             <!-- 矩阵数据行 -->
-            <tbody class="divide-y divide-black/[0.06] dark:divide-white/10" style="background-color: var(--bg-page);">
-              <!-- 历史考勤数据行 -->
-              <tr v-for="att in matrixAttendanceRecords" :key="att.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors">
+            <tbody class="divide-y divide-[#e2e2e0] dark:divide-[#333]" style="background-color: var(--bg-page);">
+              <tr v-for="att in matrixAttendanceRecords" :key="att.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222] transition-colors">
                 
-                <!-- 🌟 课程主题 (固定左侧第1列 · 紧凑单行可直接点击修改) -->
-                <td class="py-2 pl-4 pr-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[155px] w-[155px] whitespace-nowrap sticky left-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                <!-- 🌟 课程主题 (固定第1列 · 160px · 单行快速修改) -->
+                <td class="py-2.5 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
                   <div @click="openEditAttendanceRow(att)" 
-                    class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition whitespace-nowrap"
+                    class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
                     title="点击修改课程主题与上课日期">
-                    <div class="flex items-center gap-1.5 truncate max-w-[125px]">
-                      <i class="fa-regular fa-file-lines text-black dark:text-stone-400 text-[11px] flex-shrink-0"></i>
-                      <span class="font-bold text-xs text-stone-900 dark:text-black dark:text-stone-100 group-hover:text-emerald-400 transition-colors truncate">{{ att.theme }}</span>
+                    <div class="flex items-center gap-1.5 truncate max-w-[130px]">
+                      <i class="fa-regular fa-file-lines text-gray-400 text-xs flex-shrink-0"></i>
+                      <span class="font-bold text-sm text-[#111827] dark:text-[#f3f4f6] group-hover:text-emerald-600 transition-colors truncate">{{ att.theme }}</span>
                     </div>
-                    <i class="fa-solid fa-pen text-[9px] text-black dark:text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
+                    <i class="fa-solid fa-pen text-xs text-gray-400 opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                   </div>
                 </td>
 
-                <!-- 🌟 上课日期 (固定左侧第2列 · 紧凑单行可直接点击修改) -->
-                <td class="py-2 px-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[140px] w-[140px] whitespace-nowrap sticky left-[155px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                <!-- 🌟 上课日期 (固定第2列 · 145px · 单行快速修改) -->
+                <td class="py-2.5 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
                   <div @click="openEditAttendanceRow(att)" 
-                    class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition whitespace-nowrap"
+                    class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
                     title="点击修改上课日期与课程主题">
                     <div class="flex items-center gap-1.5 truncate">
-                      <i class="fa-regular fa-calendar text-black dark:text-stone-400 text-[11px] flex-shrink-0"></i>
-                      <span class="font-mono text-xs text-black dark:text-stone-400 dark:text-black dark:text-stone-400 group-hover:text-emerald-400 transition-colors whitespace-nowrap">{{ att.date }}</span>
+                      <i class="fa-regular fa-calendar text-gray-400 text-xs flex-shrink-0"></i>
+                      <span class="font-mono text-sm text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 transition-colors whitespace-nowrap">{{ att.date }}</span>
                     </div>
-                    <i class="fa-solid fa-pen text-[9px] text-black dark:text-stone-400 opacity-0 group-hover:opacity-100 text-emerald-400 transition-opacity flex-shrink-0"></i>
+                    <i class="fa-solid fa-pen text-xs text-gray-400 opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                   </div>
                 </td>
 
-                <!-- 🌟 考勤状态单元格 (紧凑居中 · 无悬浮黄点干扰 · 点击弹出极简下拉修改) -->
+                <!-- 🌟 考勤状态单元格 (110px 宽度 · O(1)极速状态匹配 · 点击快速下拉) -->
                 <td v-for="stu in matrixStudents" :key="stu.id" 
-                  class="py-1 px-1 border-r border-black/[0.06] dark:border-white/10 relative transition-all text-center min-w-[92px] w-[92px]">
+                  class="py-1.5 px-1 border-r border-[#e2e2e0] dark:border-[#333] relative transition-all text-center min-w-[110px] w-[110px]">
                   
-                  <div @click.stop="toggleCellDropdown(att.id, stu.id, $event, att, stu)"
-                    class="cursor-pointer py-1 px-1.5 rounded-lg font-bold text-xs inline-flex items-center justify-center gap-1 min-w-[68px] transition select-none hover:scale-105 active:scale-95 shadow-sm"
+                  <div @click.stop="toggleCellDropdown(att.id, stu.id, $event, att, stu)" 
+                    class="cursor-pointer py-1 px-2 rounded-md font-bold text-xs inline-flex items-center justify-center gap-1 min-w-[76px] transition select-none hover:opacity-90 active:scale-95 shadow-sm"
                     :class="getMatrixCellClass(getStudentAttendanceCell(stu.id, att).status)"
                     :title="'点击修改【' + stu.name + '】出勤状态' + (getStudentAttendanceCell(stu.id, att).note ? ' (备注: ' + getStudentAttendanceCell(stu.id, att).note + ')' : '')">
                     
                     <span>{{ getStudentAttendanceCell(stu.id, att).status }}</span>
-                    <i class="fa-solid fa-chevron-down text-[7px] opacity-60"></i>
+                    <i class="fa-solid fa-chevron-down text-[8px] opacity-60"></i>
                   </div>
 
-                  <!-- 🌟 交互式快速浮层操作菜单 (Popover) -->
+                  <!-- 交互式浮层操作菜单 (Popover) -->
                   <div v-if="activeCellDropdownKey === (att.id + '_' + stu.id)" 
-                    class="absolute z-50 top-full left-1/2 -translate-x-1/2 mt-1 w-48 p-2 rounded-xl border border-black/15 dark:border-white/20 shadow-2xl space-y-1 text-left backdrop-blur-xl"
+                    class="absolute z-50 top-full left-1/2 -translate-x-1/2 mt-1 w-48 p-2 rounded-lg border border-[#e2e2e0] dark:border-[#444] shadow-xl space-y-1 text-left"
                     style="background-color: var(--bg-surface);">
                     
-                    <div class="px-2 py-1 text-[10px] text-black dark:text-stone-400 font-mono border-b border-black/10 dark:border-white/10 flex justify-between items-center">
-                      <span>快速修改考勤</span>
-                      <span class="font-bold text-emerald-400">{{ stu.name }}</span>
+                    <div class="px-2 py-1 text-xs text-gray-500 font-mono border-b border-[#e2e2e0] dark:border-[#333] flex justify-between items-center">
+                      <span>修改考勤</span>
+                      <span class="font-bold text-emerald-600">{{ stu.name }}</span>
                     </div>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '到课')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-500/20 text-[#10E57A] transition"
-                      :class="getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-500/20 border border-emerald-500/40' : ''">
+                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-emerald-50 text-emerald-700 dark:hover:bg-emerald-950/30 transition"
+                      :class="getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-50 border border-emerald-300' : ''">
                       <span class="flex items-center gap-1.5"><span>🟢</span> 到课</span>
-                      <span class="text-[10px] text-black dark:text-stone-400 font-mono">消课-1</span>
+                      <span class="text-xs text-gray-500 font-mono">消课-1</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '未到')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-rose-500/20 text-rose-400 transition"
-                      :class="getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-500/20 border border-rose-500/40' : ''">
-                      <span class="flex items-center gap-1.5"><span>🔴</span> 未到/请假</span>
-                      <span class="text-[10px] text-black dark:text-stone-400 font-mono">不扣课</span>
+                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/30 transition"
+                      :class="getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-50 border border-rose-300' : ''">
+                      <span class="flex items-center gap-1.5"><span>🔴</span> 请假/未到</span>
+                      <span class="text-xs text-gray-500 font-mono">不扣课</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '放假')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-purple-500/20 text-purple-400 transition"
-                      :class="getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-500/20 border border-purple-500/40' : ''">
+                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-purple-50 text-purple-700 dark:hover:bg-purple-950/30 transition"
+                      :class="getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-50 border border-purple-300' : ''">
                       <span class="flex items-center gap-1.5"><span>🟣</span> 全班放假</span>
-                      <span class="text-[10px] text-black dark:text-stone-400">休假</span>
+                      <span class="text-xs text-gray-500">休假</span>
                     </button>
 
-                    <div class="border-t border-black/10 dark:border-white/10 my-1"></div>
+                    <div class="border-t border-[#e2e2e0] dark:border-[#333] my-1"></div>
 
-                    <!-- 🌟 变更该学员积分 -->
                     <button @click.stop="openIndividualPointModal(stu, 'add'); activeCellDropdownKey = null" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-amber-400 hover:bg-amber-500/10 font-bold transition">
-                      <i class="fa-solid fa-star text-[10px]"></i>
+                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-bold transition">
+                      <i class="fa-solid fa-star text-xs"></i>
                       <span>变更【{{ stu.name }}】积分</span>
                     </button>
 
                     <button @click.stop="openNoteFromDropdown(att, stu)" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs hover:bg-black/5 dark:hover:bg-white/10 transition">
-                      <i class="fa-solid fa-pen text-[10px] text-black dark:text-stone-400"></i>
-                      <span>填写 / 修改备注</span>
+                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+                      <i class="fa-solid fa-pen text-xs text-gray-400"></i>
+                      <span>填写/修改备注</span>
                     </button>
 
                     <button @click.stop="openStudentProfile(stu); activeCellDropdownKey = null" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-emerald-400 hover:bg-emerald-500/10 font-bold transition">
-                      <i class="fa-solid fa-id-card text-[10px]"></i>
+                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 font-bold transition">
+                      <i class="fa-solid fa-id-card text-xs"></i>
                       <span>查看个人档案 ↗</span>
                     </button>
 
                   </div>
-
                 </td>
 
-                <!-- 操作列 (固定右侧 · 紧凑居中) -->
-                <td class="py-1 px-2 w-16 min-w-[64px] text-center whitespace-nowrap sticky right-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
-                  <button @click="openEditAttendanceRow(att)" 
-                    class="text-black dark:text-stone-400 hover:text-emerald-400 p-1 transition text-xs"
-                    title="修改课程主题与上课日期">
-                    <i class="fa-solid fa-pen text-[11px]"></i>
-                  </button>
-                  <button @click="deleteMatrixRow(att)" 
-                    class="text-black dark:text-stone-400 hover:text-rose-400 p-1 transition text-xs ml-0.5"
-                    title="撤销/删除此节课 (自动退还消课)">
-                    <i class="fa-regular fa-trash-can text-[11px]"></i>
-                  </button>
+                <!-- 操作列 (固定右侧) -->
+                <td class="py-2 px-2 text-center whitespace-nowrap sticky right-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button @click="openEditAttendanceRow(att)" class="p-1 text-gray-500 hover:text-black dark:hover:text-white transition" title="编辑整行考勤">
+                      <i class="fa-solid fa-pen text-xs"></i>
+                    </button>
+                    <button @click="deleteAttendanceRow(att)" class="p-1 text-gray-400 hover:text-rose-600 transition" title="删除该次排课">
+                      <i class="fa-regular fa-trash-can text-xs"></i>
+                    </button>
+                  </div>
                 </td>
 
               </tr>
 
               <tr v-if="matrixAttendanceRecords.length === 0">
-                <td :colspan="matrixStudents.length + 3" class="py-16 text-center text-black dark:text-stone-400 text-xs">
-                  该班级暂无考勤历史，点击右上角【➕ 新增考勤】即可快速记录新课考勤
+                <td :colspan="matrixStudents.length + 3" class="py-16 text-center text-gray-500 text-sm">
+                  该班级暂无排课考勤记录，点击右上角【+ 新增排课】开始记录
                 </td>
               </tr>
-
             </tbody>
           </table>
         </div>
@@ -4033,6 +4012,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
             hoursGift: Number(metadata?.hoursGift ?? 0),
             hours: Number(row.hours || 0),
             date: row.date,
+            payDate: row.date,
             payMethod: metadata?.payMethod || '',
             operator: row.operator,
             remark: metadata?.remark || ''
@@ -5045,7 +5025,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     const financeStats = computed(() => {
       const now = new Date();
       const currentYear = `${now.getFullYear()}`;
-      const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const currentMonthNum = now.getMonth() + 1;
+      const currentYearMonth = `${now.getFullYear()}-${String(currentMonthNum).padStart(2, '0')}`;
+      const currentYearMonthAlt = `${now.getFullYear()}/${currentMonthNum}`;
 
       const orders = paymentOrders.value || [];
       
@@ -5058,18 +5040,42 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       orders.forEach(o => {
         const amt = Number(o.amount || 0);
         totalIncome += amt;
-        const d = o.payDate || '';
-        if (d.startsWith(currentYearMonth) || d.includes(currentYearMonth)) {
+        const rawDate = String(o.payDate || o.date || '').trim();
+        
+        let isThisMonth = false;
+        let isThisYear = false;
+
+        if (rawDate) {
+          if (rawDate.startsWith(currentYearMonth) || rawDate.includes(currentYearMonth) ||
+              rawDate.startsWith(currentYearMonthAlt) || rawDate.includes(currentYearMonthAlt)) {
+            isThisMonth = true;
+          }
+          if (rawDate.startsWith(currentYear) || rawDate.includes(currentYear)) {
+            isThisYear = true;
+          }
+          if (!isThisYear || !isThisMonth) {
+            const dObj = new Date(rawDate.replace(/\//g, '-'));
+            if (!isNaN(dObj.getTime())) {
+              if (dObj.getFullYear() === now.getFullYear()) {
+                isThisYear = true;
+                if (dObj.getMonth() === now.getMonth()) {
+                  isThisMonth = true;
+                }
+              }
+            }
+          }
+        }
+
+        if (isThisMonth) {
           monthIncome += amt;
           monthOrderCount++;
         }
-        if (d.startsWith(currentYear) || d.includes(currentYear)) {
+        if (isThisYear) {
           yearIncome += amt;
           yearOrderCount++;
         }
       });
 
-      // 预警续费预估 (剩余课时 <= 3 节的学员数 * 4800元/标准包)
       const warningStudents = activeStudents.value.filter(s => Number(s.remainHours || 0) <= 3);
       const potentialRenewalIncome = warningStudents.length * 4800;
 
@@ -5093,7 +5099,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       const orders = paymentOrders.value || [];
       const map = {};
       orders.forEach(o => {
-        const ym = (o.payDate || '').substring(0, 7) || '其他';
+        const ym = (o.payDate || o.date || '').substring(0, 7) || '其他';
         if (!map[ym]) {
           map[ym] = { ym, total: 0, count: 0, hours: 0 };
         }
@@ -5115,7 +5121,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       const orders = paymentOrders.value || [];
       const map = {};
       orders.forEach(o => {
-        const y = (o.payDate || '').substring(0, 4) || '其他';
+        const y = (o.payDate || o.date || '').substring(0, 4) || '其他';
         if (!map[y]) {
           map[y] = { year: y, total: 0, count: 0, hours: 0 };
         }
@@ -5594,13 +5600,13 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
       // KPI 点击下钻筛选
       if (selectedBreakdownYM.value) {
-        list = list.filter(o => (o.payDate || '').startsWith(selectedBreakdownYM.value));
+        list = list.filter(o => (o.payDate || o.date || '').startsWith(selectedBreakdownYM.value));
       } else if (financeActiveKpi.value === 'month') {
         const ym = financeStats.value.currentYearMonth;
-        list = list.filter(o => (o.payDate || '').startsWith(ym));
+        list = list.filter(o => (o.payDate || o.date || '').startsWith(ym));
       } else if (financeActiveKpi.value === 'year') {
         const y = financeStats.value.currentYear;
-        list = list.filter(o => (o.payDate || '').startsWith(y));
+        list = list.filter(o => (o.payDate || o.date || '').startsWith(y));
       }
 
       if (financePayMethodFilter.value !== 'all') {
@@ -5944,24 +5950,48 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const matrixAttendanceRecords = computed(() => {
       if (!matrixClassId.value) return [];
-      let records = attendanceHistory.value.filter(a => (a.classId === matrixClassId.value || a.class_id === matrixClassId.value));
-      return records.sort((a, b) => {
-        const tA = new Date(a.date).getTime() || 0;
-        const tB = new Date(b.date).getTime() || 0;
-        return attendanceSortOrder.value === 'desc' ? tB - tA : tA - tB;
-      });
+      const targetId = matrixClassId.value;
+      const list = [];
+      const source = attendanceHistory.value || [];
+      for (let i = 0; i < source.length; i++) {
+        const a = source[i];
+        if (a.classId === targetId || a.class_id === targetId) {
+          const detailMap = {};
+          if (Array.isArray(a.details)) {
+            for (let j = 0; j < a.details.length; j++) {
+              const d = a.details[j];
+              detailMap[d.studentId || d.student_id] = {
+                status: d.status || '--',
+                note: d.note || d.reason || '',
+                deductHours: d.deductHours || 0
+              };
+            }
+          }
+          list.push({
+            ...a,
+            _detailMap: detailMap,
+            _time: new Date(a.date).getTime() || 0
+          });
+        }
+      }
+      const isDesc = attendanceSortOrder.value === 'desc';
+      list.sort((a, b) => isDesc ? b._time - a._time : a._time - b._time);
+      return list;
     });
 
     const getStudentAttendanceCell = (studentId, attendanceRecord) => {
+      if (attendanceRecord && attendanceRecord._detailMap && attendanceRecord._detailMap[studentId]) {
+        return attendanceRecord._detailMap[studentId];
+      }
       if (!attendanceRecord || !attendanceRecord.details) {
         return { status: '--', note: '', deductHours: 0 };
       }
-      const item = attendanceRecord.details.find(d => d.studentId === studentId);
+      const item = attendanceRecord.details.find(d => (d.studentId === studentId || d.student_id === studentId));
       if (!item) {
         return { status: '--', note: '', deductHours: 0 };
       }
       return {
-        status: item.status,
+        status: item.status || '--',
         note: item.note || item.reason || '',
         deductHours: item.deductHours || 0
       };
@@ -6842,6 +6872,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         hoursGift: Number(rechargeForm.hoursGift || 0),
         hours: addHours,
         date: rechargeForm.payDate || new Date().toISOString().slice(0, 10),
+        payDate: rechargeForm.payDate || new Date().toISOString().slice(0, 10),
         payMethod: rechargeForm.payMethod,
         operator: rechargeForm.operator,
         remark: rechargeForm.remark
