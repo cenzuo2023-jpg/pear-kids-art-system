@@ -9,7 +9,7 @@
       <div class="notion-sidebar-inner w-full px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
         
         <!-- 品牌标识 (🍐 徽标 + 想吃梨儿童美术) -->
-        <div class="notion-brand flex items-center gap-3 cursor-pointer group select-none flex-shrink-0" @click="currentTab = 'attendance'">
+        <div class="notion-brand flex items-center gap-3 cursor-pointer group select-none flex-shrink-0" @click="currentTab = 'attendance'; profileStudent = null; selectedClassDetail = null;">
           <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center text-lg shadow-sm flex-shrink-0">
             🍐
           </div>
@@ -28,13 +28,13 @@
         <!-- 🌟 原生四大主功能导航 (极简纯粹线框胶囊) -->
         <nav class="notion-primary-nav hidden md:flex items-center wf-pill-container">
           
-          <button @click="currentTab = 'attendance'"
+          <button @click="currentTab = 'attendance'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'attendance' ? 'active' : ''"
             class="wf-pill-btn">
             <span>考勤大表</span>
           </button>
 
-          <button @click="currentTab = 'ranking'"
+          <button @click="currentTab = 'ranking'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'ranking' ? 'active' : ''"
             class="wf-pill-btn">
             <span>课时积分</span>
@@ -46,7 +46,7 @@
             <span>班级学员</span>
           </button>
 
-          <button @click="currentTab = 'records'"
+          <button @click="currentTab = 'records'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'records' ? 'active' : ''"
             class="wf-pill-btn">
             <span>财务中心</span>
@@ -81,12 +81,12 @@
       <!-- 📱 移动端底栏导航 (极简精简版) -->
       <div class="notion-mobile-nav md:hidden flex px-3 pb-2 pt-1 border-t border-black/[0.04] dark:border-white/[0.08]">
         <div class="grid grid-cols-4 gap-1 w-full text-center">
-          <button @click="currentTab = 'attendance'"
+          <button @click="currentTab = 'attendance'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'attendance' ? 'active' : ''"
             class="wf-pill-btn justify-center py-2 text-xs font-bold truncate">
             <span>考勤大表</span>
           </button>
-          <button @click="currentTab = 'ranking'"
+          <button @click="currentTab = 'ranking'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'ranking' ? 'active' : ''"
             class="wf-pill-btn justify-center py-2 text-xs font-bold truncate">
             <span>课时积分</span>
@@ -96,7 +96,7 @@
             class="wf-pill-btn justify-center py-2 text-xs font-bold truncate">
             <span>班级学员</span>
           </button>
-          <button @click="currentTab = 'records'"
+          <button @click="currentTab = 'records'; profileStudent = null; selectedClassDetail = null;"
             :class="currentTab === 'records' ? 'active' : ''"
             class="wf-pill-btn justify-center py-2 text-xs font-bold truncate">
             <span>财务中心</span>
@@ -7084,48 +7084,56 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     
     // ==========================================
-    // 🌐 浏览器前进/后退与 URL Hash 路由同步
+    // 🌐 浏览器前进/后退与 URL Hash 路由同步 (防跳跃 · 安全路由)
     // ==========================================
     const isSyncingHash = ref(false);
 
     const syncStateFromHash = () => {
       isSyncingHash.value = true;
-      const hash = window.location.hash || '#attendance';
+      const rawHash = window.location.hash || '';
       
-      if (hash.startsWith('#student-')) {
-        const sid = hash.replace('#student-', '');
+      if (rawHash.startsWith('#student-')) {
+        const sid = rawHash.replace('#student-', '');
         const stu = students.value.find(s => s.id === sid);
         if (stu) {
           profileStudent.value = stu;
-          currentTab.value = 'students';
+          currentTab.value = 'profile';
+        } else {
+          profileStudent.value = null;
+          currentTab.value = 'attendance';
+          window.history.replaceState(null, '', '#attendance');
         }
-      } else if (hash.startsWith('#class-')) {
-        const cid = hash.replace('#class-', '');
+      } else if (rawHash.startsWith('#class-')) {
+        const cid = rawHash.replace('#class-', '');
         const cls = classes.value.find(c => c.id === cid);
         if (cls) {
           selectedClassDetail.value = cls;
+          currentTab.value = 'class_detail';
+        } else {
+          selectedClassDetail.value = null;
           currentTab.value = 'students';
+          window.history.replaceState(null, '', '#students');
         }
-      } else if (hash === '#archive') {
+      } else if (rawHash === '#archive') {
         profileStudent.value = null;
         selectedClassDetail.value = null;
         currentTab.value = 'students';
         rosterSubTab.value = 'archive';
-      } else if (hash === '#students-roster' || hash === '#students') {
+      } else if (rawHash === '#students-roster' || rawHash === '#students') {
         profileStudent.value = null;
         selectedClassDetail.value = null;
         currentTab.value = 'students';
         rosterSubTab.value = 'students';
-      } else if (hash === '#students-classes') {
+      } else if (rawHash === '#students-classes') {
         profileStudent.value = null;
         selectedClassDetail.value = null;
         currentTab.value = 'students';
         rosterSubTab.value = 'classes';
-      } else if (hash === '#ranking') {
+      } else if (rawHash === '#ranking') {
         profileStudent.value = null;
         selectedClassDetail.value = null;
         currentTab.value = 'ranking';
-      } else if (hash === '#records' || hash === '#finance') {
+      } else if (rawHash === '#records' || rawHash === '#finance') {
         profileStudent.value = null;
         selectedClassDetail.value = null;
         currentTab.value = 'records';
@@ -7137,13 +7145,13 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       setTimeout(() => { isSyncingHash.value = false; }, 50);
     };
 
-    // 监听状态变化同步到 URL Hash
+    // 监听状态变化同步到 URL Hash (仅在非 profile 状态下保持主页干净)
     watch([currentTab, rosterSubTab, () => profileStudent.value?.id, () => selectedClassDetail.value?.id], () => {
       if (isSyncingHash.value) return;
       let targetHash = '#' + currentTab.value;
-      if (profileStudent.value) {
+      if (currentTab.value === 'profile' && profileStudent.value) {
         targetHash = '#student-' + profileStudent.value.id;
-      } else if (selectedClassDetail.value) {
+      } else if (currentTab.value === 'class_detail' && selectedClassDetail.value) {
         targetHash = '#class-' + selectedClassDetail.value.id;
       } else if (currentTab.value === 'students') {
         if (rosterSubTab.value === 'archive') targetHash = '#archive';
@@ -7151,9 +7159,11 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         else targetHash = '#students-classes';
       } else if (currentTab.value === 'records') {
         targetHash = '#finance';
+      } else if (currentTab.value === 'attendance') {
+        targetHash = '#attendance';
       }
       if (window.location.hash !== targetHash) {
-        window.history.pushState(null, '', targetHash);
+        window.history.replaceState(null, '', targetHash);
       }
     });
 
