@@ -115,10 +115,12 @@
           <h1>考勤大表</h1>
           <p>记录每次课程出勤、课消与备注</p>
         </div>
-        <div class="sync-state" aria-live="polite">
-          <span class="sync-state-dot"></span>
-          <span>数据自动保存</span>
-        </div>
+        <button type="button" class="sync-state" :class="'sync-' + syncStatus" aria-live="polite"
+          :title="syncErrorMessage || syncStatusLabel" @click="syncStatus === 'offline' ? retryCloudSync() : null">
+          <i v-if="syncStatus === 'syncing' || syncStatus === 'loading'" class="fa-solid fa-rotate sync-state-spinner"></i>
+          <span v-else class="sync-state-dot"></span>
+          <span>{{ syncStatusLabel }}</span>
+        </button>
       </div>
       <div class="attendance-toolbar-main w-full flex items-center justify-between gap-6">
         
@@ -3368,7 +3370,17 @@
 </template>
 
 <script setup>
-const throwOnError = async (promise) => { const { data, error } = await promise; if (error) throw new Error(error.message); return data; };
+const throwOnError = async (promise, context = 'Supabase 请求') => {
+  const { data, error } = await promise;
+  if (error) {
+    const enhancedError = new Error(context + '：' + error.message);
+    enhancedError.code = error.code;
+    enhancedError.details = error.details;
+    enhancedError.hint = error.hint;
+    throw enhancedError;
+  }
+  return data;
+};
 
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
 import { DEFAULT_INITIAL_DATA } from './data.js';
@@ -3440,174 +3452,666 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     
     // ----------------------------------------------------
-    // Supabase 云端同步与 LocalStorage 降级双缓冲机制
+    // Supabase 云端同步与 LocalStorage 双缓冲机制
+    // 本地先落盘；云端写入必须回读确认；刷新时恢复未同步快照
     // ----------------------------------------------------
-    const syncStatus = ref('connected'); // 'connected' | 'syncing' | 'offline'
+    const syncStatus = ref('loading'); // loading | pending | syncing | connected | offline
+    const syncErrorMessage = ref('');
+    const syncStatusLabel = computed(() => ({
+      loading: '正在读取云端…',
+      pending: '等待云端保存',
+      syncing: '正在同步…',
+      connected: '已保存到云端',
+      offline: '云端保存失败 · 点击重试'
+    }[syncStatus.value] || '同步状态未知'));
 
-    const loadData = async () => {
-      // 1. 先从本地缓存极速渲染
-      try {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if (local) {
-          const parsed = JSON.parse(local);
-          studioInfo.value = parsed.studioInfo || DEFAULT_INITIAL_DATA.studioInfo;
-          classes.value = parsed.classes || DEFAULT_INITIAL_DATA.classes;
-          students.value = parsed.students || DEFAULT_INITIAL_DATA.students;
-          attendanceHistory.value = parsed.attendanceHistory || DEFAULT_INITIAL_DATA.attendanceHistory || [];
-          hourLogs.value = parsed.hourLogs || DEFAULT_INITIAL_DATA.hourLogs || [];
-          paymentOrders.value = parsed.paymentOrders || DEFAULT_INITIAL_DATA.paymentOrders || [];
-          pointRewardOptions.value = parsed.pointRewardOptions || DEFAULT_INITIAL_DATA.pointRewardOptions || [];
-          pointPrizes.value = parsed.pointPrizes || DEFAULT_INITIAL_DATA.pointPrizes || [];
-          pointLogs.value = parsed.pointLogs || DEFAULT_INITIAL_DATA.pointLogs || [];
-        } else {
-          studioInfo.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.studioInfo));
-          classes.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.classes));
-          students.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.students));
-          attendanceHistory.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.attendanceHistory || []));
-          hourLogs.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.hourLogs || []));
-          paymentOrders.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.paymentOrders || []));
-          pointRewardOptions.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.pointRewardOptions || []));
-          pointPrizes.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.pointPrizes || []));
-          pointLogs.value = JSON.parse(JSON.stringify(DEFAULT_INITIAL_DATA.pointLogs || []));
+    const FINANCE_META_PREFIX = '__PEAR_FINANCE_V1__:';
+    const SYNC_TABLE_ORDER = [
+      'studio_info',
+      'classes',
+      'students',
+      'attendance_records',
+      'finance_logs',
+      'point_prizes',
+      'point_reward_options',
+      'point_logs'
+    ];
+    const HOUR_LOG_TYPES = new Set([
+      '课时扣除', '撤销返还', '考勤修改退还', '大表考勤消课', '大表新增消课',
+      '考勤撤销返还', '学员结课归档', '学员恢复在读', '个人临时消课',
+      '新生建档缴费', '续费充值', '教务手动调整', '新生建档入读'
+    ]);
+
+    const lastSyncedRows = Object.fromEntries(SYNC_TABLE_ORDER.map(table => [table, new Map()]));
+    const knownCloudIds = Object.fromEntries(SYNC_TABLE_ORDER.map(table => [table, new Set()]));
+    let lastSyncedAt = null;
+    let saveTimer = null;
+    let pendingCloudSnapshot = null;
+    let pendingForceSync = false;
+    let cloudSyncInFlight = null;
+
+    const clonePlain = value => JSON.parse(JSON.stringify(value));
+
+    const createDefaultSnapshot = () => clonePlain({
+      studioInfo: DEFAULT_INITIAL_DATA.studioInfo,
+      classes: DEFAULT_INITIAL_DATA.classes || [],
+      students: DEFAULT_INITIAL_DATA.students || [],
+      attendanceHistory: DEFAULT_INITIAL_DATA.attendanceHistory || [],
+      hourLogs: DEFAULT_INITIAL_DATA.hourLogs || [],
+      paymentOrders: DEFAULT_INITIAL_DATA.paymentOrders || [],
+      pointRewardOptions: DEFAULT_INITIAL_DATA.pointRewardOptions || [],
+      pointPrizes: DEFAULT_INITIAL_DATA.pointPrizes || [],
+      pointLogs: DEFAULT_INITIAL_DATA.pointLogs || []
+    });
+
+    const normalizeSnapshot = input => {
+      const fallback = createDefaultSnapshot();
+      const source = input && typeof input === 'object' ? input : {};
+      return clonePlain({
+        studioInfo: source.studioInfo && typeof source.studioInfo === 'object' ? source.studioInfo : fallback.studioInfo,
+        classes: Array.isArray(source.classes) ? source.classes : fallback.classes,
+        students: Array.isArray(source.students) ? source.students : fallback.students,
+        attendanceHistory: Array.isArray(source.attendanceHistory) ? source.attendanceHistory : fallback.attendanceHistory,
+        hourLogs: Array.isArray(source.hourLogs) ? source.hourLogs : fallback.hourLogs,
+        paymentOrders: Array.isArray(source.paymentOrders) ? source.paymentOrders : fallback.paymentOrders,
+        pointRewardOptions: Array.isArray(source.pointRewardOptions) ? source.pointRewardOptions : fallback.pointRewardOptions,
+        pointPrizes: Array.isArray(source.pointPrizes) ? source.pointPrizes : fallback.pointPrizes,
+        pointLogs: Array.isArray(source.pointLogs) ? source.pointLogs : fallback.pointLogs
+      });
+    };
+
+    const buildDataSnapshot = () => normalizeSnapshot({
+      studioInfo: studioInfo.value,
+      classes: classes.value,
+      students: students.value,
+      attendanceHistory: attendanceHistory.value,
+      hourLogs: hourLogs.value,
+      paymentOrders: paymentOrders.value,
+      pointRewardOptions: pointRewardOptions.value,
+      pointPrizes: pointPrizes.value,
+      pointLogs: pointLogs.value
+    });
+
+    const applyDataSnapshot = snapshotInput => {
+      const snapshot = normalizeSnapshot(snapshotInput);
+      studioInfo.value = snapshot.studioInfo;
+      classes.value = snapshot.classes;
+      students.value = snapshot.students;
+      attendanceHistory.value = snapshot.attendanceHistory;
+      hourLogs.value = snapshot.hourLogs;
+      paymentOrders.value = snapshot.paymentOrders;
+      pointRewardOptions.value = snapshot.pointRewardOptions;
+      pointPrizes.value = snapshot.pointPrizes;
+      pointLogs.value = snapshot.pointLogs;
+      nextTick(() => {
+        if (activeClasses.value.length > 0 && !activeClasses.value.some(c => c.id === matrixClassId.value)) {
+          matrixClassId.value = activeClasses.value[0].id;
         }
-      } catch (err) {
-        console.warn('本地缓存解析失败，加载初始默认数据', err);
+      });
+      return snapshot;
+    };
+
+    const serializeKnownCloudIds = () => Object.fromEntries(
+      SYNC_TABLE_ORDER.map(table => [table, Array.from(knownCloudIds[table] || [])])
+    );
+
+    const restoreKnownCloudIds = metadata => {
+      const saved = metadata?.knownCloudIds;
+      if (!saved || typeof saved !== 'object') return;
+      SYNC_TABLE_ORDER.forEach(table => {
+        knownCloudIds[table] = new Set(Array.isArray(saved[table]) ? saved[table] : []);
+      });
+    };
+
+    const writeLocalSnapshot = (snapshotInput, { pending = false, error = '' } = {}) => {
+      const snapshot = normalizeSnapshot(snapshotInput);
+      const localPayload = {
+        ...snapshot,
+        __sync: {
+          version: 2,
+          pending,
+          lastSyncedAt,
+          error,
+          knownCloudIds: serializeKnownCloudIds()
+        }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(localPayload));
+      return snapshot;
+    };
+
+    const readLocalSnapshot = () => {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const metadata = parsed.__sync || null;
+      restoreKnownCloudIds(metadata);
+      if (metadata?.lastSyncedAt) lastSyncedAt = metadata.lastSyncedAt;
+      return {
+        snapshot: normalizeSnapshot(parsed),
+        metadata,
+        needsRecovery: !metadata || metadata.version !== 2 || metadata.pending === true
+      };
+    };
+
+    const encodeFinanceMetadata = payload => FINANCE_META_PREFIX + JSON.stringify(payload);
+
+    const decodeFinanceMetadata = description => {
+      if (typeof description !== 'string' || !description.startsWith(FINANCE_META_PREFIX)) return null;
+      try {
+        return JSON.parse(description.slice(FINANCE_META_PREFIX.length));
+      } catch {
+        return null;
+      }
+    };
+
+    const isHourLogRow = row => {
+      const metadata = decodeFinanceMetadata(row.description);
+      if (metadata?.kind) return metadata.kind === 'hour';
+      const id = String(row.id || '');
+      if (id.startsWith('log_')) return true;
+      if (id.startsWith('pay_')) return false;
+      return HOUR_LOG_TYPES.has(row.type);
+    };
+    const mapCloudTablesToSnapshot = tables => {
+      const studioRow = tables.studio_info?.[0];
+      const financeRows = Array.isArray(tables.finance_logs) ? tables.finance_logs : [];
+      const cloudHourLogs = [];
+      const cloudPaymentOrders = [];
+
+      financeRows.forEach(row => {
+        const metadata = decodeFinanceMetadata(row.description);
+        if (isHourLogRow(row)) {
+          cloudHourLogs.push({
+            id: row.id,
+            studentId: row.student_id,
+            studentName: row.student_name,
+            type: row.type,
+            hours: Number(row.hours || 0),
+            balanceAfter: Number(row.amount || 0),
+            reason: metadata?.reason ?? row.description ?? '',
+            operator: row.operator,
+            time: row.date
+          });
+        } else {
+          cloudPaymentOrders.push({
+            id: row.id,
+            orderNo: metadata?.orderNo || row.id,
+            studentId: row.student_id,
+            studentName: row.student_name,
+            type: row.type,
+            amount: Number(row.amount || 0),
+            hoursBought: Number(metadata?.hoursBought ?? row.hours ?? 0),
+            hoursGift: Number(metadata?.hoursGift ?? 0),
+            hours: Number(row.hours || 0),
+            date: row.date,
+            payMethod: metadata?.payMethod || '',
+            operator: row.operator,
+            remark: metadata?.remark || ''
+          });
+        }
+      });
+
+      return normalizeSnapshot({
+        studioInfo: studioRow ? {
+          ...studioRow,
+          warningThreshold: studioRow.warning_threshold
+        } : DEFAULT_INITIAL_DATA.studioInfo,
+        classes: (tables.classes || []).map(row => ({
+          ...row,
+          createdAt: row.created_at,
+          archivedAt: row.archived_at
+        })),
+        students: (tables.students || []).map(row => ({
+          ...row,
+          classId: row.class_id,
+          parentName: row.parent_name,
+          parentPhone: row.parent_phone,
+          remainHours: Number(row.remain_hours || 0),
+          totalPurchased: Number(row.total_purchased || 0),
+          totalConsumed: Number(row.total_consumed || 0),
+          totalPointsEarned: Number(row.total_points_earned || 0),
+          redeemedCount: Number(row.redeemed_count || 0),
+          joinDate: row.join_date,
+          createdAt: row.created_at
+        })),
+        attendanceHistory: (tables.attendance_records || []).map(row => ({
+          id: row.id,
+          date: row.date,
+          theme: row.theme,
+          classId: row.class_id,
+          details: Array.isArray(row.details) ? row.details : []
+        })),
+        hourLogs: cloudHourLogs,
+        paymentOrders: cloudPaymentOrders,
+        pointPrizes: (tables.point_prizes || []).map(row => ({
+          id: row.id,
+          name: row.name,
+          cost: Number(row.cost || 0),
+          stock: Number(row.stock || 0),
+          icon: row.icon,
+          desc: row.desc_text
+        })),
+        pointLogs: (tables.point_logs || []).map(row => ({
+          id: row.id,
+          studentId: row.student_id,
+          studentName: row.student_name,
+          type: row.type,
+          points: Number(row.points || 0),
+          balanceAfter: Number(row.balance_after || 0),
+          reason: row.reason,
+          operator: row.operator,
+          time: row.time
+        })),
+        pointRewardOptions: tables.point_reward_options || []
+      });
+    };
+
+    const toDatabaseTables = snapshotInput => {
+      const snapshot = normalizeSnapshot(snapshotInput);
+      const studio = snapshot.studioInfo || {};
+      return {
+        studio_info: [{
+          id: studio.id || '00000000-0000-0000-0000-000000000000',
+          name: studio.name || '',
+          teacher: studio.teacher || '',
+          slogan: studio.slogan || '',
+          phone: studio.phone || '',
+          address: studio.address || '',
+          warning_threshold: Number(studio.warningThreshold ?? studio.warning_threshold ?? 0)
+        }],
+        classes: snapshot.classes.map(row => ({
+          id: row.id,
+          name: row.name || '',
+          teacher: row.teacher || '',
+          schedule: row.schedule || '',
+          classroom: row.classroom || '',
+          capacity: Number(row.capacity || 0),
+          status: row.status || '活跃',
+          archived_at: row.archivedAt || row.archived_at || null,
+          notes: row.notes || ''
+        })),
+        students: snapshot.students.map(row => ({
+          id: row.id,
+          name: row.name || '',
+          gender: row.gender || '',
+          age: Number(row.age || 0),
+          class_id: row.classId || row.class_id || null,
+          parent_name: row.parentName || row.parent_name || '',
+          parent_phone: row.parentPhone || row.parent_phone || '',
+          remain_hours: Number(row.remainHours ?? row.remain_hours ?? 0),
+          total_purchased: Number(row.totalPurchased ?? row.total_purchased ?? 0),
+          total_consumed: Number(row.totalConsumed ?? row.total_consumed ?? 0),
+          points: Number(row.points || 0),
+          total_points_earned: Number(row.totalPointsEarned ?? row.total_points_earned ?? 0),
+          redeemed_count: Number(row.redeemedCount ?? row.redeemed_count ?? 0),
+          status: row.status || '在读',
+          join_date: row.joinDate || row.join_date || null,
+          notes: row.notes || ''
+        })),
+        attendance_records: snapshot.attendanceHistory.map(row => ({
+          id: row.id,
+          date: row.date,
+          theme: row.theme || '',
+          class_id: row.classId || row.class_id || null,
+          details: Array.isArray(row.details) ? row.details : []
+        })),
+        finance_logs: [
+          ...snapshot.hourLogs.map(row => ({
+            id: row.id,
+            type: row.type || '课时流水',
+            date: row.time || row.date,
+            amount: Number(row.balanceAfter ?? row.amount ?? 0),
+            student_id: row.studentId || row.student_id || null,
+            student_name: row.studentName || row.student_name || '',
+            description: encodeFinanceMetadata({
+              kind: 'hour',
+              reason: row.reason || ''
+            }),
+            hours: Number(row.hours || 0),
+            operator: row.operator || ''
+          })),
+          ...snapshot.paymentOrders.map(row => ({
+            id: row.id || row.orderNo,
+            type: row.type || '收费订单',
+            date: row.date,
+            amount: Number(row.amount || 0),
+            student_id: row.studentId || row.student_id || null,
+            student_name: row.studentName || row.student_name || '',
+            description: encodeFinanceMetadata({
+              kind: 'payment',
+              orderNo: row.orderNo || row.id,
+              hoursBought: Number(row.hoursBought ?? row.hours ?? 0),
+              hoursGift: Number(row.hoursGift || 0),
+              payMethod: row.payMethod || '',
+              remark: row.remark || ''
+            }),
+            hours: Number(row.hours ?? (Number(row.hoursBought || 0) + Number(row.hoursGift || 0))),
+            operator: row.operator || ''
+          }))
+        ],
+        point_prizes: snapshot.pointPrizes.map(row => ({
+          id: row.id,
+          name: row.name || '',
+          cost: Number(row.cost || 0),
+          stock: Number(row.stock || 0),
+          icon: row.icon || '',
+          desc_text: row.desc || row.desc_text || ''
+        })),
+        point_reward_options: snapshot.pointRewardOptions.map(row => ({
+          id: row.id,
+          name: row.name || '',
+          points: Number(row.points || 0),
+          icon: row.icon || '',
+          color: row.color || ''
+        })),
+        point_logs: snapshot.pointLogs.map(row => ({
+          id: row.id,
+          student_id: row.studentId || row.student_id || null,
+          student_name: row.studentName || row.student_name || '',
+          type: row.type || '',
+          points: Number(row.points || 0),
+          balance_after: Number(row.balanceAfter ?? row.balance_after ?? 0),
+          reason: row.reason || '',
+          operator: row.operator || '',
+          time: row.time
+        }))
+      };
+    };
+
+    const fetchAllRows = async table => {
+      const pageSize = 500;
+      const rows = [];
+      for (let from = 0; ; from += pageSize) {
+        const batch = await throwOnError(
+          supabase.from(table).select('*').order('id', { ascending: true }).range(from, from + pageSize - 1),
+          '读取 ' + table
+        );
+        rows.push(...(batch || []));
+        if (!batch || batch.length < pageSize) break;
+      }
+      return rows;
+    };
+
+    const fetchCloudTables = async () => {
+      const entries = await Promise.all(
+        SYNC_TABLE_ORDER.map(async table => [table, await fetchAllRows(table)])
+      );
+      return Object.fromEntries(entries);
+    };
+
+    const refreshSyncBaseline = (databaseTables, cloudTables = databaseTables) => {
+      SYNC_TABLE_ORDER.forEach(table => {
+        const rows = databaseTables[table] || [];
+        lastSyncedRows[table] = new Map(
+          rows.filter(row => row?.id != null).map(row => [String(row.id), JSON.stringify(row)])
+        );
+        knownCloudIds[table] = new Set(
+          (cloudTables[table] || rows).filter(row => row?.id != null).map(row => String(row.id))
+        );
+      });
+    };
+
+    const mergeRowsPreferLocal = (cloudRows = [], localRows = []) => {
+      const localIds = new Set(localRows.filter(row => row?.id != null).map(row => String(row.id)));
+      return [
+        ...clonePlain(localRows),
+        ...clonePlain(cloudRows.filter(row => row?.id == null || !localIds.has(String(row.id))))
+      ];
+    };
+
+    const normalizeFinanceCollections = snapshotInput => {
+      const snapshot = normalizeSnapshot(snapshotInput);
+      const hourById = new Map();
+      const paymentById = new Map();
+
+      snapshot.hourLogs.forEach(row => {
+        if (row?.id == null) return;
+        hourById.set(String(row.id), row);
+      });
+
+      snapshot.paymentOrders.forEach(row => {
+        if (row?.id == null) return;
+        const id = String(row.id);
+        const shouldBeHour = id.startsWith('log_') || (!id.startsWith('pay_') && HOUR_LOG_TYPES.has(row.type));
+        if (shouldBeHour) {
+          hourById.set(id, {
+            id: row.id,
+            studentId: row.studentId || row.student_id,
+            studentName: row.studentName || row.student_name,
+            type: row.type,
+            hours: Number(row.hours || 0),
+            balanceAfter: Number(row.balanceAfter ?? row.amount ?? 0),
+            reason: row.reason || row.description || '',
+            operator: row.operator,
+            time: row.time || row.date
+          });
+          return;
+        }
+        paymentById.set(id, row);
+      });
+
+      hourById.forEach((row, id) => paymentById.delete(id));
+      return {
+        ...snapshot,
+        hourLogs: Array.from(hourById.values()),
+        paymentOrders: Array.from(paymentById.values())
+      };
+    };
+
+    const mergeSnapshotsPreferLocal = (cloudInput, localInput) => {
+      const cloud = normalizeFinanceCollections(cloudInput);
+      const local = normalizeFinanceCollections(localInput);
+      return normalizeSnapshot({
+        studioInfo: { ...cloud.studioInfo, ...local.studioInfo },
+        classes: mergeRowsPreferLocal(cloud.classes, local.classes),
+        students: mergeRowsPreferLocal(cloud.students, local.students),
+        attendanceHistory: mergeRowsPreferLocal(cloud.attendanceHistory, local.attendanceHistory),
+        hourLogs: mergeRowsPreferLocal(cloud.hourLogs, local.hourLogs),
+        paymentOrders: mergeRowsPreferLocal(cloud.paymentOrders, local.paymentOrders),
+        pointRewardOptions: mergeRowsPreferLocal(cloud.pointRewardOptions, local.pointRewardOptions),
+        pointPrizes: mergeRowsPreferLocal(cloud.pointPrizes, local.pointPrizes),
+        pointLogs: mergeRowsPreferLocal(cloud.pointLogs, local.pointLogs)
+      });
+    };
+    const chunkRows = (rows, size = 100) => {
+      const chunks = [];
+      for (let index = 0; index < rows.length; index += size) chunks.push(rows.slice(index, index + size));
+      return chunks;
+    };
+
+    const syncTableRows = async (table, rowsInput, { force = false } = {}) => {
+      const rows = (rowsInput || []).filter(row => row?.id != null);
+      const currentHashes = new Map(rows.map(row => [String(row.id), JSON.stringify(row)]));
+      const previousHashes = lastSyncedRows[table] || new Map();
+      const changedRows = force
+        ? rows
+        : rows.filter(row => previousHashes.get(String(row.id)) !== currentHashes.get(String(row.id)));
+
+      for (const chunk of chunkRows(changedRows)) {
+        const savedRows = await throwOnError(
+          supabase.from(table).upsert(chunk, { onConflict: 'id' }).select('id'),
+          '保存 ' + table
+        );
+        if ((savedRows || []).length !== chunk.length) {
+          throw new Error('保存 ' + table + ' 未完整返回：预期 ' + chunk.length + ' 行，实际 ' + (savedRows || []).length + ' 行');
+        }
       }
 
-      // 2. 从 Supabase 云端拉取最新数据
-      if (!supabase) return;
-      try {
-        syncStatus.value = 'syncing';
-        const [
-          { data: studio, error: errStudio },
-          { data: cls, error: errCls },
-          { data: stu, error: errStu },
-          { data: att, error: errAtt },
-          { data: fin, error: errFin },
-          { data: prz, error: errPrz },
-          { data: plog, error: errPlog },
-          { data: popt, error: errPopt }
-        ] = await Promise.all([
-          supabase.from('studio_info').select('*'),
-          supabase.from('classes').select('*'),
-          supabase.from('students').select('*'),
-          supabase.from('attendance_records').select('*'),
-          supabase.from('finance_logs').select('*'),
-          supabase.from('point_prizes').select('*'),
-          supabase.from('point_logs').select('*'),
-          supabase.from('point_reward_options').select('*')
-        ]);
+      const currentIds = new Set(currentHashes.keys());
+      const staleIds = Array.from(knownCloudIds[table] || []).filter(id => !currentIds.has(String(id)));
+      for (const chunk of chunkRows(staleIds)) {
+        const deletedRows = await throwOnError(
+          supabase.from(table).delete().in('id', chunk).select('id'),
+          '删除 ' + table + ' 的云端旧记录'
+        );
+        if ((deletedRows || []).length !== chunk.length) {
+          throw new Error('删除 ' + table + ' 未完整返回：预期 ' + chunk.length + ' 行，实际 ' + (deletedRows || []).length + ' 行');
+        }
+      }
 
-        // 如果数据库完全为空，执行首次自动种子数据注入
-        if (!studio || studio.length === 0) {
-          console.log('初始化空白画室基本资料...');
-          await throwOnError(supabase.from('studio_info').insert([{ id: '00000000-0000-0000-0000-000000000000', ...DEFAULT_INITIAL_DATA.studioInfo }]));
-          if (DEFAULT_INITIAL_DATA.pointRewardOptions?.length) {
-            await throwOnError(supabase.from('point_reward_options').upsert(DEFAULT_INITIAL_DATA.pointRewardOptions));
+      lastSyncedRows[table] = currentHashes;
+      knownCloudIds[table] = currentIds;
+    };
+
+    const persistSnapshotToCloud = async (snapshotInput, { force = false } = {}) => {
+      const databaseTables = toDatabaseTables(snapshotInput);
+      for (const table of SYNC_TABLE_ORDER) {
+        await syncTableRows(table, databaseTables[table], { force });
+      }
+      return databaseTables;
+    };
+
+    const reportSyncFailure = (error, snapshot) => {
+      const message = error?.message || '未知错误';
+      console.error('写入 Supabase 失败:', error);
+      pendingCloudSnapshot = pendingCloudSnapshot || snapshot;
+      pendingForceSync = true;
+      syncStatus.value = 'offline';
+      const isNewError = syncErrorMessage.value !== message;
+      syncErrorMessage.value = message;
+      try {
+        writeLocalSnapshot(buildDataSnapshot(), { pending: true, error: message });
+      } catch (localError) {
+        console.error('本地缓存写入也失败:', localError);
+      }
+      if (isNewError) {
+        showToast('云端保存失败：' + message + '。数据仍保留在本机，点击右上角状态可重试。', 'error', 8000);
+      }
+    };
+
+    const runCloudSyncLoop = () => {
+      if (cloudSyncInFlight) return cloudSyncInFlight;
+      cloudSyncInFlight = (async () => {
+        let lastSuccessfulSnapshot = null;
+        while (pendingCloudSnapshot) {
+          const snapshot = pendingCloudSnapshot;
+          const force = pendingForceSync;
+          pendingCloudSnapshot = null;
+          pendingForceSync = false;
+          syncStatus.value = 'syncing';
+          try {
+            await persistSnapshotToCloud(snapshot, { force });
+            lastSuccessfulSnapshot = snapshot;
+          } catch (error) {
+            reportSyncFailure(error, snapshot);
+            return false;
           }
+        }
+
+        if (lastSuccessfulSnapshot) {
+          lastSyncedAt = new Date().toISOString();
+          syncErrorMessage.value = '';
           syncStatus.value = 'connected';
+          writeLocalSnapshot(lastSuccessfulSnapshot, { pending: false });
+        }
+        return true;
+      })().finally(() => {
+        cloudSyncInFlight = null;
+      });
+      return cloudSyncInFlight;
+    };
+
+    const queueCloudSync = (snapshot, { immediate = false, force = false } = {}) => {
+      pendingCloudSnapshot = snapshot;
+      pendingForceSync = pendingForceSync || force;
+      if (saveTimer) {
+        clearTimeout(saveTimer);
+        saveTimer = null;
+      }
+      syncStatus.value = immediate ? 'syncing' : 'pending';
+      if (immediate) return runCloudSyncLoop();
+      saveTimer = setTimeout(() => {
+        saveTimer = null;
+        runCloudSyncLoop();
+      }, 450);
+      return Promise.resolve(true);
+    };
+
+    const saveData = (options = {}) => {
+      const safeOptions = options && typeof options === 'object' && !('target' in options) ? options : {};
+      const snapshot = buildDataSnapshot();
+      try {
+        writeLocalSnapshot(snapshot, { pending: Boolean(supabase) });
+      } catch (error) {
+        console.error('本地缓存保存失败:', error);
+        showToast('本机缓存保存失败：' + error.message, 'error', 8000);
+      }
+
+      if (!supabase) {
+        syncStatus.value = 'offline';
+        syncErrorMessage.value = 'Supabase 客户端未配置';
+        return Promise.resolve(false);
+      }
+      return queueCloudSync(snapshot, {
+        immediate: Boolean(safeOptions.immediate),
+        force: Boolean(safeOptions.force)
+      });
+    };
+
+    const retryCloudSync = () => saveData({ immediate: true, force: true });
+
+    const loadData = async () => {
+      let localRecord = null;
+      try {
+        localRecord = readLocalSnapshot();
+        applyDataSnapshot(localRecord?.snapshot || createDefaultSnapshot());
+      } catch (error) {
+        console.warn('本地缓存解析失败，改用初始数据:', error);
+        applyDataSnapshot(createDefaultSnapshot());
+      }
+
+      if (!supabase) {
+        syncStatus.value = 'offline';
+        syncErrorMessage.value = 'Supabase 客户端未配置';
+        return;
+      }
+
+      syncStatus.value = 'loading';
+      try {
+        const cloudTables = await fetchCloudTables();
+        const cloudIsEmpty = !cloudTables.studio_info || cloudTables.studio_info.length === 0;
+        const cloudSnapshot = cloudIsEmpty
+          ? createDefaultSnapshot()
+          : mapCloudTablesToSnapshot(cloudTables);
+
+        refreshSyncBaseline(toDatabaseTables(cloudSnapshot), cloudTables);
+
+        if (cloudIsEmpty || localRecord?.needsRecovery) {
+          const recoveredSnapshot = localRecord
+            ? mergeSnapshotsPreferLocal(cloudSnapshot, localRecord.snapshot)
+            : cloudSnapshot;
+          applyDataSnapshot(recoveredSnapshot);
+          await persistSnapshotToCloud(recoveredSnapshot);
+          lastSyncedAt = new Date().toISOString();
+          syncErrorMessage.value = '';
+          syncStatus.value = 'connected';
+          writeLocalSnapshot(recoveredSnapshot, { pending: false });
+          if (localRecord?.needsRecovery) {
+            showToast('已恢复浏览器中的未同步数据，并保存到云端。', 'success', 3500);
+          }
           return;
         }
 
-        // 映射云端字段到前端响应式变量
-        if (studio && studio.length > 0) studioInfo.value = studio[0];
-        if (cls && cls.length > 0) {
-          classes.value = cls.map(c => ({ ...c, createdAt: c.created_at, archivedAt: c.archived_at }));
-          nextTick(() => {
-            if (activeClasses.value.length > 0) {
-              const isValid = activeClasses.value.some(c => c.id === matrixClassId.value);
-              if (!isValid) {
-                matrixClassId.value = activeClasses.value[0].id;
-              }
-            }
-          });
-        }
-        if (stu && stu.length > 0) students.value = stu.map(s => ({
-          ...s, classId: s.class_id, parentName: s.parent_name, parentPhone: s.parent_phone, remainHours: s.remain_hours,
-          totalPurchased: s.total_purchased, totalConsumed: s.total_consumed, totalPointsEarned: s.total_points_earned,
-          redeemedCount: s.redeemed_count, joinDate: s.join_date
-        }));
-        if (att) attendanceHistory.value = att.map(a => ({ id: a.id, date: a.date, theme: a.theme, classId: a.class_id, details: a.details }));
-        if (fin) {
-          hourLogs.value = fin.filter(f => f.type === '课时扣除' || f.type === '撤销返还').map(f => ({
-            id: f.id, studentId: f.student_id, studentName: f.student_name, type: f.type, hours: f.hours, balanceAfter: f.amount, reason: f.description, operator: f.operator, time: f.date
-          }));
-          paymentOrders.value = fin.filter(f => f.type !== '课时扣除' && f.type !== '撤销返还').map(f => ({
-            id: f.id, orderNo: f.id, studentId: f.student_id, studentName: f.student_name, type: f.type, amount: f.amount, hours: f.hours, date: f.date, operator: f.operator
-          }));
-        }
-        if (prz && prz.length > 0) pointPrizes.value = prz.map(p => ({ id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc: p.desc_text }));
-        if (plog && plog.length > 0) pointLogs.value = plog.map(p => ({ id: p.id, studentId: p.student_id, studentName: p.student_name, type: p.type, points: p.points, balanceAfter: p.balance_after, reason: p.reason, operator: p.operator, time: p.time }));
-        if (popt && popt.length > 0) pointRewardOptions.value = popt;
-
+        applyDataSnapshot(cloudSnapshot);
+        lastSyncedAt = new Date().toISOString();
+        syncErrorMessage.value = '';
         syncStatus.value = 'connected';
-        // 同步覆盖本地快照
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          studioInfo: studioInfo.value,
-          classes: classes.value,
-          students: students.value,
-          attendanceHistory: attendanceHistory.value,
-          hourLogs: hourLogs.value,
-          paymentOrders: paymentOrders.value,
-          pointRewardOptions: pointRewardOptions.value,
-          pointPrizes: pointPrizes.value,
-          pointLogs: pointLogs.value
-        }));
-      } catch (err) {
-        console.error('从 Supabase 同步数据失败:', err);
+        writeLocalSnapshot(cloudSnapshot, { pending: false });
+      } catch (error) {
+        console.error('从 Supabase 加载数据失败:', error);
         syncStatus.value = 'offline';
+        syncErrorMessage.value = error?.message || '读取云端失败';
+        try {
+          writeLocalSnapshot(buildDataSnapshot(), {
+            pending: Boolean(localRecord?.needsRecovery),
+            error: syncErrorMessage.value
+          });
+        } catch (localError) {
+          console.error('保存本地降级快照失败:', localError);
+        }
+        showToast('云端读取失败，当前继续使用本机数据：' + syncErrorMessage.value, 'error', 8000);
       }
     };
-
-    let saveTimer = null;
-    const saveData = () => {
-      const payload = {
-        studioInfo: studioInfo.value,
-        classes: classes.value,
-        students: students.value,
-        attendanceHistory: attendanceHistory.value,
-        hourLogs: hourLogs.value,
-        paymentOrders: paymentOrders.value,
-        pointRewardOptions: pointRewardOptions.value,
-        pointPrizes: pointPrizes.value,
-        pointLogs: pointLogs.value
-      };
-      // 立即写入本地缓存保证流畅
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-
-      // 防抖写入 Supabase
-      if (!supabase) return;
-      if (saveTimer) clearTimeout(saveTimer);
-      saveTimer = setTimeout(async () => {
-        try {
-          syncStatus.value = 'syncing';
-          await throwOnError(supabase.from('studio_info').upsert([{ id: studioInfo.value.id || '00000000-0000-0000-0000-000000000000', ...studioInfo.value }]));
-          const clsDb = classes.value.map(c => ({ id: c.id, name: c.name, teacher: c.teacher, schedule: c.schedule, classroom: c.classroom, capacity: c.capacity, status: c.status, created_at: c.createdAt || new Date().toISOString(), archived_at: c.archivedAt, notes: c.notes }));
-          if (clsDb.length) await throwOnError(supabase.from('classes').upsert(clsDb));
-          const stuDb = students.value.map(s => ({ id: s.id, name: s.name, gender: s.gender, age: s.age, class_id: s.classId, parent_name: s.parentName, parent_phone: s.parentPhone, remain_hours: s.remainHours, total_purchased: s.totalPurchased, total_consumed: s.totalConsumed, points: s.points, total_points_earned: s.totalPointsEarned, redeemed_count: s.redeemedCount, status: s.status, join_date: s.joinDate, notes: s.notes }));
-          if (stuDb.length) await throwOnError(supabase.from('students').upsert(stuDb));
-          const attDb = attendanceHistory.value.map(a => ({ id: a.id, date: a.date, theme: a.theme, class_id: a.classId, details: a.details }));
-          if (attDb.length) await throwOnError(supabase.from('attendance_records').upsert(attDb));
-          const finDb = [
-            ...hourLogs.value.map(h => ({ id: h.id, type: h.type, date: h.time, amount: h.balanceAfter, student_id: h.studentId, student_name: h.studentName, description: h.reason, hours: h.hours, operator: h.operator })),
-            ...paymentOrders.value.map(p => ({ id: p.id, type: p.type, date: p.date, amount: p.amount, student_id: p.studentId, student_name: p.studentName, description: '', hours: p.hours, operator: p.operator }))
-          ];
-          if (finDb.length) await throwOnError(supabase.from('finance_logs').upsert(finDb));
-          const przDb = pointPrizes.value.map(p => ({ id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc }));
-          if (przDb.length) await throwOnError(supabase.from('point_prizes').upsert(przDb));
-          const poptDb = pointRewardOptions.value.map(p => ({ id: p.id, name: p.name, points: p.points, icon: p.icon, color: p.color }));
-          if (poptDb.length) await throwOnError(supabase.from('point_reward_options').upsert(poptDb));
-          const plogDb = pointLogs.value.map(p => ({ id: p.id, student_id: p.studentId, student_name: p.studentName, type: p.type, points: p.points, balance_after: p.balanceAfter, reason: p.reason, operator: p.operator, time: p.time }));
-          if (plogDb.length) await throwOnError(supabase.from('point_logs').upsert(plogDb));
-          syncStatus.value = 'connected';
-        } catch (err) {
-          console.error('异步写入 Supabase 失败:', err);
-          alert('数据保存失败，原因: ' + err.message);
-          syncStatus.value = 'offline';
-        }
-      }, 800);
-    };
-
 
     const exportDataJSON = () => {
       const dataToExport = {
