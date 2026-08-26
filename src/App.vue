@@ -6455,7 +6455,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         return {
           ...item,
           rank: index + 1,
-          status,
+          hourStatus: status,
           className: cls.name
         };
       });
@@ -6548,41 +6548,59 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     };
 
     const archiveStudent = (stu) => {
-      if (confirm(`确定要归档学员【${stu.name}】吗？\n归档后该学员将从日常在读名册移至归档中心，保留所有历史考勤与流水记录。`)) {
+      if (!stu) return;
+      const targetId = stu.id || stu.studentId || stu.student_id;
+      const realStudent = students.value.find(s => s.id === targetId);
+      if (!realStudent) {
+        showToast('未找到该学员信息', 'warning');
+        return;
+      }
+      if (confirm(`确定要归档学员【${realStudent.name}】吗？\n归档后该学员将从日常在读名册与大表中移至归档中心，保留所有历史考勤与流水记录。`)) {
+        realStudent.status = '已归档';
+        realStudent.archivedAt = new Date().toISOString().slice(0, 10);
         stu.status = '已归档';
-        stu.archivedAt = new Date().toISOString().slice(0, 10);
+
         hourLogs.value.unshift({
-          id: 'log_' + Date.now(),
-          studentId: stu.id,
-          studentName: stu.name,
+          id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: realStudent.id,
+          studentName: realStudent.name,
           type: '学员结课归档',
           hours: 0,
-          balanceAfter: stu.remainHours,
-          reason: `学员档案已归档保存 (结余积分: ${stu.points || 0}分)`,
+          balanceAfter: realStudent.remainHours,
+          reason: `学员档案已归档保存 (结余积分: ${realStudent.points || 0}分)`,
           operator: '陈老师',
           time: new Date().toLocaleString('zh-CN', { hour12: false })
         });
         saveData();
-        showToast(`📦 学员【${stu.name}】已归档`);
+        showToast(`📦 学员【${realStudent.name}】已成功归档！`);
       }
     };
 
     const unarchiveStudent = (stu) => {
+      if (!stu) return;
+      const targetId = stu.id || stu.studentId || stu.student_id;
+      const realStudent = students.value.find(s => s.id === targetId);
+      if (!realStudent) {
+        showToast('未找到该学员信息', 'warning');
+        return;
+      }
+      realStudent.status = '在读';
+      delete realStudent.archivedAt;
       stu.status = '在读';
-      delete stu.archivedAt;
+
       hourLogs.value.unshift({
-        id: 'log_' + Date.now(),
-        studentId: stu.id,
-        studentName: stu.name,
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        studentId: realStudent.id,
+        studentName: realStudent.name,
         type: '学员恢复在读',
         hours: 0,
-        balanceAfter: stu.remainHours,
+        balanceAfter: realStudent.remainHours,
         reason: `学员从归档库恢复为在读状态`,
         operator: '陈老师',
         time: new Date().toLocaleString('zh-CN', { hour12: false })
       });
       saveData();
-      showToast(`🔄 学员【${stu.name}】已恢复为在读状态！`);
+      showToast(`🔄 学员【${realStudent.name}】已恢复为在读状态！`);
     };
 
     // ==========================================
