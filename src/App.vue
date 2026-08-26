@@ -3342,6 +3342,8 @@
 </template>
 
 <script setup>
+const throwOnError = async (promise) => { const { data, error } = await promise; if (error) throw new Error(error.message); return data; };
+
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
 import { DEFAULT_INITIAL_DATA } from './data.js';
 import { supabase } from './lib/supabase.js';
@@ -3473,9 +3475,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         // 如果数据库完全为空，执行首次自动种子数据注入
         if (!studio || studio.length === 0) {
           console.log('初始化空白画室基本资料...');
-          await supabase.from('studio_info').insert([{ id: '00000000-0000-0000-0000-000000000000', ...DEFAULT_INITIAL_DATA.studioInfo }]);
+          await throwOnError(supabase.from('studio_info').insert([{ id: '00000000-0000-0000-0000-000000000000', ...DEFAULT_INITIAL_DATA.studioInfo }]));
           if (DEFAULT_INITIAL_DATA.pointRewardOptions?.length) {
-            await supabase.from('point_reward_options').upsert(DEFAULT_INITIAL_DATA.pointRewardOptions);
+            await throwOnError(supabase.from('point_reward_options').upsert(DEFAULT_INITIAL_DATA.pointRewardOptions));
           }
           syncStatus.value = 'connected';
           return;
@@ -3553,27 +3555,28 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       saveTimer = setTimeout(async () => {
         try {
           syncStatus.value = 'syncing';
-          await supabase.from('studio_info').upsert([{ id: studioInfo.value.id || '00000000-0000-0000-0000-000000000000', ...studioInfo.value }]);
+          await throwOnError(supabase.from('studio_info').upsert([{ id: studioInfo.value.id || '00000000-0000-0000-0000-000000000000', ...studioInfo.value }]));
           const clsDb = classes.value.map(c => ({ id: c.id, name: c.name, teacher: c.teacher, schedule: c.schedule, classroom: c.classroom, capacity: c.capacity, status: c.status, created_at: c.createdAt || new Date().toISOString(), archived_at: c.archivedAt, notes: c.notes }));
-          if (clsDb.length) await supabase.from('classes').upsert(clsDb);
+          if (clsDb.length) await throwOnError(supabase.from('classes').upsert(clsDb));
           const stuDb = students.value.map(s => ({ id: s.id, name: s.name, gender: s.gender, age: s.age, class_id: s.classId, parent_name: s.parentName, parent_phone: s.parentPhone, remain_hours: s.remainHours, total_purchased: s.totalPurchased, total_consumed: s.totalConsumed, points: s.points, total_points_earned: s.totalPointsEarned, redeemed_count: s.redeemedCount, status: s.status, join_date: s.joinDate, notes: s.notes }));
-          if (stuDb.length) await supabase.from('students').upsert(stuDb);
+          if (stuDb.length) await throwOnError(supabase.from('students').upsert(stuDb));
           const attDb = attendanceHistory.value.map(a => ({ id: a.id, date: a.date, theme: a.theme, class_id: a.classId, details: a.details }));
-          if (attDb.length) await supabase.from('attendance_records').upsert(attDb);
+          if (attDb.length) await throwOnError(supabase.from('attendance_records').upsert(attDb));
           const finDb = [
             ...hourLogs.value.map(h => ({ id: h.id, type: h.type, date: h.time, amount: h.balanceAfter, student_id: h.studentId, student_name: h.studentName, description: h.reason, hours: h.hours, operator: h.operator })),
             ...paymentOrders.value.map(p => ({ id: p.id, type: p.type, date: p.date, amount: p.amount, student_id: p.studentId, student_name: p.studentName, description: '', hours: p.hours, operator: p.operator }))
           ];
-          if (finDb.length) await supabase.from('finance_logs').upsert(finDb);
+          if (finDb.length) await throwOnError(supabase.from('finance_logs').upsert(finDb));
           const przDb = pointPrizes.value.map(p => ({ id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc }));
-          if (przDb.length) await supabase.from('point_prizes').upsert(przDb);
+          if (przDb.length) await throwOnError(supabase.from('point_prizes').upsert(przDb));
           const poptDb = pointRewardOptions.value.map(p => ({ id: p.id, name: p.name, points: p.points, icon: p.icon, color: p.color }));
-          if (poptDb.length) await supabase.from('point_reward_options').upsert(poptDb);
+          if (poptDb.length) await throwOnError(supabase.from('point_reward_options').upsert(poptDb));
           const plogDb = pointLogs.value.map(p => ({ id: p.id, student_id: p.studentId, student_name: p.studentName, type: p.type, points: p.points, balance_after: p.balanceAfter, reason: p.reason, operator: p.operator, time: p.time }));
-          if (plogDb.length) await supabase.from('point_logs').upsert(plogDb);
+          if (plogDb.length) await throwOnError(supabase.from('point_logs').upsert(plogDb));
           syncStatus.value = 'connected';
         } catch (err) {
           console.error('异步写入 Supabase 失败:', err);
+          alert('数据保存失败，原因: ' + err.message);
           syncStatus.value = 'offline';
         }
       }, 800);
@@ -5197,9 +5200,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: student.id,
           studentName: student.name,
           type: '考勤修改退还',
-          change: +1,
+          hours: +1,
           balanceAfter: student.remainHours,
-          relatedInfo: `大表修改：${attendanceRecord.date}《${attendanceRecord.theme}》改为「${newStatus}」退还课时`,
+          reason: `大表修改：${attendanceRecord.date}《${attendanceRecord.theme}》改为「${newStatus}」退还课时`,
           operator: '陈老师',
           time: nowStr
         });
@@ -5213,9 +5216,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: student.id,
           studentName: student.name,
           type: '大表考勤消课',
-          change: -1,
+          hours: -1,
           balanceAfter: student.remainHours,
-          relatedInfo: `大表点名：${attendanceRecord.date}《${attendanceRecord.theme}》到课${noteDesc}`,
+          reason: `大表点名：${attendanceRecord.date}《${attendanceRecord.theme}》到课${noteDesc}`,
           operator: '陈老师',
           time: nowStr
         });
@@ -5282,9 +5285,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
             studentId: s.id,
             studentName: s.name,
             type: '大表新增消课',
-            change: -1,
+            hours: -1,
             balanceAfter: s.remainHours,
-            relatedInfo: `${dateText} ${cls.name}《${themeText}》表格考勤到课`,
+            reason: `${dateText} ${cls.name}《${themeText}》表格考勤到课`,
             operator: cls.teacher || '陈老师',
             time: nowStr
           });
@@ -5379,9 +5382,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
               studentId: s.id,
               studentName: s.name,
               type: '考勤撤销返还',
-              change: +d.deductHours,
+              hours: +d.deductHours,
               balanceAfter: s.remainHours,
-              relatedInfo: `撤销 ${att.date} ${att.className} 考勤`,
+              reason: `撤销 ${att.date} ${att.className} 考勤`,
               operator: '陈老师',
               time: nowStr
             });
@@ -5576,9 +5579,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: stu.id,
           studentName: stu.name,
           type: '学员结课归档',
-          change: 0,
+          hours: 0,
           balanceAfter: stu.remainHours,
-          relatedInfo: `学员档案已归档保存 (结余积分: ${stu.points || 0}分)`,
+          reason: `学员档案已归档保存 (结余积分: ${stu.points || 0}分)`,
           operator: '陈老师',
           time: new Date().toLocaleString('zh-CN', { hour12: false })
         });
@@ -5595,9 +5598,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         studentId: stu.id,
         studentName: stu.name,
         type: '学员恢复在读',
-        change: 0,
+        hours: 0,
         balanceAfter: stu.remainHours,
-        relatedInfo: `学员从归档库恢复为在读状态`,
+        reason: `学员从归档库恢复为在读状态`,
         operator: '陈老师',
         time: new Date().toLocaleString('zh-CN', { hour12: false })
       });
@@ -5683,9 +5686,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: s.id,
           studentName: s.name,
           type: '个人临时消课',
-          change: -deduct,
+          hours: -deduct,
           balanceAfter: s.remainHours,
-          relatedInfo: `${adhocForm.date} 临时考勤《${adhocForm.theme}》${reasonRemark}`,
+          reason: `${adhocForm.date} 临时考勤《${adhocForm.theme}》${reasonRemark}`,
           operator: adhocForm.operator || '陈老师',
           time: nowStr
         });
@@ -5851,9 +5854,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: targetStudent.id,
           studentName: targetStudent.name,
           type: '新生建档缴费',
-          change: +addHours,
+          hours: +addHours,
           balanceAfter: targetStudent.remainHours,
-          relatedInfo: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时) (备注: ${rechargeForm.remark || '新生首次报名'})`,
+          reason: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时) (备注: ${rechargeForm.remark || '新生首次报名'})`,
           operator: rechargeForm.operator,
           time: nowStr
         });
@@ -5875,9 +5878,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: targetStudent.id,
           studentName: targetStudent.name,
           type: '续费充值',
-          change: +addHours,
+          hours: +addHours,
           balanceAfter: targetStudent.remainHours,
-          relatedInfo: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时)${noteText}`,
+          reason: `${rechargeForm.payMethod} ¥${rechargeForm.amount} (+${addHours}课时)${noteText}`,
           operator: rechargeForm.operator,
           time: nowStr
         });
@@ -5906,8 +5909,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         amount: Number(rechargeForm.amount || 0),
         hoursBought: Number(rechargeForm.hoursBought || 0),
         hoursGift: Number(rechargeForm.hoursGift || 0),
-        totalHours: addHours,
-        payDate: rechargeForm.payDate,
+        hours: addHours,
+        date: rechargeForm.payDate || new Date().toISOString().slice(0, 10),
         payMethod: rechargeForm.payMethod,
         operator: rechargeForm.operator,
         remark: rechargeForm.remark
@@ -5976,9 +5979,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
               studentId: old.id,
               studentName: studentForm.name,
               type: '教务手动调整',
-              change: diff,
+              hours: diff,
               balanceAfter: Number(studentForm.remainHours),
-              relatedInfo: `修改档案课时 (备注: ${studentForm.notes || '无备注'})`,
+              reason: `修改档案课时 (备注: ${studentForm.notes || '无备注'})`,
               operator: '陈老师',
               time: new Date().toLocaleString('zh-CN', { hour12: false })
             });
@@ -6011,9 +6014,9 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
           studentId: newS.id,
           studentName: newS.name,
           type: '新生建档入读',
-          change: +newS.remainHours,
+          hours: +newS.remainHours,
           balanceAfter: newS.remainHours,
-          relatedInfo: `首次建档初始课时 (备注: ${newS.notes || '新生入学'})`,
+          reason: `首次建档初始课时 (备注: ${newS.notes || '新生入学'})`,
           operator: '陈老师',
           time: new Date().toLocaleString('zh-CN', { hour12: false })
         });
