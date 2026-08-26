@@ -3386,7 +3386,14 @@ const loadData = async () => {
         redeemedCount: s.redeemed_count, joinDate: s.join_date
     }));
     attendanceHistory.value = att.map(a => ({id: a.id, date: a.date, theme: a.theme, classId: a.class_id, details: a.details}));
-    financeLogs.value = fin.map(f => ({id: f.id, type: f.type, date: f.date, amount: f.amount, studentId: f.student_id, studentName: f.student_name, description: f.description, hours: f.hours, operator: f.operator}));
+    
+    hourLogs.value = fin.filter(f => f.type === '课时扣除' || f.type === '撤销返还').map(f => ({
+        id: f.id, studentId: f.student_id, studentName: f.student_name, type: f.type, hours: f.hours, balanceAfter: f.amount, reason: f.description, operator: f.operator, time: f.date
+    }));
+    paymentOrders.value = fin.filter(f => f.type !== '课时扣除' && f.type !== '撤销返还').map(f => ({
+        id: f.id, orderNo: f.id, studentId: f.student_id, studentName: f.student_name, type: f.type, amount: f.amount, hours: f.hours, date: f.date, operator: f.operator
+    }));
+            
     pointPrizes.value = prz.map(p => ({id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc: p.desc_text}));
     pointLogs.value = plog.map(p => ({id: p.id, studentId: p.student_id, studentName: p.student_name, type: p.type, points: p.points, balanceAfter: p.balance_after, reason: p.reason, operator: p.operator, time: p.time}));
     pointRewardOptions.value = popt;
@@ -3418,8 +3425,13 @@ const saveData = () => {
       const attDb = attendanceHistory.value.map(a => ({id: a.id, date: a.date, theme: a.theme, class_id: a.classId, details: a.details}));
       if(attDb.length) await supabase.from('attendance_records').upsert(attDb);
 
-      const finDb = financeLogs.value.map(f => ({id: f.id, type: f.type, date: f.date, amount: f.amount, student_id: f.studentId, student_name: f.studentName, description: f.description, hours: f.hours, operator: f.operator}));
+      
+      const finDb = [
+        ...hourLogs.value.map(h => ({id: h.id, type: h.type, date: h.time, amount: h.balanceAfter, student_id: h.studentId, student_name: h.studentName, description: h.reason, hours: h.hours, operator: h.operator})),
+        ...paymentOrders.value.map(p => ({id: p.id, type: p.type, date: p.date, amount: p.amount, student_id: p.studentId, student_name: p.studentName, description: '', hours: p.hours, operator: p.operator}))
+      ];
       if(finDb.length) await supabase.from('finance_logs').upsert(finDb);
+        
 
       const przDb = pointPrizes.value.map(p => ({id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc}));
       if(przDb.length) await supabase.from('point_prizes').upsert(przDb);
@@ -3436,9 +3448,6 @@ const saveData = () => {
     }
   }, 1000);
 };
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    };
 
     watch([classes, students, attendanceHistory, hourLogs, paymentOrders, pointRewardOptions, pointPrizes, pointLogs, studioInfo], () => {
       saveData();
