@@ -169,7 +169,7 @@
     <!-- ============================================================ -->
     <!-- 主要内容区域 -->
     <!-- ============================================================ -->
-    <main class="flex-1 pb-16" @click="activeCellDropdownKey = null">
+    <main class="flex-1 pb-0" @click="activeCellDropdownKey = null">
       
       <!-- ======================================================== -->
       <!-- TAB 1: 📝 二维考勤总大表 (极简线框 · 紧凑排版 · 顺畅横向滑动) -->
@@ -177,7 +177,7 @@
       <section v-if="currentTab === 'attendance'" class="w-full">
         
         <!-- 表格水平滚动容器 (支持多学员流畅横向滑动，前两列固定) -->
-        <div class="overflow-x-auto max-h-[calc(100vh-160px)] w-full border-b border-black/10 dark:border-white/10" style="scrollbar-width: thin; background-color: var(--bg-page);">
+        <div class="overflow-x-auto h-[calc(100vh-130px)] overflow-y-auto w-full border-b border-black/10 dark:border-white/10" style="scrollbar-width: thin; background-color: var(--bg-page);">
           <table class="w-max min-w-full text-center text-xs border-collapse select-none" style="background-color: var(--bg-page); table-layout: fixed;">
             
             <!-- 表头 (紧凑高雅线框 · 课程与日期固定置顶与左置) -->
@@ -194,9 +194,10 @@
 
                 <!-- 02 上课日期 (固定左侧第2列 · 紧凑单行) -->
                 <th class="py-2.5 px-3 text-left border-r border-black/[0.06] dark:border-white/10 min-w-[140px] w-[140px] whitespace-nowrap sticky left-[155px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
-                  <div class="flex items-center gap-1.5 whitespace-nowrap">
+                  <div class="flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-500 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
                     <span class="text-[10px] text-black dark:text-stone-400 font-mono font-normal">02</span>
                     <span class="text-xs font-black tracking-tight">上课日期</span>
+                    <i class="fa-solid fa-sort text-[10px] opacity-40 group-hover:opacity-100 transition" :class="attendanceSortOrder === 'desc' ? 'fa-sort-down text-emerald-500 opacity-100' : 'fa-sort-up text-emerald-500 opacity-100'"></i>
                     <span class="text-[9px] text-black dark:text-stone-400 font-normal ml-0.5">📅</span>
                   </div>
                 </th>
@@ -4923,7 +4924,12 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const matrixAttendanceRecords = computed(() => {
       if (!matrixClassId.value) return [];
-      return attendanceHistory.value.filter(a => a.classId === matrixClassId.value);
+      let records = attendanceHistory.value.filter(a => a.classId === matrixClassId.value);
+      return records.sort((a, b) => {
+        const tA = new Date(a.date).getTime() || 0;
+        const tB = new Date(b.date).getTime() || 0;
+        return attendanceSortOrder.value === 'desc' ? tB - tA : tA - tB;
+      });
     });
 
     const getStudentAttendanceCell = (studentId, attendanceRecord) => {
