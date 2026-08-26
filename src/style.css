@@ -443,26 +443,44 @@ html.dark .matrix-cell-holiday {
   white-space: nowrap;
 }
 
-html.dark .wf-badge-green {
-  border-color: rgba(16, 229, 122, 0.4);
-  background-color: rgba(16, 229, 122, 0.12);
-  color: #10e57a;
+html.dark .wf-badge-green,
+html.dark .nt-tag-green,
+.dark .wf-badge-green,
+.dark .nt-tag-green {
+  border-color: rgba(16, 229, 122, 0.35) !important;
+  background-color: rgba(16, 229, 122, 0.12) !important;
+  color: #10e57a !important;
 }
-html.dark .wf-badge-red {
-  border-color: rgba(244, 63, 94, 0.4);
-  background-color: rgba(244, 63, 94, 0.12);
-  color: #fb7185;
+
+html.dark .wf-badge-red,
+html.dark .nt-tag-red,
+.dark .wf-badge-red,
+.dark .nt-tag-red {
+  border-color: rgba(244, 63, 94, 0.35) !important;
+  background-color: rgba(244, 63, 94, 0.12) !important;
+  color: #fb7185 !important;
 }
+
 html.dark .wf-badge-yellow,
-html.dark .wf-badge-gold {
-  border-color: rgba(245, 158, 11, 0.4);
-  background-color: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
+html.dark .nt-tag-yellow,
+.dark .wf-badge-yellow,
+.dark .nt-tag-yellow,
+html.dark .wf-badge-gold,
+html.dark .nt-tag-gold,
+.dark .wf-badge-gold,
+.dark .nt-tag-gold {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  color: #fbbf24 !important;
 }
-html.dark .wf-badge-purple {
-  border-color: rgba(168, 85, 247, 0.4);
-  background-color: rgba(168, 85, 247, 0.12);
-  color: #c084fc;
+
+html.dark .wf-badge-purple,
+html.dark .nt-tag-purple,
+.dark .wf-badge-purple,
+.dark .nt-tag-purple {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  background-color: rgba(168, 85, 247, 0.12) !important;
+  color: #c084fc !important;
 }
 
 /* 快捷积分选项 */
