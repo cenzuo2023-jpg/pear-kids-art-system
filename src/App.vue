@@ -3388,41 +3388,11 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
         // 如果数据库完全为空，执行首次自动种子数据注入
         if (!studio || studio.length === 0) {
-          console.log('检测到云端数据库为空，正在自动写入初始示范数据...');
+          console.log('初始化空白画室基本资料...');
           await supabase.from('studio_info').insert([{ id: '00000000-0000-0000-0000-000000000000', ...DEFAULT_INITIAL_DATA.studioInfo }]);
-          if (DEFAULT_INITIAL_DATA.classes?.length) {
-            await supabase.from('classes').insert(DEFAULT_INITIAL_DATA.classes.map(c => ({
-              id: c.id, name: c.name, teacher: c.teacher, schedule: c.schedule, classroom: c.classroom, capacity: c.capacity, status: c.status,
-              created_at: c.createdAt || new Date().toISOString(), archived_at: c.archivedAt || null, notes: c.notes
-            })));
-          }
-          if (DEFAULT_INITIAL_DATA.students?.length) {
-            await supabase.from('students').insert(DEFAULT_INITIAL_DATA.students.map(s => ({
-              id: s.id, name: s.name, gender: s.gender, age: s.age, class_id: s.classId, parent_name: s.parentName, parent_phone: s.parentPhone,
-              remain_hours: s.remainHours, total_purchased: s.totalPurchased, total_consumed: s.totalConsumed, points: s.points,
-              total_points_earned: s.totalPointsEarned, redeemed_count: s.redeemedCount, status: s.status, join_date: s.joinDate, notes: s.notes
-            })));
-          }
-          if (DEFAULT_INITIAL_DATA.attendanceHistory?.length) {
-            await supabase.from('attendance_records').insert(DEFAULT_INITIAL_DATA.attendanceHistory.map(a => ({
-              date: a.date, theme: a.theme, class_id: a.classId, details: a.details
-            })));
-          }
-          const combinedFinance = [
-            ...(DEFAULT_INITIAL_DATA.hourLogs || []).map(h => ({ id: h.id, type: h.type, date: h.time, amount: h.balanceAfter, student_id: h.studentId, student_name: h.studentName, description: h.reason, hours: h.hours, operator: h.operator })),
-            ...(DEFAULT_INITIAL_DATA.paymentOrders || []).map(p => ({ id: p.id, type: p.type, date: p.date, amount: p.amount, student_id: p.studentId, student_name: p.studentName, description: '', hours: p.hours, operator: p.operator }))
-          ];
-          if (combinedFinance.length) await supabase.from('finance_logs').insert(combinedFinance);
-          if (DEFAULT_INITIAL_DATA.pointPrizes?.length) {
-            await supabase.from('point_prizes').insert(DEFAULT_INITIAL_DATA.pointPrizes.map(p => ({ id: p.id, name: p.name, cost: p.cost, stock: p.stock, icon: p.icon, desc_text: p.desc })));
-          }
           if (DEFAULT_INITIAL_DATA.pointRewardOptions?.length) {
-            await supabase.from('point_reward_options').insert(DEFAULT_INITIAL_DATA.pointRewardOptions);
+            await supabase.from('point_reward_options').upsert(DEFAULT_INITIAL_DATA.pointRewardOptions);
           }
-          if (DEFAULT_INITIAL_DATA.pointLogs?.length) {
-            await supabase.from('point_logs').insert(DEFAULT_INITIAL_DATA.pointLogs.map(p => ({ id: p.id, student_id: p.studentId, student_name: p.studentName, type: p.type, points: p.points, balance_after: p.balanceAfter, reason: p.reason, operator: p.operator, time: p.time })));
-          }
-          console.log('云端数据初始注入完成！');
           syncStatus.value = 'connected';
           return;
         }
