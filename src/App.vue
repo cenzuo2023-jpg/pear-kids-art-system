@@ -5896,32 +5896,62 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const exportStudentAttendanceCSV = (student) => {
       const targetStudent = student || profileStudent.value;
-      if (!targetStudent) return;
+      if (!targetStudent) {
+        showToast('未选择学员', 'warning');
+        return;
+      }
       const stu = targetStudent;
-      const logs = hourLogs.value.filter(l => l.studentId === stu.id);
+      const sId = stu.id;
       
-      const headers = ['学员姓名', '家长电话', '所属班级', '变动类型', '课时变动', '结余课时', '考勤/缴费说明与备注', '经办老师', '时间记录'];
-      const rows = logs.map(l => [
+      // 提取该学员在全部排课考勤中的完整出勤明细
+      const attList = [];
+      (attendanceHistory.value || []).forEach(att => {
+        if (att.details && Array.isArray(att.details)) {
+          const detail = att.details.find(d => (d.studentId === sId || d.student_id === sId));
+          if (detail) {
+            const st = normalizeAttendanceStatus(detail.status);
+            attList.push({
+              date: att.date || '',
+              theme: att.theme || '美育主题创作课',
+              className: att.className || getClassById(att.classId || att.class_id).name,
+              teacher: att.teacher || getClassById(att.classId || att.class_id).teacher || '陈老师',
+              status: st,
+              deductHours: detail.deductHours !== undefined ? detail.deductHours : (st === '到课' ? 1 : 0),
+              note: detail.note || detail.reason || ''
+            });
+          }
+        }
+      });
+
+      attList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+      if (!attList.length) {
+        showToast(`学员【${stu.name}】暂无历史排课出勤记录`, 'warning');
+        return;
+      }
+
+      const headers = ['学员姓名', '上课日期', '课程绘画主题', '所在班级', '出勤状态', '消课课时', '任课主讲老师', '出勤与请假备注说明'];
+      const rows = attList.map(a => [
         `"${stu.name.replace(/"/g, '""')}"`,
-        `\t${stu.parentPhone || ''}`,
-        `"${getClassById(stu.classId).name.replace(/"/g, '""')}"`,
-        l.type,
-        l.change > 0 ? `+${l.change}` : l.change,
-        `${l.balanceAfter} 节`,
-        `"${(l.relatedInfo || '').replace(/"/g, '""')}"`,
-        l.operator || '陈老师',
-        l.time
+        `	${a.date}`,
+        `"${(a.theme || '').replace(/"/g, '""')}"`,
+        `"${(a.className || '').replace(/"/g, '""')}"`,
+        `"${a.status}"`,
+        a.deductHours > 0 ? `-${a.deductHours} 节` : '0 节',
+        `"${(a.teacher || '陈老师').replace(/"/g, '""')}"`,
+        `"${(a.note || '').replace(/"/g, '""')}"`
       ]);
 
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('
+');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `想吃梨_【${stu.name}】个人考勤成长总账_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `想吃梨_【${stu.name}】个人排课出勤明细表_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast(`🍐 【${stu.name}】个人考勤档案已成功导出！`);
+      showToast(`🍐 学员【${stu.name}】个人考勤表已成功导出！`);
     };
 
     // ==========================================
