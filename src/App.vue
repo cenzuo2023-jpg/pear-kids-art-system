@@ -3483,7 +3483,17 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
         // 映射云端字段到前端响应式变量
         if (studio && studio.length > 0) studioInfo.value = studio[0];
-        if (cls && cls.length > 0) classes.value = cls.map(c => ({ ...c, createdAt: c.created_at, archivedAt: c.archived_at }));
+        if (cls && cls.length > 0) {
+          classes.value = cls.map(c => ({ ...c, createdAt: c.created_at, archivedAt: c.archived_at }));
+          nextTick(() => {
+            if (activeClasses.value.length > 0) {
+              const isValid = activeClasses.value.some(c => c.id === matrixClassId.value);
+              if (!isValid) {
+                matrixClassId.value = activeClasses.value[0].id;
+              }
+            }
+          });
+        }
         if (stu && stu.length > 0) students.value = stu.map(s => ({
           ...s, classId: s.class_id, parentName: s.parent_name, parentPhone: s.parent_phone, remainHours: s.remain_hours,
           totalPurchased: s.total_purchased, totalConsumed: s.total_consumed, totalPointsEarned: s.total_points_earned,
@@ -4992,22 +5002,27 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // ==========================================
     // 7. 二维考勤总表 (单元格下拉修改考勤 & 奖励积分)
     // ==========================================
-    const matrixClassId = ref(activeClasses.value[0]?.id || classes.value[0]?.id || '');
+    const matrixClassId = ref('');
     watch(activeClasses, (newVal) => {
-      if (!matrixClassId.value && newVal.length > 0) {
-        matrixClassId.value = newVal[0].id;
+      if (newVal && newVal.length > 0) {
+        const isValid = newVal.some(c => c.id === matrixClassId.value);
+        if (!isValid) {
+          matrixClassId.value = newVal[0].id;
+        }
+      } else {
+        matrixClassId.value = '';
       }
-    }, { immediate: true });
+    }, { immediate: true, deep: true });
 
 
     const matrixStudents = computed(() => {
       if (!matrixClassId.value) return [];
-      return activeStudents.value.filter(s => s.classId === matrixClassId.value);
+      return activeStudents.value.filter(s => (s.classId === matrixClassId.value || s.class_id === matrixClassId.value));
     });
 
     const matrixAttendanceRecords = computed(() => {
       if (!matrixClassId.value) return [];
-      let records = attendanceHistory.value.filter(a => a.classId === matrixClassId.value);
+      let records = attendanceHistory.value.filter(a => (a.classId === matrixClassId.value || a.class_id === matrixClassId.value));
       return records.sort((a, b) => {
         const tA = new Date(a.date).getTime() || 0;
         const tB = new Date(b.date).getTime() || 0;
