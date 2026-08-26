@@ -3357,7 +3357,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // Tab 2 排行榜子视图：hours (课时排行榜) | points (积分光荣榜)
     const rankingViewType = ref('hours');
 
-    const isDarkMode = ref(true);
+    const isDarkMode = ref(localStorage.getItem(THEME_KEY) === 'dark' ? false : false);
 
     // 核心数据
     const studioInfo = ref(DEFAULT_INITIAL_DATA.studioInfo);
@@ -6163,6 +6163,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     window.addEventListener('hashchange', syncStateFromHash);
 
     onMounted(() => {
+      applyTheme();
       loadData();
       syncStateFromHash();
       window.addEventListener('click', handleGlobalClick);
