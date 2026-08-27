@@ -1372,95 +1372,81 @@
           </div>
         </div>
 
-        <!-- 周期统计切换控制栏 -->
-        <div class="wf-card p-3.5 space-y-3 bg-stone-50/50 dark:bg-stone-900/20 border border-stone-200 dark:border-stone-800">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <!-- 周期切换按钮组 -->
-            <div class="flex items-center gap-1 bg-stone-200/60 dark:bg-stone-800/80 p-1 rounded-lg text-xs font-medium">
-              <button @click="statPeriodMode = 'month'"
-                :class="statPeriodMode === 'month' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded transition">
-                按月统计
-              </button>
+<!-- 财务概览与周期切换控制条 -->
+<div class="wf-card p-5 border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/20 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2">
 
-              <button @click="statPeriodMode = 'quarter'"
-                :class="statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded transition">
-                按季度统计
-              </button>
+  <!-- 左侧：核心数据（实收总额） -->
+  <div class="flex-shrink-0">
+    <div class="flex items-center gap-2 mb-1.5">
+      <span class="font-medium text-stone-600 dark:text-stone-400 text-sm">实收总额</span>
+      <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">
+        {{ periodStatSummary.orderCount }} 笔
+      </span>
+    </div>
+    <div class="text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+      ¥ {{ periodStatSummary.totalAmount.toLocaleString() }}
+    </div>
+    <div class="text-xs text-stone-500 font-mono mt-1.5">
+      周期实收资金
+    </div>
+  </div>
 
-              <button @click="statPeriodMode = 'year'"
-                :class="statPeriodMode === 'year' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded transition">
-                按年统计
-              </button>
+  <!-- 右侧：统计周期切换与选择器 -->
+  <div class="flex flex-col items-start md:items-end gap-3">
+    <!-- 周期切换按钮组 -->
+    <div class="flex items-center gap-1 bg-stone-200/60 dark:bg-stone-800/80 p-1 rounded-lg text-xs font-medium">
+      <button @click="statPeriodMode = 'month'"
+        :class="statPeriodMode === 'month' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+        class="px-3 py-1.5 rounded transition">按月统计</button>
+      
+      <button @click="statPeriodMode = 'quarter'"
+        :class="statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+        class="px-3 py-1.5 rounded transition">按季度统计</button>
+      
+      <button @click="statPeriodMode = 'year'"
+        :class="statPeriodMode === 'year' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+        class="px-3 py-1.5 rounded transition">按年统计</button>
+      
+      <button @click="statPeriodMode = 'all'"
+        :class="statPeriodMode === 'all' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+        class="px-3 py-1.5 rounded transition">全部历史</button>
+    </div>
 
-              <button @click="statPeriodMode = 'all'"
-                :class="statPeriodMode === 'all' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded transition">
-                全部历史
-              </button>
-            </div>
+    <!-- 联动选择器 -->
+    <div class="flex items-center gap-2 text-xs flex-wrap">
+      <!-- 按月 -->
+      <div v-if="statPeriodMode === 'month'" class="flex items-center gap-2">
+        <span class="text-stone-500">月份:</span>
+        <input type="month" v-model="selectedMonthStr" class="px-2.5 py-1 wf-input font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
+        <button @click="selectedMonthStr = currentYearMonth" class="text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:underline">返回当月</button>
+      </div>
 
-            <!-- 联动选择器 -->
-            <div class="flex items-center gap-2 text-xs flex-wrap">
-              <!-- 按月 -->
-              <div v-if="statPeriodMode === 'month'" class="flex items-center gap-2">
-                <span class="text-stone-500">月份:</span>
-                <input type="month" v-model="selectedMonthStr" class="px-2.5 py-1 wf-input font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
-                <button @click="selectedMonthStr = currentYearMonth" class="text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:underline">
-                  返回当月
-                </button>
-              </div>
-
-              <!-- 按季 -->
-              <div v-if="statPeriodMode === 'quarter'" class="flex items-center gap-2">
-                <span class="text-stone-500">年份:</span>
-                <select v-model="selectedYearStr" class="px-2 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
-                  <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年</option>
-                </select>
-                <div class="flex items-center bg-stone-200/60 dark:bg-stone-800/80 p-0.5 rounded text-xs font-mono font-medium">
-                  <button v-for="q in ['Q1', 'Q2', 'Q3', 'Q4']" :key="q"
-                    @click="selectedQuarterStr = q"
-                    :class="selectedQuarterStr === q ? 'bg-emerald-600 text-white font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                    class="px-2 py-0.5 rounded transition">
-                    {{ q }} ({{ q === 'Q1' ? '1-3月' : q === 'Q2' ? '4-6月' : q === 'Q3' ? '7-9月' : '10-12月' }})
-                  </button>
-                </div>
-              </div>
-
-              <!-- 按年 -->
-              <div v-if="statPeriodMode === 'year'" class="flex items-center gap-2">
-                <span class="text-stone-500">年份:</span>
-                <select v-model="selectedYearStr" class="px-2.5 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
-                  <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年度</option>
-                </select>
-              </div>
-            </div>
-          </div>
+      <!-- 按季 -->
+      <div v-if="statPeriodMode === 'quarter'" class="flex items-center gap-2">
+        <span class="text-stone-500">年份:</span>
+        <select v-model="selectedYearStr" class="px-2 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
+          <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年度</option>
+        </select>
+        <div class="flex items-center bg-stone-200/60 dark:bg-stone-800/80 p-0.5 rounded text-xs font-mono font-medium">
+          <button v-for="q in ['Q1', 'Q2', 'Q3', 'Q4']" :key="q"
+            @click="selectedQuarterStr = q"
+            :class="selectedQuarterStr === q ? 'bg-emerald-600 text-white font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+            class="px-2 py-0.5 rounded transition">
+            {{ q }} ({{ q === 'Q1' ? '1-3月' : q === 'Q2' ? '4-6月' : q === 'Q3' ? '7-9月' : '10-12月' }})
+          </button>
         </div>
+      </div>
 
-        <!-- 4 维核心统计卡片 (统一色调 · 统一字号 · 纯粹典雅) -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          <!-- 1. 实收金额 -->
-          <div @click="cardFilterMode = 'all'"
-            :class="cardFilterMode === 'all' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
-            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-stone-600 dark:text-stone-400">实收总额</span>
-              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">
-                {{ periodStatSummary.orderCount }} 笔
-              </span>
-            </div>
-            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
-              ¥ {{ periodStatSummary.totalAmount.toLocaleString() }}
-            </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
-              <span>周期实收资金</span>
-              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">显示全部</span>
-            </div>
-          </div>
+      <!-- 按年 -->
+      <div v-if="statPeriodMode === 'year'" class="flex items-center gap-2">
+        <span class="text-stone-500">年份:</span>
+        <select v-model="selectedYearStr" class="px-2.5 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
+          <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年度</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 
 
         </div>
