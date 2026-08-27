@@ -295,51 +295,25 @@
                     class="absolute z-50 top-full left-1/2 -translate-x-1/2 mt-1 w-48 p-2 rounded-lg border border-[#e2e2e0] dark:border-[#444] shadow-xl space-y-1 text-left"
                     style="background-color: var(--bg-surface);">
                     
-                    <div class="px-2 py-1 text-xs text-gray-500 font-mono border-b border-[#e2e2e0] dark:border-[#333] flex justify-between items-center">
-                      <span>修改考勤</span>
-                      <span class="font-bold text-emerald-600">{{ stu.name }}</span>
-                    </div>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '到课')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-emerald-50 text-emerald-700 dark:hover:bg-emerald-950/30 transition"
+                      class="w-full flex items-center px-2.5 py-1.5 rounded text-xs font-bold hover:bg-emerald-50 text-emerald-700 dark:hover:bg-emerald-950/30 transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-50 border border-emerald-300' : ''">
                       <span class="flex items-center gap-1.5"><span>🟢</span> 到课</span>
-                      <span class="text-xs text-gray-500 font-mono">消课-1</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '未到')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/30 transition"
+                      class="w-full flex items-center px-2.5 py-1.5 rounded text-xs font-bold hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/30 transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-50 border border-rose-300' : ''">
                       <span class="flex items-center gap-1.5"><span>🔴</span> 请假/未到</span>
-                      <span class="text-xs text-gray-500 font-mono">不扣课</span>
                     </button>
 
                     <button @click.stop="selectCellStatusFromDropdown(att, stu, '放假')"
-                      class="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-purple-50 text-purple-700 dark:hover:bg-purple-950/30 transition"
+                      class="w-full flex items-center px-2.5 py-1.5 rounded text-xs font-bold hover:bg-purple-50 text-purple-700 dark:hover:bg-purple-950/30 transition"
                       :class="getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-50 border border-purple-300' : ''">
                       <span class="flex items-center gap-1.5"><span>🟣</span> 全班放假</span>
-                      <span class="text-xs text-gray-500">休假</span>
                     </button>
 
-                    <div class="border-t border-[#e2e2e0] dark:border-[#333] my-1"></div>
-
-                    <button @click.stop="openIndividualPointModal(stu, 'add'); activeCellDropdownKey = null" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-bold transition">
-                      <i class="fa-solid fa-star text-xs"></i>
-                      <span>变更【{{ stu.name }}】积分</span>
-                    </button>
-
-                    <button @click.stop="openNoteFromDropdown(att, stu)" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-                      <i class="fa-solid fa-pen text-xs text-gray-400"></i>
-                      <span>填写/修改备注</span>
-                    </button>
-
-                    <button @click.stop="openStudentProfile(stu); activeCellDropdownKey = null" 
-                      class="w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 font-bold transition">
-                      <i class="fa-solid fa-id-card text-xs"></i>
-                      <span>查看个人档案 ↗</span>
-                    </button>
 
                   </div>
                 </td>
