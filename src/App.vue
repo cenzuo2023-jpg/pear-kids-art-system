@@ -6472,7 +6472,7 @@ const selectedClassDetail = ref(null);
         targetHash = '#attendance';
       }
       if (window.location.hash !== targetHash) {
-        window.history.replaceState(null, '', targetHash);
+        window.history.pushState(null, '', targetHash);
       }
     });
 
