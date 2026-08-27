@@ -1488,55 +1488,6 @@
             </div>
           </div>
 
-          <!-- 2. 正课课时 -->
-          <div @click="cardFilterMode = 'bought'"
-            :class="cardFilterMode === 'bought' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
-            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-stone-600 dark:text-stone-400">正课课时</span>
-              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">正课</span>
-            </div>
-            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
-              {{ periodStatSummary.totalHoursBought }} <span class="text-xs font-normal text-stone-500">节</span>
-            </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
-              <span>均价: ¥{{ periodStatSummary.avgHourPrice }}/节</span>
-              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">过滤正课</span>
-            </div>
-          </div>
-
-          <!-- 3. 赠送课时 -->
-          <div @click="cardFilterMode = 'gift'"
-            :class="cardFilterMode === 'gift' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
-            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-stone-600 dark:text-stone-400">赠送课时</span>
-              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">赠送</span>
-            </div>
-            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
-              {{ periodStatSummary.totalHoursGift }} <span class="text-xs font-normal text-stone-500">节</span>
-            </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
-              <span>合计: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节</span>
-              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">只看赠课</span>
-            </div>
-          </div>
-
-          <!-- 4. 收费笔数 -->
-          <div @click="cardFilterMode = 'all'"
-            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-stone-600 dark:text-stone-400">收费笔数</span>
-              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">笔数</span>
-            </div>
-            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
-              {{ periodStatSummary.orderCount }} <span class="text-xs font-normal text-stone-500">笔</span>
-            </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
-              <span>笔均: ¥{{ periodStatSummary.avgOrderAmount }}</span>
-              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">刷新全部</span>
-            </div>
-          </div>
 
         </div>
 
