@@ -3766,12 +3766,16 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     });
 
     const activeStudents = computed(() => {
-      return students.value.filter(s => s.status !== '已归档');
-    });
+  return students.value
+    .filter(s => s.status !== '已归档')
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'zh-Hans-CN'));
+});
 
     const archivedStudents = computed(() => {
-      return students.value.filter(s => s.status === '已归档');
-    });
+  return students.value
+    .filter(s => s.status === '已归档')
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'zh-Hans-CN'));
+});
 
     // ==========================================
     // 3. 统计指标
@@ -4155,12 +4159,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         );
       }
 
-      list.sort((a, b) => {
-        if (pointsRankingSort.value === 'total') {
-          return Number(b.totalPointsEarned || 0) - Number(a.totalPointsEarned || 0);
-        }
-        return Number(b.points || 0) - Number(a.points || 0);
-      });
+      
 
       return list.map((item, index) => {
         const cls = getClassById(item.classId);
@@ -5693,10 +5692,7 @@ const selectedClassDetail = ref(null);
         );
       }
 
-      list.sort((a, b) => {
-        const diff = Number(a.remainHours) - Number(b.remainHours);
-        return rankingSortOrder.value === 'asc' ? diff : -diff;
-      });
+      
 
       return list.map((item, index) => {
         const status = getHourStatus(item.remainHours);
