@@ -4701,7 +4701,7 @@ const selectedClassDetail = ref(null);
         }
       });
 
-      return list;
+      return list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     });
 
     const profileStudentStats = computed(() => {
