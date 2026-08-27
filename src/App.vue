@@ -2002,6 +2002,12 @@
           </div>
         </div>
 
+        <div v-if="exportModalConfig.mode.startsWith('student')" class="pt-1">
+          <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">购课数量 (用于报表计算剩余课时)</label>
+          <input v-model.number="exportModalConfig.purchaseQuantity" type="number" min="0"
+            class="w-full px-3 py-2 nt-input font-mono text-sm" placeholder="请输入该区间对应的购课总量">
+        </div>
+
         <!-- 导出范围与符合条数实时统计预览 -->
         <div class="p-3 rounded-lg border border-[#e2e2e0] dark:border-[#333] bg-[#f7f7f5] dark:bg-[#222] text-xs text-gray-600 dark:text-gray-300 flex items-center justify-between">
           <div class="flex items-center gap-1.5">
@@ -4730,13 +4736,14 @@ const selectedClassDetail = ref(null);
     // ==========================================
     const showExportAttendanceModal = ref(false);
     const exportModalConfig = reactive({
-      mode: 'student', // 'student' | 'student_csv' | 'student_pdf' | 'matrix'
+      mode: 'student',
       title: '',
       targetStudent: null,
       targetClassId: '',
-      presetRange: 'all', // 'all' | 'this_month' | 'last_month' | 'last_3_months' | 'this_year' | 'custom'
+      presetRange: 'all',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      purchaseQuantity: 0
     });
 
     const openExportModal = (mode, student = null, classId = '') => {
@@ -4746,6 +4753,13 @@ const selectedClassDetail = ref(null);
       exportModalConfig.presetRange = 'all';
       exportModalConfig.startDate = '';
       exportModalConfig.endDate = '';
+  
+  if (exportModalConfig.targetStudent) {
+    const s = exportModalConfig.targetStudent;
+    exportModalConfig.purchaseQuantity = s.totalPurchased || (Number(s.remainHours || 0) + Number(s.totalConsumed || 0)) || 0;
+  } else {
+    exportModalConfig.purchaseQuantity = 0;
+  }
 
       if (mode.startsWith('student') && exportModalConfig.targetStudent) {
         exportModalConfig.title = `正在导出学员【${exportModalConfig.targetStudent.name}】的个人课程出勤明细`;
@@ -4765,6 +4779,13 @@ const selectedClassDetail = ref(null);
       if (preset === 'all') {
         exportModalConfig.startDate = '';
         exportModalConfig.endDate = '';
+  
+  if (exportModalConfig.targetStudent) {
+    const s = exportModalConfig.targetStudent;
+    exportModalConfig.purchaseQuantity = s.totalPurchased || (Number(s.remainHours || 0) + Number(s.totalConsumed || 0)) || 0;
+  } else {
+    exportModalConfig.purchaseQuantity = 0;
+  }
       } else if (preset === 'this_month') {
         const firstDay = `${y}-${String(m + 1).padStart(2, '0')}-01`;
         const lastDay = new Date(y, m + 1, 0).toISOString().slice(0, 10);
@@ -4937,6 +4958,10 @@ const selectedClassDetail = ref(null);
       const totalLessons = presentCount + leaveCount;
       const rate = totalLessons > 0 ? ((presentCount / totalLessons) * 100).toFixed(0) + '%' : '100%';
       const todayStr = new Date().toISOString().slice(0, 10);
+      
+      const calculatedConsumed = finalAttList.filter(a => a.status === '到课').reduce((sum, a) => sum + (Number(a.deductHours) || 0), 0);
+      const customPurchased = Number(exportModalConfig.purchaseQuantity) || 0;
+      const customRemaining = customPurchased - calculatedConsumed;
 
       // 生成整洁高雅的 A4 PDF 打印文档
       const rowsHtml = finalAttList.length > 0 ? finalAttList.map((a, idx) => {
@@ -5105,19 +5130,19 @@ const selectedClassDetail = ref(null);
     <div class="stats-cards">
       <div class="stat-card">
         <div class="label">累计购课总量</div>
-        <div class="value">${stu.totalPurchased || (Number(stu.remainHours || 0) + Number(stu.totalConsumed || 0))} <span style="font-size:12px; font-weight:normal;">节</span></div>
+        <div class="value">${customPurchased} <span style="font-size:12px; font-weight:normal;">节</span></div>
       </div>
       <div class="stat-card">
         <div class="label">累计出勤消课</div>
-        <div class="value">${stu.totalConsumed || presentCount} <span style="font-size:12px; font-weight:normal;">节</span></div>
+        <div class="value">${calculatedConsumed} <span style="font-size:12px; font-weight:normal;">节</span></div>
       </div>
       <div class="stat-card green">
         <div class="label">当前剩余课时</div>
-        <div class="value">${stu.remainHours} <span style="font-size:12px; font-weight:normal;">节</span></div>
+        <div class="value">${customRemaining} <span style="font-size:12px; font-weight:normal;">节</span></div>
       </div>
       <div class="stat-card amber">
         <div class="label">历史出勤率 / 画币</div>
-        <div class="value" style="font-size:18px;">${rate} <span style="font-size:12px; color:#b45309;">(⭐${stu.points || 0})</span></div>
+        <div class="value" style="font-size:18px;">${rate} <span style="font-size:12px; color:#b45309;">(⭐️${stu.points || 0})</span></div>
       </div>
     </div>
 
