@@ -182,13 +182,13 @@
         <div class="attendance-table-scroll w-full border-b border-[#e2e2e0] dark:border-[#333]" 
           style="overflow-x: auto !important; overflow-y: auto !important; max-width: 100vw; height: calc(100vh - 125px); -webkit-overflow-scrolling: touch; background-color: var(--bg-page);">
           <table class="attendance-matrix text-center text-sm border-collapse select-none" 
-            style="width: max-content; min-width: 100%; border-spacing: 0; background-color: var(--bg-page);">
+            style="width: max-content; border-spacing: 0; background-color: var(--bg-page);">
             
             <!-- 表头 (14px 粗体 · 课程与日期固定置顶与左置) -->
             <thead class="sticky top-0 z-30 shadow-sm border-b border-[#e2e2e0] dark:border-[#333]" style="background-color: var(--bg-surface);">
               <tr class="font-bold select-none">
                 <!-- 01 课程主题 (固定左侧第1列 · 160px 宽 · 绝不挤压) -->
-                <th class="py-3 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                <th class="py-3 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] max-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   <div class="flex items-center gap-1.5 whitespace-nowrap">
                     <span class="text-xs text-gray-500 font-mono font-bold">01</span>
                     <span class="text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]">课程主题</span>
@@ -197,7 +197,7 @@
                 </th>
 
                 <!-- 02 上课日期 (固定左侧第2列 · 145px 宽 · 带排序) -->
-                <th class="py-3 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                <th class="py-3 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] max-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
                   <div class="flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-600 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
                     <span class="text-xs text-gray-500 font-mono font-bold">02</span>
                     <span class="text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]">上课日期</span>
@@ -252,7 +252,7 @@
               <tr v-for="att in matrixAttendanceRecords" :key="att.id" class="hover:bg-[#f7f7f5] dark:hover:bg-[#222] transition-colors">
                 
                 <!-- 🌟 课程主题 (固定第1列 · 160px · 单行快速修改) -->
-                <td class="py-2.5 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                <td class="py-2.5 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] max-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-10 shadow-sm" style="background-color: var(--bg-surface);">
                   <div @click="openEditAttendanceRow(att)" 
                     class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
                     title="点击修改课程主题与上课日期">
@@ -265,7 +265,7 @@
                 </td>
 
                 <!-- 🌟 上课日期 (固定第2列 · 145px · 单行快速修改) -->
-                <td class="py-2.5 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                <td class="py-2.5 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] max-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
                   <div @click="openEditAttendanceRow(att)" 
                     class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
                     title="点击修改上课日期与课程主题">
@@ -1914,10 +1914,6 @@
             <input v-model="editingAttendanceForm.rawDate" type="date" class="w-full px-3 py-2 nt-input font-mono font-bold text-sm">
           </div>
 
-          <div>
-            <label class="block text-black dark:text-stone-400 mb-1 font-semibold">任课主讲老师</label>
-            <input v-model="editingAttendanceForm.teacher" type="text" placeholder="例: 陈老师" class="w-full px-3 py-2 wf-input">
-          </div>
         </div>
 
         <div class="pt-3 border-t border-black/10 dark:border-white/10 flex items-center justify-between gap-2">
