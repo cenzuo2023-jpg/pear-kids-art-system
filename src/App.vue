@@ -1449,7 +1449,6 @@
 </div>
 
 
-        </div>
 
         <!-- 搜索与筛选工具栏 -->
         <div class="wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800">
