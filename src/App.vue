@@ -4346,7 +4346,7 @@ const archivedClasses = computed(() => {
         );
       }
 
-      return list;
+      return list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     });
 
     // ==========================================
@@ -4719,12 +4719,12 @@ const selectedClassDetail = ref(null);
 
     const profileStudentLogs = computed(() => {
       if (!profileStudent.value) return [];
-      return hourLogs.value.filter(l => l.studentId === profileStudent.value.id);
+      return hourLogs.value.filter(l => l.studentId === profileStudent.value.id).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
     });
 
     const profileStudentPointLogs = computed(() => {
       if (!profileStudent.value) return [];
-      return pointLogs.value.filter(l => l.studentId === profileStudent.value.id);
+      return pointLogs.value.filter(l => l.studentId === profileStudent.value.id).sort((a, b) => (b.time || '').localeCompare(a.time || ''));
     });
 
         // ==========================================
