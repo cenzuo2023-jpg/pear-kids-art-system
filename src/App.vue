@@ -1660,37 +1660,49 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="order in filteredPaymentOrders" :key="order.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ order.id }}</td>
+                
+                <tr v-for="order in filteredPaymentOrders" :key="order.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition" :class="order.status === '已撤销' ? 'opacity-50 grayscale' : ''">
+                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap" :class="order.status === '已撤销' ? 'line-through' : ''">{{ order.id }}</td>
                   <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ order.payDate }}</td>
                   <td class="py-3 px-4 font-bold whitespace-nowrap">
                     <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看个人档案">
+                      class="cursor-pointer hover:text-emerald-400 transition" title="查看学员档案">
                       {{ order.studentName }} ↗
                     </span>
                   </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
+                  <td class="py-3 px-4 font-mono font-black text-sm text-emerald-500 dark:text-emerald-400 whitespace-nowrap" :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">
                     ¥ {{ (order.amount || 0).toLocaleString() }}
                   </td>
                   <td class="py-3 px-4 font-mono font-bold whitespace-nowrap">
-                    <span>{{ order.hoursBought }} 节</span>
-                    <span v-if="order.hoursGift > 0" class="text-amber-400 text-xs ml-1 font-normal">(赠{{ order.hoursGift }})</span>
+                    <span :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">{{ order.hoursBought }} 节</span>
+                    <span v-if="order.hoursGift > 0" class="text-amber-500 dark:text-amber-400 text-xs ml-1 font-normal" :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">(赠{{ order.hoursGift }})</span>
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
+                      :class="order.status === '已撤销' ? 'bg-stone-500/10 text-stone-500 border-stone-500/30' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'">
+                      {{ order.status || '正常' }}
+                    </span>
                   </td>
                   <td class="py-3 px-4 whitespace-nowrap">
                     <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block font-mono"
-                      :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
+                      :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30'">
                       {{ order.payMethod || '微信支付' }}
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ order.remark || '-' }}</td>
-                  <td class="py-3 px-4 text-right whitespace-nowrap">
-                    <button @click="openReceiptModal(order)" class="wf-btn-outline text-xs py-1 px-2.5 text-emerald-400 border-emerald-500/30">
+                  <td class="py-3 px-4 text-xs whitespace-nowrap">{{ order.operator || '系统' }}</td>
+                  <td class="py-3 px-4 text-stone-500 dark:text-stone-400 text-xs min-w-[120px]">{{ order.remark || '-' }}</td>
+                  <td class="py-3 px-4 whitespace-nowrap text-right space-x-2">
+                    <button class="text-emerald-500 hover:text-emerald-600 text-xs font-bold transition">
                       <i class="fa-solid fa-receipt mr-1"></i>
                       <span>电子收据</span>
                     </button>
+                    <button v-if="order.status !== '已撤销'" @click="revokePaymentOrder(order)" class="text-red-500 hover:text-red-600 text-xs font-bold transition">
+                      <i class="fa-solid fa-rotate-left mr-1"></i>
+                      <span>撤销退费</span>
+                    </button>
                   </td>
                 </tr>
+
 
                 <tr v-if="filteredPaymentOrders.length === 0">
                   <td colspan="9" class="py-16 text-center text-stone-400 text-xs">
@@ -4781,7 +4793,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       const currentYearMonth = `${now.getFullYear()}-${String(currentMonthNum).padStart(2, '0')}`;
       const currentYearMonthAlt = `${now.getFullYear()}/${currentMonthNum}`;
 
-      const orders = paymentOrders.value || [];
+      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
       
       let monthIncome = 0;
       let monthOrderCount = 0;
@@ -4848,7 +4860,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     // 本年度月度营收明细分析
     const monthlyRevenueBreakdown = computed(() => {
-      const orders = paymentOrders.value || [];
+      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
       const map = {};
       orders.forEach(o => {
         const ym = (o.payDate || o.date || '').substring(0, 7) || '其他';
@@ -4870,7 +4882,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     // 历年年度营收汇总
     const annualRevenueBreakdown = computed(() => {
-      const orders = paymentOrders.value || [];
+      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
       const map = {};
       orders.forEach(o => {
         const y = (o.payDate || o.date || '').substring(0, 4) || '其他';
@@ -5375,6 +5387,61 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       }
       return list;
     });
+
+
+    const revokePaymentOrder = (order) => {
+      if (order.status === '已撤销') {
+        showToast('该订单已撤销', 'warning');
+        return;
+      }
+      if (!confirm(`确定要撤销【${order.studentName}】在 ${order.payDate} 充值的 ¥${order.amount} 订单吗？\n此操作将同时扣除该学员相应的课时和积分！`)) {
+        return;
+      }
+      
+      // 1. 标记订单为撤销
+      order.status = '已撤销';
+      
+      // 2. 扣除学生课时和积分
+      const targetStudent = students.value.find(s => s.id === order.studentId);
+      if (targetStudent) {
+        const deductHours = (order.hoursBought || 0) + (order.hoursGift || 0);
+        targetStudent.remainHours = Math.max(0, Number(targetStudent.remainHours || 0) - deductHours);
+        targetStudent.totalPurchased = Math.max(0, Number(targetStudent.totalPurchased || 0) - deductHours);
+        targetStudent.points = Math.max(0, Number(targetStudent.points || 0) - deductHours); // Assuming points = hours
+        targetStudent.totalPointsEarned = Math.max(0, Number(targetStudent.totalPointsEarned || 0) - deductHours);
+
+        const nowStr = new Date().toLocaleString('zh-CN', { hour12: false });
+        
+        // 3. 添加课时退费扣除流水
+        hourLogs.value.unshift({
+          id: 'log_revoke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '撤销/退费',
+          hours: -deductHours,
+          balanceAfter: targetStudent.remainHours,
+          reason: `撤销订单 ${order.id} 扣除课时`,
+          operator: order.operator || '系统',
+          time: nowStr
+        });
+        
+        // 4. 添加积分撤销流水
+        pointLogs.value.unshift({
+          id: 'plog_revoke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '撤销/退费扣除',
+          points: -deductHours,
+          balanceAfter: targetStudent.points,
+          reason: `撤销订单 ${order.id} 扣除赠送积分`,
+          operator: order.operator || '系统',
+          time: nowStr
+        });
+      }
+      
+      saveData();
+      showToast('撤销退费成功，已同步扣除相关课时和积分');
+    };
 
     const exportPaymentOrdersCSV = () => {
       const data = filteredPaymentOrders.value;
@@ -7104,7 +7171,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         payDate: rechargeForm.payDate || new Date().toISOString().slice(0, 10),
         payMethod: rechargeForm.payMethod,
         operator: rechargeForm.operator,
-        remark: rechargeForm.remark
+        remark: rechargeForm.remark,
+        status: '正常'
       });
 
       saveData();
