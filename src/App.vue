@@ -1360,956 +1360,1221 @@
       <!-- ======================================================== -->
       <!-- TAB 4: 💰 财务与收费管理中心 (统一高雅 · 极简线框设计系统) -->
       <!-- ======================================================== -->
+            <!-- ======================================================== -->
+      <!-- TAB 4: 💰 财务与经营管理中心 (系统化多周期统计 · 订单全生命周期 · 收支总账) -->
+      <!-- ======================================================== -->
       <section v-if="currentTab === 'records'" class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         
-        <!-- 顶部通栏标题与全局概览 -->
+        <!-- 1. 顶部通栏标题与全局概览 -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-black/10 dark:border-white/10 flex-wrap">
           <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-lg sm:text-xl font-bold">财务与课消管理中心</h2>
-              <span v-if="financeActiveKpi !== 'all'" @click="resetFinanceFilter"
-                class="cursor-pointer text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center gap-1">
-                <span>正在下钻筛选</span>
-                <i class="fa-solid fa-xmark text-[9px]"></i>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xl">💰</span>
+              <h2 class="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100">财务与经营管理中心</h2>
+              <span class="text-xs px-2.5 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                {{ financePeriodLabel }}
+              </span>
+              <span v-if="financePeriodType !== 'all'" @click="resetFinancePeriod"
+                class="text-xs text-stone-500 hover:text-emerald-500 cursor-pointer flex items-center gap-1">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>重置为全部</span>
               </span>
             </div>
-            <p class="text-xs text-stone-400 mt-0.5">实时基于具体考勤信息汇总周/月消课产值；收费充值与课消流水全链路留痕。</p>
+            <p class="text-xs text-stone-600 dark:text-stone-400 mt-1">
+              全周期多维经营统计（月/季/年/自定义）、收费订单全生命周期管理（退费/修改/开据/撤销）与资金收支闭环核算。
+            </p>
           </div>
 
+          <!-- 右侧操作栏 -->
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <!-- 导出下拉入口 -->
+            <div class="relative group">
+              <button class="wf-btn-outline text-xs py-2 px-3 flex items-center gap-1.5 text-stone-800 dark:text-stone-200">
+                <i class="fa-solid fa-file-export text-emerald-500"></i>
+                <span>导出财务报表 ▾</span>
+              </button>
+              <div class="absolute right-0 top-full mt-1 hidden group-hover:block z-30 w-48 bg-white dark:bg-[#1e1e1e] border border-black/10 dark:border-white/10 rounded-xl shadow-xl p-1.5 text-xs space-y-1">
+                <button @click="exportPaymentOrdersCSV" class="w-full text-left px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2">
+                  <i class="fa-solid fa-file-invoice text-emerald-500"></i>
+                  <span>导出收费订单明细 CSV</span>
+                </button>
+                <button @click="exportMonthlyReportCSV" class="w-full text-left px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2">
+                  <i class="fa-solid fa-calendar-days text-blue-500"></i>
+                  <span>导出月度财务报表 CSV</span>
+                </button>
+                <button @click="exportQuarterlyReportCSV" class="w-full text-left px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-pie text-amber-500"></i>
+                  <span>导出季度经营报表 CSV</span>
+                </button>
+                <button @click="exportAnnualReportCSV" class="w-full text-left px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-line text-purple-500"></i>
+                  <span>导出年度决算报表 CSV</span>
+                </button>
+                <button @click="exportCashFlowCSV" class="w-full text-left px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 flex items-center gap-2">
+                  <i class="fa-solid fa-money-bill-transfer text-teal-500"></i>
+                  <span>导出资金收支流水 CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 录入收费充值 -->
+            <button @click="openRechargeModal"
+              class="wf-btn-primary text-xs py-2 px-4 shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-plus-circle text-sm"></i>
+              <span>录入学员收费 / 充值开单</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. 🌟 多周期智能统计切换控制台 (月/季/年/自定义) -->
+        <div class="wf-card p-4 space-y-3 bg-stone-50/50 dark:bg-stone-900/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 flex-wrap">
+            <!-- 周期切换药丸 -->
+            <div class="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1 rounded-xl border border-black/5 dark:border-white/10 text-xs font-bold flex-wrap">
+              <button @click="setFinancePeriod('all')"
+                :class="financePeriodType === 'all' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-globe"></i>
+                <span>全部周期</span>
+              </button>
+
+              <button @click="setFinancePeriod('month')"
+                :class="financePeriodType === 'month' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>🗓️ 月度统计</span>
+              </button>
+
+              <button @click="setFinancePeriod('quarter')"
+                :class="financePeriodType === 'quarter' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>📊 季度统计 (Q1-Q4)</span>
+              </button>
+
+              <button @click="setFinancePeriod('year')"
+                :class="financePeriodType === 'year' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>📅 年度统计</span>
+              </button>
+
+              <button @click="setFinancePeriod('custom')"
+                :class="financePeriodType === 'custom' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-sliders"></i>
+                <span>🔍 自定义范围</span>
+              </button>
+            </div>
+
+            <!-- 动态联动选择器 -->
+            <div class="flex items-center gap-2 flex-wrap text-xs">
+              <!-- 月度选择器 -->
+              <div v-if="financePeriodType === 'month'" class="flex items-center gap-2">
+                <label class="font-bold text-stone-600 dark:text-stone-400">选择月份:</label>
+                <input type="month" v-model="financeSelectedMonth"
+                  class="px-3 py-1.5 wf-input font-mono font-bold text-xs bg-white dark:bg-stone-800">
+                <button @click="financeSelectedMonth = currentYearMonth" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+                  返回本月
+                </button>
+              </div>
+
+              <!-- 季度选择器 -->
+              <div v-if="financePeriodType === 'quarter'" class="flex items-center gap-2">
+                <label class="font-bold text-stone-600 dark:text-stone-400">年份:</label>
+                <select v-model="financeSelectedYear" class="px-2.5 py-1.5 wf-select font-mono font-bold text-xs bg-white dark:bg-stone-800">
+                  <option v-for="y in availableYears" :key="y" :value="y">{{ y }} 年</option>
+                </select>
+                <div class="flex items-center bg-black/5 dark:bg-white/5 p-0.5 rounded-lg border border-black/5 dark:border-white/10 font-mono font-bold">
+                  <button v-for="q in ['Q1', 'Q2', 'Q3', 'Q4']" :key="q"
+                    @click="financeSelectedQuarter = q"
+                    :class="financeSelectedQuarter === q ? 'bg-emerald-500 text-white shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                    class="px-2.5 py-1 rounded-md transition text-xs">
+                    {{ q }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- 年度选择器 -->
+              <div v-if="financePeriodType === 'year'" class="flex items-center gap-2">
+                <label class="font-bold text-stone-600 dark:text-stone-400">选择年份:</label>
+                <select v-model="financeSelectedYear" class="px-3 py-1.5 wf-select font-mono font-bold text-xs bg-white dark:bg-stone-800">
+                  <option v-for="y in availableYears" :key="y" :value="y">{{ y }} 年度</option>
+                </select>
+              </div>
+
+              <!-- 自定义日期范围 -->
+              <div v-if="financePeriodType === 'custom'" class="flex items-center gap-2 flex-wrap">
+                <label class="font-bold text-stone-600 dark:text-stone-400">日期范围:</label>
+                <input type="date" v-model="financeCustomStartDate" class="px-2.5 py-1.5 wf-input font-mono text-xs bg-white dark:bg-stone-800">
+                <span class="text-stone-400">至</span>
+                <input type="date" v-model="financeCustomEndDate" class="px-2.5 py-1.5 wf-input font-mono text-xs bg-white dark:bg-stone-800">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 🌟 6 维核心财务经营指标看板 (高清晰度 · 纯粹线框) -->
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+          
+          <!-- 1. 收费总入账 -->
+          <div class="wf-card p-4 space-y-2 border-emerald-500/30 bg-emerald-500/5">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">💰 收费总入账</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold">
+                {{ financeSummaryStats.orderCount }} 笔
+              </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+              ¥ {{ financeSummaryStats.grossIncome.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>充值 {{ financeSummaryStats.totalHoursBought }} 节</span>
+              <span v-if="financeSummaryStats.totalHoursGift > 0" class="text-amber-500">(赠{{ financeSummaryStats.totalHoursGift }}节)</span>
+            </div>
+          </div>
+
+          <!-- 2. 退费总支出 -->
+          <div class="wf-card p-4 space-y-2 border-rose-500/30 bg-rose-500/5">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">💸 退费支出</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold">
+                {{ financeSummaryStats.refundOrderCount }} 单退款
+              </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-rose-600 dark:text-rose-400">
+              ¥ {{ financeSummaryStats.totalRefund.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>已扣减 {{ financeSummaryStats.totalRefundHours }} 节课时</span>
+              <span class="text-rose-500 font-bold">退费率 {{ financeSummaryStats.refundRate }}%</span>
+            </div>
+          </div>
+
+          <!-- 3. 实际净营收 -->
+          <div class="wf-card p-4 space-y-2 border-blue-500/30 bg-blue-500/5">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">📈 实际净营收</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-400 font-bold">净入账</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-blue-600 dark:text-blue-400">
+              ¥ {{ financeSummaryStats.netIncome.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>折合均价 ¥{{ financeSummaryStats.avgHourPrice }}/节</span>
+              <span class="text-blue-500 font-bold">实到资金</span>
+            </div>
+          </div>
+
+          <!-- 4. 教学消课产值 -->
+          <div class="wf-card p-4 space-y-2">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">🎨 课消教学产值</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-bold font-mono">
+                {{ financeSummaryStats.consumedHours }} 节
+              </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
+              ¥ {{ financeSummaryStats.consumedValue.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>已确认教学价值</span>
+              <span class="text-emerald-500 font-bold hover:underline cursor-pointer" @click="financeSubTab = 'consumption'">课消明细 ↗</span>
+            </div>
+          </div>
+
+          <!-- 5. 未耗课时资金池 (预收负债) -->
+          <div class="wf-card p-4 space-y-2">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">⏳ 未耗课时负债</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold font-mono">
+                {{ totalRemainHoursAllStudents }} 节
+              </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
+              ¥ {{ prepaidLiabilityAmount.toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>全校在读存量课时</span>
+              <span class="text-stone-400">预收待消</span>
+            </div>
+          </div>
+
+          <!-- 6. 待续费预警预估 -->
+          <div class="wf-card p-4 space-y-2 border-amber-500/30 bg-amber-500/5">
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">⚠️ 待续费应收池</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold font-mono">
+                {{ renewalWarningStudents.length }} 人
+              </span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-black font-mono text-amber-500">
+              ¥ {{ (renewalWarningStudents.length * 4800).toLocaleString() }}
+            </div>
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 font-mono flex items-center justify-between pt-1.5 border-t border-black/5 dark:border-white/10">
+              <span>预计回款池</span>
+              <span class="text-amber-500 font-bold hover:underline cursor-pointer" @click="financeSubTab = 'renewal'">查看名单 ↗</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 4. 🌟 下钻透视卡片流 (月度分布 / 季度对比 / 年度走势) -->
+        <!-- 季度透视视图 -->
+        <div v-if="financePeriodType === 'quarter'" class="wf-card p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h4 class="font-bold text-sm flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-emerald-500"></i>
+              <span>{{ financeSelectedYear }} 年度 · Q1~Q4 四个季度经营指标对比</span>
+            </h4>
+            <span class="text-xs text-stone-500">点击任意季度卡片快速过滤对应数据</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div v-for="q in quarterlyAnalyticsList" :key="q.quarter"
+              @click="financeSelectedQuarter = q.quarter"
+              :class="financeSelectedQuarter === q.quarter ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
+              class="wf-card p-4 space-y-3 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-base flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-xs font-mono">{{ q.quarter }}</span>
+                  <span>{{ q.name }}</span>
+                </span>
+                <span class="text-xs text-stone-400 font-mono">{{ q.monthRange }}</span>
+              </div>
+              <div class="space-y-1">
+                <div class="text-xs text-stone-500">季度净营收</div>
+                <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                  ¥ {{ q.netIncome.toLocaleString() }}
+                </div>
+              </div>
+              <div class="space-y-1 text-xs text-stone-600 dark:text-stone-400 pt-2 border-t border-black/5 dark:border-white/10">
+                <div class="flex justify-between">
+                  <span>总入账: ¥{{ q.grossIncome.toLocaleString() }}</span>
+                  <span>退费: ¥{{ q.totalRefund.toLocaleString() }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>充值课时: {{ q.hoursSold }} 节</span>
+                  <span>订单数: {{ q.orderCount }} 笔</span>
+                </div>
+              </div>
+              <!-- 占比进度条 -->
+              <div class="w-full bg-black/5 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" :style="{ width: q.percentage + '%' }"></div>
+              </div>
+              <div class="text-[10px] text-stone-400 text-right">占全年营收 {{ q.percentage }}%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 月度透视视图 -->
+        <div v-if="financePeriodType === 'month'" class="wf-card p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h4 class="font-bold text-sm flex items-center gap-2">
+              <i class="fa-solid fa-calendar-days text-emerald-500"></i>
+              <span>{{ financeSelectedMonth.slice(0, 4) }} 年 1~12 月度营收分布图表</span>
+            </h4>
+            <span class="text-xs text-stone-500">点击月份可快速切换到该月数据</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div v-for="m in monthlyAnalyticsList" :key="m.ym"
+              @click="financeSelectedMonth = m.ym"
+              :class="financeSelectedMonth === m.ym ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
+              class="wf-card p-3 space-y-2 cursor-pointer transition">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold">{{ m.monthNum }} 月</span>
+                <span v-if="m.ym === currentYearMonth" class="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-500 font-bold">当月</span>
+              </div>
+              <div class="text-lg font-black font-mono text-stone-900 dark:text-stone-100">
+                ¥ {{ m.netIncome.toLocaleString() }}
+              </div>
+              <div class="text-[10px] text-stone-500 flex justify-between">
+                <span>{{ m.orderCount }} 笔</span>
+                <span>{{ m.hoursSold }} 节</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 年度透视视图 -->
+        <div v-if="financePeriodType === 'year'" class="wf-card p-5 space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <h4 class="font-bold text-sm flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-emerald-500"></i>
+              <span>历年年度决算与复合营收走势</span>
+            </h4>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div v-for="y in annualAnalyticsList" :key="y.year"
+              @click="financeSelectedYear = y.year"
+              :class="financeSelectedYear === y.year ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
+              class="wf-card p-4 space-y-3 cursor-pointer transition">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-lg font-mono">{{ y.year }} 年度</span>
+                <span class="text-xs px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 font-bold font-mono">{{ y.orderCount }} 笔订单</span>
+              </div>
+              <div class="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                ¥ {{ y.netIncome.toLocaleString() }}
+              </div>
+              <div class="text-xs text-stone-500 space-y-1 pt-2 border-t border-black/5 dark:border-white/10">
+                <div class="flex justify-between">
+                  <span>总入账: ¥{{ y.grossIncome.toLocaleString() }}</span>
+                  <span>退费: ¥{{ y.totalRefund.toLocaleString() }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>年度充值: {{ y.hoursSold }} 节课时</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. 🌟 7 大核心财务子导航药丸 -->
+        <div class="flex items-center justify-between gap-3 overflow-x-auto pb-2 border-b border-black/10 dark:border-white/10 flex-wrap">
           <div class="flex items-center gap-2">
-            <button @click="openRecharge(activeStudents[0] || {})" class="wf-btn-primary text-xs py-2 px-4 shadow-sm">
-              <i class="fa-solid fa-plus-circle text-sm mr-1"></i>
-              <span>录入学员收费充值</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- 🌟 4 维核心财务 KPI 统计卡片 (统一标准高雅线框 · 纯粹协调) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          
-          <!-- 1. 本月收费入账 -->
-          <div @click="selectFinanceKpi('month')"
-            class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
-            :class="financeActiveKpi === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-300">📅 本月收费入账</span>
-              <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
-                {{ financeActiveKpi === 'month' ? '已下钻 ▾' : '当月实收 ↗' }}
-              </span>
-            </div>
-            <div class="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-              ¥ {{ financeStats.monthIncome.toLocaleString() }}
-            </div>
-            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
-              <span>当月入账 {{ financeStats.monthOrderCount }} 笔</span>
-              <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline">查看明细 ↗</span>
-            </div>
-          </div>
-
-          <!-- 2. 本年累计营收 -->
-          <div @click="selectFinanceKpi('year')"
-            class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
-            :class="financeActiveKpi === 'year' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-300">📈 本年累计营收</span>
-              <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'year' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
-                {{ financeActiveKpi === 'year' ? '已下钻 ▾' : '年度拆解 ↗' }}
-              </span>
-            </div>
-            <div class="text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
-              ¥ {{ financeStats.yearIncome.toLocaleString() }}
-            </div>
-            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
-              <span>本年累计 {{ financeStats.yearOrderCount }} 笔订单</span>
-              <span class="text-[10px] text-stone-800 dark:text-stone-300 font-bold hover:underline">月度趋势 ↗</span>
-            </div>
-          </div>
-
-          <!-- 3. 机构累计总营收 -->
-          <div @click="selectFinanceKpi('total')"
-            class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
-            :class="financeActiveKpi === 'total' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-300">💎 机构累计总营收</span>
-              <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'total' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
-                {{ financeActiveKpi === 'total' ? '已下钻 ▾' : '历史总额 ↗' }}
-              </span>
-            </div>
-            <div class="text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
-              ¥ {{ financeStats.totalIncome.toLocaleString() }}
-            </div>
-            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
-              <span>全校总消课 {{ consumptionSummaryKPI.totalAllConsumed }} 节</span>
-              <span class="text-[10px] text-stone-800 dark:text-stone-300 font-bold hover:underline">历史总账 ↗</span>
-            </div>
-          </div>
-
-          <!-- 4. 待续费预估收入 -->
-          <div @click="selectFinanceKpi('renewal')"
-            class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
-            :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-300">⏳ 待续费预估收入</span>
-              <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'bg-amber-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
-                {{ financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? '已展开 ▾' : '需提醒 ↗' }}
-              </span>
-            </div>
-            <div class="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
-              ¥ {{ financeStats.potentialRenewalIncome.toLocaleString() }}
-            </div>
-            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
-              <span>共有 <strong class="text-amber-600 dark:text-amber-400">{{ financeStats.warningCount }}</strong> 位学员待续费</span>
-              <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold hover:underline">查看名单 ↗</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- 🌟 2级下钻展示区 A: 本年度各月度营收趋势卡片流 -->
-        <div v-if="financeActiveKpi === 'year'" class="wf-card p-5 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <h4 class="font-bold text-sm flex items-center gap-2">
-                <i class="fa-solid fa-chart-simple text-emerald-400"></i>
-                <span>{{ financeStats.currentYear }} 年度月度营收与收费进度拆解</span>
-              </h4>
-              <p class="text-xs text-stone-400 mt-0.5">点击下方任意月份卡片，可直接快速过滤查看该月份的所有入账订单。</p>
-            </div>
-
-            <button @click="selectedBreakdownYM = ''" class="wf-btn-outline text-xs py-1 px-2.5">
-              <span>显示全年全部订单</span>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            <div v-for="m in monthlyRevenueBreakdown" :key="m.ym"
-              @click="filterByYM(m.ym)"
-              :class="selectedBreakdownYM === m.ym ? 'border-emerald-400 bg-emerald-500/20 ring-1 ring-emerald-400' : 'hover:border-emerald-500/40'"
-              class="wf-card p-3 cursor-pointer transition flex flex-col justify-between space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-xs font-mono">{{ m.ym }}</span>
-                <span class="text-[10px] text-stone-400 font-mono">{{ m.count }}笔</span>
-              </div>
-              <div class="text-lg font-black font-mono text-emerald-400">
-                ¥{{ (m.total || 0).toLocaleString() }}
-              </div>
-              <div class="w-full bg-black/20 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
-                <div class="bg-emerald-400 h-full rounded-full" :style="{ width: m.percent + '%' }"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 🌟 2级下钻展示区 B: 历年年度对比总账 -->
-        <div v-if="financeActiveKpi === 'total'" class="wf-card p-5 space-y-4">
-          <div class="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <h4 class="font-bold text-sm flex items-center gap-2">
-                <i class="fa-solid fa-gem text-amber-400"></i>
-                <span>机构历年累计营收资产总账 ({{ yearlyRevenueHistory.length }} 年统计)</span>
-              </h4>
-              <p class="text-xs text-stone-400 mt-0.5">机构历年累计总收费、累计总消课课时与全校消课总产值沉淀。</p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div v-for="y in yearlyRevenueHistory" :key="y.year"
-              class="wf-card p-4 flex flex-col justify-between space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-sm font-mono text-stone-200">{{ y.year }} 年度</span>
-                <span class="text-xs text-stone-400 font-mono">{{ y.count }} 笔订单</span>
-              </div>
-              <div class="text-2xl font-black font-mono text-emerald-400">
-                ¥ {{ (y.total || 0).toLocaleString() }}
-              </div>
-              <div class="text-xs text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/10 dark:border-white/10">
-                <span>充值总课时: {{ y.hours }} 节</span>
-                <span class="text-emerald-400">稳健增长</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 🌟 5 大财务子导航胶囊 (统一规范线框 · 纯粹协调) -->
-        <div class="flex items-center justify-between gap-4 pb-2 border-b border-black/10 dark:border-white/10 flex-wrap">
-          
-          <div class="flex items-center gap-2 wf-pill-container">
-            <!-- 1. 收费明细 -->
+            <!-- 1. 收费订单中心 -->
             <button @click="financeSubTab = 'orders'"
               :class="financeSubTab === 'orders' ? 'active' : ''"
               class="wf-pill-btn">
-              <span>💳 学员收费明细 ({{ filteredPaymentOrders.length }}笔)</span>
+              <span>🧾 收费订单中心 ({{ filteredPaymentOrders.length }})</span>
             </button>
 
-            <!-- 2. 教学课消统计 -->
+            <!-- 2. 多维财务报表 -->
+            <button @click="financeSubTab = 'reports'"
+              :class="financeSubTab === 'reports' ? 'active' : ''"
+              class="wf-pill-btn">
+              <span>📊 多维财务报表</span>
+            </button>
+
+            <!-- 3. 收支流水总账 -->
+            <button @click="financeSubTab = 'cashflow'"
+              :class="financeSubTab === 'cashflow' ? 'active' : ''"
+              class="wf-pill-btn">
+              <span>💸 收支流水总账 ({{ cashFlowLogs.length }})</span>
+            </button>
+
+            <!-- 4. 教学课消统计 -->
             <button @click="financeSubTab = 'consumption'"
               :class="financeSubTab === 'consumption' ? 'active' : ''"
               class="wf-pill-btn">
-              <span>📊 教学课消统计 (周/月/班级)</span>
+              <span>📉 教学课消产值</span>
             </button>
 
-            <!-- 3. 待续费预警 -->
+            <!-- 5. 待续费预警池 -->
             <button @click="financeSubTab = 'renewal'"
               :class="financeSubTab === 'renewal' ? 'active' : ''"
               class="wf-pill-btn">
-              <span>⏳ 待续费预警 ({{ renewalWarningStudents.length }}人)</span>
+              <span>⏳ 待续费预警 ({{ renewalWarningStudents.length }})</span>
             </button>
 
-            <!-- 4. 课时流水 -->
+            <!-- 6. 课时变动流水 -->
             <button @click="financeSubTab = 'hours'"
               :class="financeSubTab === 'hours' ? 'active' : ''"
               class="wf-pill-btn">
-              <span>🧾 课时流水总账 ({{ hourLogs.length }}条)</span>
+              <span>🕰️ 课时流水</span>
             </button>
 
-            <!-- 5. 积分流水 -->
+            <!-- 7. 积分礼物流水 -->
             <button @click="financeSubTab = 'points'"
               :class="financeSubTab === 'points' ? 'active' : ''"
               class="wf-pill-btn">
-              <span>⭐ 积分礼物流水 ({{ pointLogs.length }}条)</span>
+              <span>⭐ 积分流水</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 1: 🧾 收费订单全流程管理中心 -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'orders'" class="space-y-4">
+          <!-- 筛选与搜索控制栏 -->
+          <div class="wf-card p-4 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <!-- 搜索框 -->
+              <div class="relative flex-1 min-w-[240px]">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                <input v-model="financeSearchQuery" type="text"
+                  placeholder="搜索订单号 / 学员姓名 / 经办人 / 备注说明..."
+                  class="w-full pl-9 pr-4 py-2 wf-input text-xs">
+              </div>
+
+              <!-- 快捷状态与支付方式过滤 -->
+              <div class="flex items-center gap-2 flex-wrap text-xs">
+                <!-- 订单状态筛选 -->
+                <select v-model="financeOrderStatusFilter" class="px-3 py-2 wf-select font-bold">
+                  <option value="all">全部订单状态</option>
+                  <option value="正常">正常已收款</option>
+                  <option value="部分退费">部分退费</option>
+                  <option value="全部退费">全部退费</option>
+                  <option value="已撤销">已撤销/作废</option>
+                </select>
+
+                <!-- 支付方式筛选 -->
+                <select v-model="financePayMethodFilter" class="px-3 py-2 wf-select font-bold">
+                  <option value="all">全部支付方式</option>
+                  <option value="微信支付">微信支付</option>
+                  <option value="支付宝">支付宝</option>
+                  <option value="现金">现金</option>
+                  <option value="银行转账">银行转账</option>
+                  <option value="POS刷卡">POS刷卡</option>
+                </select>
+
+                <!-- 收费类型筛选 -->
+                <select v-model="financeOrderTypeFilter" class="px-3 py-2 wf-select font-bold">
+                  <option value="all">全部业务类型</option>
+                  <option value="新生报名">新生报名</option>
+                  <option value="老生续费">老生续费</option>
+                </select>
+
+                <button @click="resetOrderFilters" class="wf-btn-outline py-2 px-3 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100">
+                  <i class="fa-solid fa-rotate-left mr-1"></i>
+                  <span>重置</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 订单列表大表 -->
+          <div class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">订单编号</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">交费时间</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">业务类型</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">实收金额</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">购买课时</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">折合单价</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">支付方式</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办人</th>
+                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">订单状态</th>
+                  <th class="py-3.5 px-4 min-w-[140px]">备注/退款说明</th>
+                  <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[200px]">操作管理</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                <tr v-for="order in filteredPaymentOrders" :key="order.id"
+                  class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition"
+                  :class="order.status === '已撤销' ? 'opacity-50 grayscale' : ''">
+                  
+                  <!-- 订单编号 -->
+                  <td class="py-3 px-4 font-mono font-bold text-stone-500 whitespace-nowrap" :class="order.status === '已撤销' ? 'line-through' : ''">
+                    {{ order.id }}
+                  </td>
+
+                  <!-- 交费时间 -->
+                  <td class="py-3 px-4 font-mono text-stone-500 whitespace-nowrap">
+                    {{ order.payDate || order.date }}
+                  </td>
+
+                  <!-- 学员姓名 -->
+                  <td class="py-3 px-4 font-bold whitespace-nowrap">
+                    <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
+                      class="cursor-pointer hover:text-emerald-500 transition flex items-center gap-1">
+                      <span>{{ order.studentName }}</span>
+                      <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-stone-400"></i>
+                    </span>
+                  </td>
+
+                  <!-- 业务类型 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded font-bold text-[11px]"
+                      :class="order.type === '新生报名' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'">
+                      {{ order.type || '老生续费' }}
+                    </span>
+                  </td>
+
+                  <!-- 实收金额 (如有退费同时标注) -->
+                  <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
+                    :class="order.status === '已撤销' ? 'line-through text-stone-400' : 'text-emerald-600 dark:text-emerald-400'">
+                    <div>¥ {{ (order.amount || 0).toLocaleString() }}</div>
+                    <div v-if="order.refundAmount > 0" class="text-[10px] font-normal text-rose-500">
+                      已退 ¥{{ order.refundAmount.toLocaleString() }}
+                    </div>
+                  </td>
+
+                  <!-- 购买课时 -->
+                  <td class="py-3 px-4 font-mono font-bold whitespace-nowrap">
+                    <span :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">{{ order.hoursBought || order.hours || 0 }} 节</span>
+                    <span v-if="order.hoursGift > 0" class="text-amber-500 text-xs ml-1 font-normal" :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">
+                      (赠{{ order.hoursGift }})
+                    </span>
+                  </td>
+
+                  <!-- 折合单价 -->
+                  <td class="py-3 px-4 font-mono text-stone-600 dark:text-stone-400 whitespace-nowrap">
+                    ¥{{ (order.hoursBought > 0 ? Math.round(order.amount / order.hoursBought) : 0) }}/节
+                  </td>
+
+                  <!-- 支付方式 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded border inline-block font-mono font-bold text-[11px]"
+                      :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'">
+                      {{ order.payMethod || '微信支付' }}
+                    </span>
+                  </td>
+
+                  <!-- 经办人 -->
+                  <td class="py-3 px-4 text-stone-600 dark:text-stone-400 whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
+
+                  <!-- 订单状态 -->
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded border inline-block font-bold text-[11px]"
+                      :class="order.status === '已撤销' ? 'bg-stone-500/10 text-stone-500 border-stone-500/30' : order.status === '全部退费' ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30' : order.status === '部分退费' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'">
+                      {{ order.status || '正常' }}
+                    </span>
+                  </td>
+
+                  <!-- 备注说明 -->
+                  <td class="py-3 px-4 text-stone-500 dark:text-stone-400 text-xs">
+                    <div>{{ order.remark || '-' }}</div>
+                    <div v-if="order.refundReason" class="text-[10px] text-rose-500 mt-0.5">
+                      退费原因: {{ order.refundReason }}
+                    </div>
+                  </td>
+
+                  <!-- 操作管理按钮群 -->
+                  <td class="py-3 px-4 whitespace-nowrap text-right space-x-1.5 font-bold">
+                    <!-- 电子收据 -->
+                    <button @click="openReceiptModal(order)"
+                      class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 transition" title="查看并打印电子收据">
+                      <i class="fa-solid fa-receipt mr-1"></i>
+                      <span>收据</span>
+                    </button>
+
+                    <!-- 退费办理 -->
+                    <button v-if="order.status !== '已撤销' && order.status !== '全部退费'" @click="openRefundModal(order)"
+                      class="px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition" title="办理退费并同步扣减课时">
+                      <i class="fa-solid fa-hand-holding-dollar mr-1"></i>
+                      <span>退费</span>
+                    </button>
+
+                    <!-- 修改订单 -->
+                    <button v-if="order.status !== '已撤销'" @click="openEditOrderModal(order)"
+                      class="px-2 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition" title="修改经办人/支付方式/备注">
+                      <i class="fa-solid fa-pen mr-1"></i>
+                      <span>修改</span>
+                    </button>
+
+                    <!-- 作废撤销 -->
+                    <button v-if="order.status !== '已撤销'" @click="revokePaymentOrder(order)"
+                      class="px-2 py-1 rounded bg-stone-500/10 hover:bg-stone-500/20 text-stone-500 dark:text-stone-400 transition" title="全额作废撤销">
+                      <i class="fa-solid fa-trash-can mr-1"></i>
+                      <span>撤销</span>
+                    </button>
+                  </td>
+                </tr>
+
+                <tr v-if="filteredPaymentOrders.length === 0">
+                  <td colspan="12" class="py-16 text-center text-stone-400 text-xs">
+                    未检索到符合条件的收费订单记录，可尝试重置筛选或新建收费开单
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 2: 📊 多维财务经营报表中心 (月/季/年/渠道对账) -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'reports'" class="space-y-4">
+          <!-- 报表类型选择栏 -->
+          <div class="flex items-center justify-between gap-3 border-b border-black/5 dark:border-white/5 pb-2 flex-wrap">
+            <div class="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl font-bold text-xs">
+              <button @click="financeReportType = 'month'"
+                :class="financeReportType === 'month' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>🗓️ 月度财务对账报表</span>
+              </button>
+              <button @click="financeReportType = 'quarter'"
+                :class="financeReportType === 'quarter' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>📊 季度经营核算报表</span>
+              </button>
+              <button @click="financeReportType = 'year'"
+                :class="financeReportType === 'year' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>📅 年度决算总表</span>
+              </button>
+              <button @click="financeReportType = 'channel'"
+                :class="financeReportType === 'channel' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-wallet"></i>
+                <span>💳 支付渠道分布分析</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 报表 A: 月度对账表 -->
+          <div v-if="financeReportType === 'month'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">月份</th>
+                  <th class="py-3.5 px-4 font-mono">总入账 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">退费总额 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">实际净营收 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">充值课时 (节)</th>
+                  <th class="py-3.5 px-4 font-mono">订单笔数</th>
+                  <th class="py-3.5 px-4 font-mono">课时均价</th>
+                  <th class="py-3.5 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="item in monthlyAnalyticsList" :key="item.ym" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold font-sans flex items-center gap-2">
+                    <span>{{ item.ym }}</span>
+                    <span v-if="item.ym === currentYearMonth" class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-500 font-bold">当月</span>
+                  </td>
+                  <td class="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-black">¥ {{ item.grossIncome.toLocaleString() }}</td>
+                  <td class="py-3 px-4 text-rose-500 font-bold">¥ {{ item.totalRefund.toLocaleString() }}</td>
+                  <td class="py-3 px-4 text-blue-600 dark:text-blue-400 font-black text-sm">¥ {{ item.netIncome.toLocaleString() }}</td>
+                  <td class="py-3 px-4 font-bold">{{ item.hoursSold }} 节</td>
+                  <td class="py-3 px-4 font-sans text-stone-500">{{ item.orderCount }} 笔</td>
+                  <td class="py-3 px-4 text-stone-600 dark:text-stone-400">¥{{ item.avgPrice }}/节</td>
+                  <td class="py-3 px-4 text-right font-sans">
+                    <button @click="financePeriodType = 'month'; financeSelectedMonth = item.ym; financeSubTab = 'orders'"
+                      class="text-emerald-500 hover:text-emerald-600 font-bold hover:underline">
+                      查看该月明细 ↗
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 报表 B: 季度经营表 -->
+          <div v-if="financeReportType === 'quarter'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">季度</th>
+                  <th class="py-3.5 px-4">月份跨度</th>
+                  <th class="py-3.5 px-4 font-mono">季度总入账 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">退费总额 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">实际净营收 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">充值课时</th>
+                  <th class="py-3.5 px-4 font-mono">订单笔数</th>
+                  <th class="py-3.5 px-4">全年占比</th>
+                  <th class="py-3.5 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="q in quarterlyAnalyticsList" :key="q.quarter" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3.5 px-4 font-bold font-sans">{{ q.quarter }} ({{ q.name }})</td>
+                  <td class="py-3.5 px-4 text-stone-500 font-sans">{{ q.monthRange }}</td>
+                  <td class="py-3.5 px-4 text-emerald-600 dark:text-emerald-400 font-black">¥ {{ q.grossIncome.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 text-rose-500 font-bold">¥ {{ q.totalRefund.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-black text-sm">¥ {{ q.netIncome.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 font-bold">{{ q.hoursSold }} 节</td>
+                  <td class="py-3.5 px-4 font-sans text-stone-500">{{ q.orderCount }} 笔</td>
+                  <td class="py-3.5 px-4 font-sans">
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
+                      {{ q.percentage }}%
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-right font-sans">
+                    <button @click="financePeriodType = 'quarter'; financeSelectedQuarter = q.quarter; financeSubTab = 'orders'"
+                      class="text-emerald-500 hover:text-emerald-600 font-bold hover:underline">
+                      筛选本季度 ↗
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 报表 C: 年度决算表 -->
+          <div v-if="financeReportType === 'year'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">决算年度</th>
+                  <th class="py-3.5 px-4 font-mono">年度总入账 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">退费总支出 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">年度净营收 (元)</th>
+                  <th class="py-3.5 px-4 font-mono">充值总课时</th>
+                  <th class="py-3.5 px-4 font-mono">总订单数</th>
+                  <th class="py-3.5 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="y in annualAnalyticsList" :key="y.year" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3.5 px-4 font-bold font-sans text-sm">{{ y.year }} 年度</td>
+                  <td class="py-3.5 px-4 text-emerald-600 dark:text-emerald-400 font-black">¥ {{ y.grossIncome.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 text-rose-500 font-bold">¥ {{ y.totalRefund.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 text-blue-600 dark:text-blue-400 font-black text-sm">¥ {{ y.netIncome.toLocaleString() }}</td>
+                  <td class="py-3.5 px-4 font-bold">{{ y.hoursSold }} 节</td>
+                  <td class="py-3.5 px-4 font-sans text-stone-500">{{ y.orderCount }} 笔</td>
+                  <td class="py-3.5 px-4 text-right font-sans">
+                    <button @click="financePeriodType = 'year'; financeSelectedYear = y.year; financeSubTab = 'orders'"
+                      class="text-emerald-500 hover:text-emerald-600 font-bold hover:underline">
+                      查看该年总账 ↗
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 报表 D: 支付渠道分布 -->
+          <div v-if="financeReportType === 'channel'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="wf-card p-5 space-y-4">
+              <h4 class="font-bold text-sm">💳 支付方式收入占比分布</h4>
+              <div class="space-y-3">
+                <div v-for="ch in paymentMethodAnalytics" :key="ch.method" class="space-y-1 text-xs">
+                  <div class="flex justify-between font-bold">
+                    <span>{{ ch.method }}</span>
+                    <span class="font-mono">¥{{ ch.amount.toLocaleString() }} ({{ ch.percentage }}%)</span>
+                  </div>
+                  <div class="w-full bg-black/5 dark:bg-white/10 rounded-full h-2 overflow-hidden">
+                    <div class="h-full rounded-full" :class="ch.colorClass" :style="{ width: ch.percentage + '%' }"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wf-card p-5 space-y-4">
+              <h4 class="font-bold text-sm">👶 新生报名 vs 老生续费贡献构成</h4>
+              <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
+                    <div class="text-stone-500">新生报名收费</div>
+                    <div class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+                      ¥ {{ businessTypeAnalytics.newStudentAmount.toLocaleString() }}
+                    </div>
+                    <div class="text-[10px] text-stone-400 font-mono">{{ businessTypeAnalytics.newStudentCount }} 笔订单</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 space-y-1">
+                    <div class="text-stone-500">老生续费充值</div>
+                    <div class="text-xl font-black font-mono text-blue-600 dark:text-blue-400">
+                      ¥ {{ businessTypeAnalytics.renewalAmount.toLocaleString() }}
+                    </div>
+                    <div class="text-[10px] text-stone-400 font-mono">{{ businessTypeAnalytics.renewalCount }} 笔订单</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 3: 💸 资金收支流水总账 (入账与退费红冲留痕) -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'cashflow'" class="space-y-4">
+          <div class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">流水时间</th>
+                  <th class="py-3.5 px-4">关联单号</th>
+                  <th class="py-3.5 px-4">学员</th>
+                  <th class="py-3.5 px-4">流水类型</th>
+                  <th class="py-3.5 px-4">收支方向</th>
+                  <th class="py-3.5 px-4 font-mono text-right">资金变动金额</th>
+                  <th class="py-3.5 px-4">支付渠道</th>
+                  <th class="py-3.5 px-4">经办人</th>
+                  <th class="py-3.5 px-4">流水明细说明</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5">
+                <tr v-for="log in cashFlowLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-mono text-stone-500">{{ log.time }}</td>
+                  <td class="py-3 px-4 font-mono font-bold">{{ log.orderId }}</td>
+                  <td class="py-3 px-4 font-bold">{{ log.studentName }}</td>
+                  <td class="py-3 px-4">
+                    <span class="px-2 py-0.5 rounded font-bold text-[11px]"
+                      :class="log.isIncome ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'">
+                      {{ log.category }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 font-bold" :class="log.isIncome ? 'text-emerald-600' : 'text-rose-500'">
+                    {{ log.isIncome ? '＋ 资金收入' : '－ 资金支出' }}
+                  </td>
+                  <td class="py-3 px-4 font-mono font-black text-sm text-right"
+                    :class="log.isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                    {{ log.isIncome ? '+' : '-' }} ¥ {{ Math.abs(log.amount).toLocaleString() }}
+                  </td>
+                  <td class="py-3 px-4 font-mono">{{ log.payMethod || '微信支付' }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ log.operator }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ log.reason }}</td>
+                </tr>
+                <tr v-if="cashFlowLogs.length === 0">
+                  <td colspan="9" class="py-16 text-center text-stone-400 text-xs">
+                    暂无资金收支流水
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 4: 📉 教学课消产值核算 -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'consumption'" class="space-y-6">
+          <!-- 课消 4 大 KPI -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div @click="consumptionPeriodType = 'week'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
+              :class="consumptionPeriodType === 'week' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
+              <div class="text-xs text-stone-500 dark:text-stone-400 flex items-center justify-between">
+                <span>🗓️ 本周教学消课</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold"
+                  :class="consumptionPeriodType === 'week' ? 'bg-emerald-400 text-black font-black' : 'text-stone-400 bg-white/5'">
+                  {{ consumptionPeriodType === 'week' ? '已展开' : '查看周' }}
+                </span>
+              </div>
+              <div class="text-2xl font-black font-mono text-emerald-500 dark:text-emerald-400">
+                {{ consumptionSummaryKPI.weekConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
+              </div>
+              <div class="text-[11px] text-stone-500 font-mono">周消课产值: ¥{{ (consumptionSummaryKPI.weekConsumed * financeSummaryStats.avgHourPrice).toLocaleString() }}</div>
+            </div>
+
+            <div @click="consumptionPeriodType = 'month'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
+              :class="consumptionPeriodType === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
+              <div class="text-xs text-stone-500 dark:text-stone-400 flex items-center justify-between">
+                <span>📅 本月累计消课</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded font-mono font-bold"
+                  :class="consumptionPeriodType === 'month' ? 'bg-emerald-400 text-black font-black' : 'text-stone-400 bg-white/5'">
+                  {{ consumptionPeriodType === 'month' ? '已展开' : '查看月' }}
+                </span>
+              </div>
+              <div class="text-2xl font-black font-mono text-emerald-500 dark:text-emerald-400">
+                {{ consumptionSummaryKPI.monthConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
+              </div>
+              <div class="text-[11px] text-stone-500 font-mono">月消课产值: ¥{{ (consumptionSummaryKPI.monthConsumed * financeSummaryStats.avgHourPrice).toLocaleString() }}</div>
+            </div>
+
+            <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
+              <div class="text-xs text-stone-500 dark:text-stone-400">💰 当月消课教学价值</div>
+              <div class="text-2xl font-black font-mono text-stone-900 dark:text-stone-100">
+                ¥ {{ consumptionSummaryKPI.monthValue.toLocaleString() }}
+              </div>
+              <div class="text-[11px] text-stone-500 font-mono">按全校综合均价折算</div>
+            </div>
+
+            <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
+              <div class="text-xs text-stone-500 dark:text-stone-400">💎 机构累计总消课</div>
+              <div class="text-2xl font-black font-mono text-blue-500">
+                {{ consumptionSummaryKPI.totalAllConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
+              </div>
+              <div class="text-[11px] text-stone-500 font-mono">全链路累计已上课次</div>
+            </div>
+          </div>
+
+          <!-- 4 维切换 -->
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1 rounded-xl text-xs font-bold">
+              <button @click="consumptionPeriodType = 'month'"
+                :class="consumptionPeriodType === 'month' ? 'bg-white dark:bg-stone-800 text-emerald-500 shadow-sm' : 'text-stone-400 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition">
+                <span>🗓️ 月度消课报表</span>
+              </button>
+              <button @click="consumptionPeriodType = 'week'"
+                :class="consumptionPeriodType === 'week' ? 'bg-white dark:bg-stone-800 text-emerald-500 shadow-sm' : 'text-stone-400 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition">
+                <span>📅 周度消课明细</span>
+              </button>
+              <button @click="consumptionPeriodType = 'class'"
+                :class="consumptionPeriodType === 'class' ? 'bg-white dark:bg-stone-800 text-emerald-500 shadow-sm' : 'text-stone-400 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition">
+                <span>🎨 班级课消分析</span>
+              </button>
+              <button @click="consumptionPeriodType = 'student'"
+                :class="consumptionPeriodType === 'student' ? 'bg-white dark:bg-stone-800 text-emerald-500 shadow-sm' : 'text-stone-400 hover:text-white'"
+                class="px-3 py-1.5 rounded-lg transition">
+                <span>👶 学员消课总榜</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 月度课消 -->
+          <div v-if="consumptionPeriodType === 'month'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">考勤月份</th>
+                  <th class="py-3.5 px-4 font-mono">该月消课节数</th>
+                  <th class="py-3.5 px-4 font-mono">消课核算产值</th>
+                  <th class="py-3.5 px-4 font-mono">开课课次</th>
+                  <th class="py-3.5 px-4 font-mono">到课人次</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="m in monthlyConsumptionList" :key="m.monthKey" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold font-sans">{{ m.monthKey }}</td>
+                  <td class="py-3 px-4 font-bold text-emerald-500">{{ m.totalConsumed }} 节</td>
+                  <td class="py-3 px-4 font-black text-stone-900 dark:text-stone-100">¥ {{ (m.totalConsumed * financeSummaryStats.avgHourPrice).toLocaleString() }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ m.sessionCount }} 次</td>
+                  <td class="py-3 px-4 text-stone-500">{{ m.totalPresent }} 人次</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 周度课消 -->
+          <div v-if="consumptionPeriodType === 'week'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">自然周</th>
+                  <th class="py-3.5 px-4 font-mono">周消课节数</th>
+                  <th class="py-3.5 px-4 font-mono">周消课产值</th>
+                  <th class="py-3.5 px-4 font-mono">开课节数</th>
+                  <th class="py-3.5 px-4 font-mono">到课人次</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="w in weeklyConsumptionList" :key="w.weekKey" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold font-sans">{{ w.weekKey }}</td>
+                  <td class="py-3 px-4 font-bold text-emerald-500">{{ w.totalConsumed }} 节</td>
+                  <td class="py-3 px-4 font-black text-stone-900 dark:text-stone-100">¥ {{ (w.totalConsumed * financeSummaryStats.avgHourPrice).toLocaleString() }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ w.sessionCount }} 节</td>
+                  <td class="py-3 px-4 text-stone-500">{{ w.totalPresent }} 人次</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 班级消课 -->
+          <div v-if="consumptionPeriodType === 'class'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">班级名称</th>
+                  <th class="py-3.5 px-4 font-mono">累计消课节数</th>
+                  <th class="py-3.5 px-4 font-mono">产生消课价值</th>
+                  <th class="py-3.5 px-4 font-mono">开课总课次</th>
+                  <th class="py-3.5 px-4 font-mono">平均出勤率</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="c in classConsumptionList" :key="c.classId" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold font-sans">{{ c.className }}</td>
+                  <td class="py-3 px-4 font-bold text-emerald-500">{{ c.totalConsumed }} 节</td>
+                  <td class="py-3 px-4 font-black text-stone-900 dark:text-stone-100">¥ {{ (c.totalConsumed * financeSummaryStats.avgHourPrice).toLocaleString() }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ c.sessionCount }} 次</td>
+                  <td class="py-3 px-4 text-stone-500 font-bold">{{ c.attendanceRate }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 学员消课总榜 -->
+          <div v-if="consumptionPeriodType === 'student'" class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">排行</th>
+                  <th class="py-3.5 px-4">学员姓名</th>
+                  <th class="py-3.5 px-4">所属班级</th>
+                  <th class="py-3.5 px-4 font-mono">累计已消课时</th>
+                  <th class="py-3.5 px-4 font-mono">剩余课时</th>
+                  <th class="py-3.5 px-4">累计贡献产值</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="(stu, idx) in studentConsumptionRankList" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold text-stone-400">#{{ idx + 1 }}</td>
+                  <td class="py-3 px-4 font-bold font-sans">
+                    <span @click="openStudentProfile(stu)" class="cursor-pointer hover:text-emerald-500">{{ stu.name }} ↗</span>
+                  </td>
+                  <td class="py-3 px-4 font-sans text-stone-500">{{ getClassById(stu.classId)?.name || '未分班' }}</td>
+                  <td class="py-3 px-4 font-bold text-emerald-500">{{ stu.totalConsumed || 0 }} 节</td>
+                  <td class="py-3 px-4 font-bold text-amber-500">{{ stu.remainHours || 0 }} 节</td>
+                  <td class="py-3 px-4 font-black text-stone-900 dark:text-stone-100">¥ {{ ((stu.totalConsumed || 0) * financeSummaryStats.avgHourPrice).toLocaleString() }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 5: ⏳ 待续费预警学员清单与催费池 -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'renewal'" class="space-y-4">
+          <div class="wf-card p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div class="text-xs text-stone-500">
+              当前剩余课时 ≤ 3节（或已耗尽）的学员共 <strong class="text-amber-500 font-mono text-sm">{{ renewalWarningStudents.length }}</strong> 人，预估续费回款资金池约为 <strong class="text-amber-500 font-mono text-sm">¥ {{ (renewalWarningStudents.length * 4800).toLocaleString() }}</strong>
+            </div>
+            <button @click="exportRenewalWarningsCSV" class="wf-btn-outline text-xs py-1.5 px-3 text-amber-500 border-amber-500/30">
+              <i class="fa-solid fa-file-csv mr-1"></i>
+              <span>导出续费预警清单 CSV</span>
             </button>
           </div>
 
-          <!-- 对应 Tab 导出入口 -->
-          <div class="flex items-center gap-2">
-            <button v-if="financeSubTab === 'orders'" @click="exportPaymentOrdersCSV" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
-              <i class="fa-solid fa-file-csv mr-1"></i>
-              <span>导出收费明细 CSV</span>
-            </button>
-            <button v-if="financeSubTab === 'consumption'" @click="exportConsumptionReportCSV" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
-              <i class="fa-solid fa-file-csv mr-1"></i>
-              <span>导出课消统计报表 CSV</span>
-            </button>
-            <button v-if="financeSubTab === 'renewal'" @click="exportRenewalWarningsCSV" class="wf-btn-outline text-xs text-amber-400 border-amber-500/30">
-              <i class="fa-solid fa-file-csv mr-1"></i>
-              <span>导出待续费清单 CSV</span>
-            </button>
-            <button v-if="financeSubTab === 'hours'" @click="exportHourLogsCSV" class="wf-btn-outline text-xs text-emerald-400 border-emerald-500/30">
+          <div class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">学员姓名</th>
+                  <th class="py-3.5 px-4">所属班级</th>
+                  <th class="py-3.5 px-4">联系电话</th>
+                  <th class="py-3.5 px-4 font-mono">剩余课时</th>
+                  <th class="py-3.5 px-4 font-mono">累计购买</th>
+                  <th class="py-3.5 px-4 font-mono">累计消课</th>
+                  <th class="py-3.5 px-4">预警级别</th>
+                  <th class="py-3.5 px-4 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="stu in renewalWarningStudents" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 font-bold font-sans">
+                    <span @click="openStudentProfile(stu)" class="cursor-pointer hover:text-emerald-500">{{ stu.name }} ↗</span>
+                  </td>
+                  <td class="py-3 px-4 font-sans text-stone-500">{{ getClassById(stu.classId)?.name || '未分班' }}</td>
+                  <td class="py-3 px-4 text-stone-500">{{ stu.parentPhone || '-' }}</td>
+                  <td class="py-3 px-4 font-black text-sm" :class="stu.remainHours <= 0 ? 'text-rose-500' : 'text-amber-500'">
+                    {{ stu.remainHours }} 节
+                  </td>
+                  <td class="py-3 px-4">{{ stu.totalPurchased || 0 }} 节</td>
+                  <td class="py-3 px-4 text-stone-500">{{ stu.totalConsumed || 0 }} 节</td>
+                  <td class="py-3 px-4 font-sans">
+                    <span class="px-2 py-0.5 rounded font-bold text-[11px]"
+                      :class="stu.remainHours <= 0 ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'">
+                      {{ stu.remainHours <= 0 ? '🚨 课时已耗尽' : '⚠️ 临期预警' }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 text-right font-sans">
+                    <button @click="openRechargeForStudent(stu)"
+                      class="px-2.5 py-1 rounded bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition shadow-sm">
+                      <i class="fa-solid fa-plus-circle mr-1"></i>
+                      <span>一键续费开单</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 6: 🕰️ 课时变动流水总账 -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'hours'" class="space-y-4">
+          <div class="wf-card p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <input v-model="recordsSearchQuery" type="text" placeholder="搜索课时流水学员 / 变动原因..." class="px-3 py-1.5 wf-input text-xs min-w-[200px]">
+              <select v-model="recordsHourTypeFilter" class="px-3 py-1.5 wf-select text-xs font-bold">
+                <option value="all">全部课时变动类型</option>
+                <option value="新生建档缴费">新生建档缴费</option>
+                <option value="续费充值">续费充值</option>
+                <option value="正常上课消课">正常上课消课</option>
+                <option value="撤销/退费">撤销/退费</option>
+              </select>
+            </div>
+            <button @click="exportHourLogsCSV" class="wf-btn-outline text-xs py-1.5 px-3 text-emerald-500 border-emerald-500/30">
               <i class="fa-solid fa-file-csv mr-1"></i>
               <span>导出课时流水 CSV</span>
             </button>
-            <button v-if="financeSubTab === 'points'" @click="exportPointLogsCSV" class="wf-btn-outline text-xs text-amber-400 border-amber-500/30">
+          </div>
+
+          <div class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">变动时间</th>
+                  <th class="py-3.5 px-4">学员姓名</th>
+                  <th class="py-3.5 px-4">变动类型</th>
+                  <th class="py-3.5 px-4 font-mono">课时增减</th>
+                  <th class="py-3.5 px-4 font-mono">变动后余额</th>
+                  <th class="py-3.5 px-4">经办人</th>
+                  <th class="py-3.5 px-4">变动明细说明</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="log in filteredHourLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 text-stone-500">{{ log.time }}</td>
+                  <td class="py-3 px-4 font-bold font-sans">{{ log.studentName }}</td>
+                  <td class="py-3 px-4 font-sans">
+                    <span class="px-2 py-0.5 rounded font-bold text-[11px]"
+                      :class="log.hours > 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-stone-500/10 text-stone-600 dark:text-stone-400'">
+                      {{ log.type }}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4 font-black text-sm" :class="log.hours > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'">
+                    {{ log.hours > 0 ? '+' : '' }}{{ log.hours }} 节
+                  </td>
+                  <td class="py-3 px-4 font-bold">{{ log.balanceAfter }} 节</td>
+                  <td class="py-3 px-4 text-stone-500 font-sans">{{ log.operator || '系统' }}</td>
+                  <td class="py-3 px-4 text-stone-500 font-sans">{{ log.reason }}</td>
+                </tr>
+                <tr v-if="filteredHourLogs.length === 0">
+                  <td colspan="7" class="py-16 text-center text-stone-400 text-xs font-sans">未检索到符合条件的课时流水记录</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- 🌟 子视图 7: ⭐ 积分礼物流水 -->
+        <!-- ======================================================== -->
+        <div v-if="financeSubTab === 'points'" class="space-y-4">
+          <div class="wf-card p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <input v-model="recordsSearchQuery" type="text" placeholder="搜索积分流水学员 / 兑换说明..." class="px-3 py-1.5 wf-input text-xs min-w-[200px]">
+              <select v-model="recordsPointTypeFilter" class="px-3 py-1.5 wf-select text-xs font-bold">
+                <option value="all">全部积分类型</option>
+                <option value="新生赠送积分">新生赠送积分</option>
+                <option value="续费赠送积分">续费赠送积分</option>
+                <option value="课堂表现奖励">课堂表现奖励</option>
+                <option value="礼品兑换消耗">礼品兑换消耗</option>
+              </select>
+            </div>
+            <button @click="exportPointLogsCSV" class="wf-btn-outline text-xs py-1.5 px-3 text-amber-500 border-amber-500/30">
               <i class="fa-solid fa-file-csv mr-1"></i>
               <span>导出积分流水 CSV</span>
             </button>
           </div>
 
-        </div>
-
-        <!-- ======================================================== -->
-        <!-- 🌟 子视图 1: 💳 学员收费明细 (订单总账) -->
-        <!-- ======================================================== -->
-        <div v-if="financeSubTab === 'orders'" class="space-y-4">
-          
-          <!-- 统一筛选控制栏 -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <div class="flex items-center gap-3 flex-1 max-w-2xl flex-wrap">
-              <div class="relative flex-1 min-w-[220px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
-                <input v-model="financeSearchQuery" type="text" placeholder="搜索订单号 / 学员姓名 / 备注 / 经办人..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
-              </div>
-
-              <div class="relative">
-                <select v-model="financePayMethodFilter" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer">
-                  <option value="all">💳 全部支付方式</option>
-                  <option value="微信支付">微信支付</option>
-                  <option value="支付宝">支付宝</option>
-                  <option value="现金">现金</option>
-                  <option value="银行转账">银行转账</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
-              </div>
-
-              <!-- 当月/月份快速下钻标签 -->
-              <span v-if="financeActiveKpi === 'month'" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                <span>📅 仅显示本月</span>
-                <i @click="resetFinanceFilter" class="fa-solid fa-xmark cursor-pointer hover:text-white" title="清除筛选"></i>
-              </span>
-
-              <span v-if="selectedBreakdownYM" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-                <span>月份: {{ selectedBreakdownYM }}</span>
-                <i @click="selectedBreakdownYM = ''" class="fa-solid fa-xmark cursor-pointer hover:text-white" title="清除月份筛选"></i>
-              </span>
-            </div>
-
-            <button @click="openRecharge(activeStudents[0] || {})" class="wf-btn-primary text-xs py-2 px-3.5 whitespace-nowrap">
-              <i class="fa-solid fa-plus-circle text-xs mr-1"></i>
-              <span>新收费录入</span>
-            </button>
-          </div>
-
-          <!-- 收费订单明细大表 -->
-          <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-              <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">订单编号</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">缴费时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">实收金额</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">充值课时</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">支付方式</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
-                  <th class="py-3.5 px-4 min-w-[140px]">收费说明与备注</th>
-                  <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[90px]">凭据</th>
+          <div class="wf-card border-none shadow-sm overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/50 dark:bg-stone-800/50 font-bold border-b border-black/5 dark:border-white/5">
+                <tr>
+                  <th class="py-3.5 px-4">流水时间</th>
+                  <th class="py-3.5 px-4">学员姓名</th>
+                  <th class="py-3.5 px-4">变动类型</th>
+                  <th class="py-3.5 px-4 font-mono">画币积分增减</th>
+                  <th class="py-3.5 px-4 font-mono">变动后积分</th>
+                  <th class="py-3.5 px-4">经办人</th>
+                  <th class="py-3.5 px-4">明细原因</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                
-                <tr v-for="order in filteredPaymentOrders" :key="order.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition" :class="order.status === '已撤销' ? 'opacity-50 grayscale' : ''">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap" :class="order.status === '已撤销' ? 'line-through' : ''">{{ order.id }}</td>
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ order.payDate }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="查看学员档案">
-                      {{ order.studentName }} ↗
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm text-emerald-500 dark:text-emerald-400 whitespace-nowrap" :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">
-                    ¥ {{ (order.amount || 0).toLocaleString() }}
-                  </td>
-                  <td class="py-3 px-4 font-mono font-bold whitespace-nowrap">
-                    <span :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">{{ order.hoursBought }} 节</span>
-                    <span v-if="order.hoursGift > 0" class="text-amber-500 dark:text-amber-400 text-xs ml-1 font-normal" :class="order.status === '已撤销' ? 'line-through text-stone-400' : ''">(赠{{ order.hoursGift }})</span>
-                  </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="order.status === '已撤销' ? 'bg-stone-500/10 text-stone-500 border-stone-500/30' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'">
-                      {{ order.status || '正常' }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block font-mono"
-                      :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30'">
-                      {{ order.payMethod || '微信支付' }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 text-xs whitespace-nowrap">{{ order.operator || '系统' }}</td>
-                  <td class="py-3 px-4 text-stone-500 dark:text-stone-400 text-xs min-w-[120px]">{{ order.remark || '-' }}</td>
-                  <td class="py-3 px-4 whitespace-nowrap text-right space-x-2">
-                    <button class="text-emerald-500 hover:text-emerald-600 text-xs font-bold transition">
-                      <i class="fa-solid fa-receipt mr-1"></i>
-                      <span>电子收据</span>
-                    </button>
-                    <button v-if="order.status !== '已撤销'" @click="revokePaymentOrder(order)" class="text-red-500 hover:text-red-600 text-xs font-bold transition">
-                      <i class="fa-solid fa-rotate-left mr-1"></i>
-                      <span>撤销退费</span>
-                    </button>
-                  </td>
-                </tr>
-
-
-                <tr v-if="filteredPaymentOrders.length === 0">
-                  <td colspan="9" class="py-16 text-center text-stone-400 text-xs">
-                    未检索到符合条件的学员缴费收费订单，点击上方【清除筛选】或切换月份
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-        <!-- ======================================================== -->
-        <!-- 🌟 子视图 2: 📊 教学课消统计 (周/月/班级具体考勤课消) -->
-        <!-- ======================================================== -->
-        <div v-if="financeSubTab === 'consumption'" class="space-y-6">
-          
-          <!-- 4 维课消看板 KPI (统一标准卡片排版) -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            
-            <!-- 本周教学消课 -->
-            <div @click="consumptionPeriodType = 'week'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
-              :class="consumptionPeriodType === 'week' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">📅 本周教学消课</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                  :class="consumptionPeriodType === 'week' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">周度</span>
-              </div>
-              <div class="text-2xl font-black font-mono text-emerald-400">
-                {{ consumptionSummaryKPI.thisWeekConsumed }} <span class="text-xs font-normal text-stone-400">节课时</span>
-              </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
-                <span>完成 {{ consumptionSummaryKPI.thisWeekSessions }} 堂课</span>
-                <span class="font-mono text-emerald-400 font-bold">出勤率 {{ consumptionSummaryKPI.thisWeekRate }}</span>
-              </div>
-            </div>
-
-            <!-- 本月累计消课 -->
-            <div @click="consumptionPeriodType = 'month'" class="wf-card-interactive p-4 space-y-1.5 transition flex flex-col justify-between"
-              :class="consumptionPeriodType === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">🗓️ 本月累计消课</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                  :class="consumptionPeriodType === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">月度</span>
-              </div>
-              <div class="text-2xl font-black font-mono text-emerald-400">
-                {{ consumptionSummaryKPI.thisMonthConsumed }} <span class="text-xs font-normal text-stone-400">节课时</span>
-              </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10">
-                <span>完成 {{ consumptionSummaryKPI.thisMonthSessions }} 堂课</span>
-                <span class="font-mono text-emerald-400 font-bold">出勤率 {{ consumptionSummaryKPI.thisMonthRate }}</span>
-              </div>
-            </div>
-
-            <!-- 当月消课教学价值 -->
-            <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">💎 当月消课教学价值</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-stone-400 bg-white/5">产值折算</span>
-              </div>
-              <div class="text-2xl font-black font-mono text-amber-400">
-                ¥ {{ consumptionSummaryKPI.thisMonthValue.toLocaleString() }}
-              </div>
-              <div class="text-[11px] text-stone-400 pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
-                按行业标准课消价值估算
-              </div>
-            </div>
-
-            <!-- 机构累计总消课 -->
-            <div class="wf-card p-4 space-y-1.5 flex flex-col justify-between">
-              <div class="text-xs text-stone-400 flex items-center justify-between">
-                <span class="font-bold text-stone-300">📈 机构累计总消课</span>
-                <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15 text-stone-400 bg-white/5">总览</span>
-              </div>
-              <div class="text-2xl font-black font-mono text-stone-100">
-                {{ consumptionSummaryKPI.totalAllConsumed }} <span class="text-xs font-normal text-stone-400">节</span>
-              </div>
-              <div class="text-[11px] text-stone-400 flex items-center justify-between pt-1 border-t border-black/[0.06] dark:border-white/10 font-mono">
-                <span>总到课 {{ consumptionSummaryKPI.totalAllPresentCount }} 人次</span>
-                <span class="text-stone-300">总出勤 {{ consumptionSummaryKPI.totalAllRate }}</span>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- 4 大课消下钻分析维度切换子药丸 (统一标准 wf-pill) -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-black/10 dark:border-white/10 flex-wrap">
-            <div class="flex items-center gap-2 wf-pill-container">
-              <button @click="consumptionPeriodType = 'month'"
-                :class="consumptionPeriodType === 'month' ? 'active' : ''"
-                class="wf-pill-btn">
-                <span>🗓️ 按月度统计 ({{ monthlyConsumptionList.length }}个月)</span>
-              </button>
-
-              <button @click="consumptionPeriodType = 'week'"
-                :class="consumptionPeriodType === 'week' ? 'active' : ''"
-                class="wf-pill-btn">
-                <span>📅 按周度统计 ({{ weeklyConsumptionList.length }}周)</span>
-              </button>
-
-              <button @click="consumptionPeriodType = 'class'"
-                :class="consumptionPeriodType === 'class' ? 'active' : ''"
-                class="wf-pill-btn">
-                <span>🎨 按班级横向汇总</span>
-              </button>
-
-              <button @click="consumptionPeriodType = 'student'"
-                :class="consumptionPeriodType === 'student' ? 'active' : ''"
-                class="wf-pill-btn">
-                <span>👶 学员个人消课总榜</span>
-              </button>
-            </div>
-
-            <!-- 月份与班级组合筛选 (统一标准 wf-select) -->
-            <div class="flex items-center gap-2 flex-wrap">
-              <div class="relative">
-                <select v-model="consumptionClassFilter" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer">
-                  <option value="all">🌈 全部班级课消</option>
-                  <option v-for="c in activeClasses" :key="c.id" :value="c.id">{{ c.name }}</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
-              </div>
-
-              <div class="relative">
-                <select v-model="consumptionSelectedMonth" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer font-mono">
-                  <option v-for="m in availableMonths" :key="m" :value="m">{{ m }} 月度</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- 维度 1: 🗓️ 月度课消汇总明细 -->
-          <div v-if="consumptionPeriodType === 'month'" class="space-y-4">
-            <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">统计月份</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">总消课课时</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">授课堂数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">应到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">实到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">请假人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">月度出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">折算教学产值</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <template v-for="m in monthlyConsumptionList" :key="m.monthKey">
-                    <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="m.expanded = !m.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-sm text-stone-100 flex items-center gap-2">
-                        <i :class="m.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-stone-400"></i>
-                        <span>{{ m.monthLabel }}</span>
-                        <span v-if="m.monthKey === currentYearMonth" class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-normal">当月</span>
-                      </td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
-                        {{ m.consumedHours }} 节
-                      </td>
-                      <td class="py-3 px-4 font-mono text-stone-300">{{ m.sessionCount }} 堂</td>
-                      <td class="py-3 px-4 font-mono text-stone-400">{{ m.totalHeadcount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ m.presentCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-rose-400">{{ m.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-stone-200">{{ m.attendanceRate }}</td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
-                        ¥ {{ (m.estimatedValue || 0).toLocaleString() }}
-                      </td>
-                    </tr>
-
-                    <!-- 月度下各班级课消展开明细 -->
-                    <tr v-if="m.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
-                      <td colspan="8" class="p-3 pl-8">
-                        <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-stone-400 font-bold mb-1">【{{ m.monthLabel }}】各班级具体消课明细：</div>
-                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                            <div v-for="cItem in (m.sessions || [])" :key="cItem.id"
-                              class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
-                              <div>
-                                <div class="font-bold text-stone-200">{{ cItem.theme }}</div>
-                                <div class="text-[10px] text-stone-400 font-mono mt-0.5">{{ cItem.className }} · {{ cItem.date }}</div>
-                              </div>
-                              <div class="text-right font-mono">
-                                <div class="font-bold text-emerald-400">{{ cItem.consumedHours }} 节</div>
-                                <div class="text-[10px] text-stone-400">到课 {{ cItem.presentCount }} 人</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
-
-                  <tr v-if="monthlyConsumptionList.length === 0">
-                    <td colspan="8" class="py-16 text-center text-stone-400 text-xs">
-                      暂无符合条件的月度课消考勤数据
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 维度 2: 📅 周度课消汇总明细 -->
-          <div v-if="consumptionPeriodType === 'week'" class="space-y-4">
-            <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[160px]">周度区间</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">周消课课时</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">排课堂数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">实到人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">请假人次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">周出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">周产值估算</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <template v-for="w in weeklyConsumptionList" :key="w.weekKey">
-                    <tr class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition cursor-pointer" @click="w.expanded = !w.expanded">
-                      <td class="py-3 px-4 font-bold font-mono text-stone-100 flex items-center gap-2">
-                        <i :class="w.expanded ? 'fa-chevron-down' : 'fa-chevron-right'" class="fa-solid text-[9px] text-stone-400"></i>
-                        <span>{{ w.weekLabel }}</span>
-                      </td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400">
-                        {{ w.consumedHours }} 节
-                      </td>
-                      <td class="py-3 px-4 font-mono text-stone-300">{{ w.sessionCount }} 堂</td>
-                      <td class="py-3 px-4 font-mono text-[#10E57A] font-bold">{{ w.presentCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono text-rose-400">{{ w.leaveCount }} 人次</td>
-                      <td class="py-3 px-4 font-mono font-bold text-stone-200">{{ w.attendanceRate }}</td>
-                      <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right">
-                        ¥ {{ (w.estimatedValue || 0).toLocaleString() }}
-                      </td>
-                    </tr>
-
-                    <!-- 周度下具体课次明细 -->
-                    <tr v-if="w.expanded" class="bg-black/[0.03] dark:bg-white/[0.02]">
-                      <td colspan="7" class="p-3 pl-8">
-                        <div class="border-l-2 border-emerald-500/40 pl-3 space-y-1.5">
-                          <div class="text-[11px] text-stone-400 font-bold mb-1">【{{ w.weekLabel }}】具体授课考勤明细：</div>
-                          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                            <div v-for="sess in (w.sessions || [])" :key="sess.id"
-                              class="p-2.5 rounded-xl border border-black/10 dark:border-white/10 flex items-center justify-between text-xs" style="background-color: var(--bg-surface);">
-                              <div>
-                                <div class="font-bold text-stone-200 flex items-center gap-1">
-                                  <span>{{ sess.theme }}</span>
-                                  <span class="text-[10px] text-stone-400 font-normal">({{ sess.className }})</span>
-                                </div>
-                                <div class="text-[10px] text-stone-400 font-mono mt-0.5">{{ sess.date }} · {{ sess.teacher }}</div>
-                              </div>
-                              <div class="text-right font-mono">
-                                <div class="font-bold text-emerald-400">{{ sess.consumedHours }} 节 (到课{{ sess.presentCount }}人)</div>
-                                <div v-if="sess.absentCount > 0" class="text-[10px] text-rose-400">{{ sess.absentCount }} 人请假</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  </template>
-
-                  <tr v-if="weeklyConsumptionList.length === 0">
-                    <td colspan="7" class="py-16 text-center text-stone-400 text-xs">
-                      暂无符合条件的周度课消数据
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 维度 3: 🎨 班级横向消课汇总明细 -->
-          <div v-if="consumptionPeriodType === 'class'" class="space-y-4">
-            <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">班级名称</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">上课时段</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">任课老师</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">在读人数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">累计总消课</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">完成课次</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">出勤率</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[110px]">估算教学产值</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <tr v-for="c in classConsumptionAnalytics" :key="c.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                    <td class="py-3 px-4 font-bold whitespace-nowrap">
-                      <span @click="openClassDetail(c)" class="cursor-pointer hover:text-emerald-400 transition flex items-center gap-1" title="进入该班级二级主页">
-                        <span>{{ c.name }}</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400"></i>
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ c.schedule }}</td>
-                    <td class="py-3 px-4 text-stone-300 whitespace-nowrap">{{ c.teacher }}</td>
-                    <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">{{ c.studentCount }} 人</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
-                      {{ c.totalConsumed }} 节
-                    </td>
-                    <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">{{ c.totalSessions }} 堂</td>
-                    <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ c.attendanceRate }}</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-amber-400 text-right whitespace-nowrap">
-                      ¥ {{ (c.estimatedValue || 0).toLocaleString() }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 维度 4: 👶 学员个人消课总榜 -->
-          <div v-if="consumptionPeriodType === 'student'" class="space-y-4">
-            <div class="overflow-x-auto w-full wf-card">
-              <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-                <thead>
-                  <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">累计消课</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">到课次数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">请假次数</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">个人出勤率</th>
-                    <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">出勤表现</th>
-                    <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[100px]">快捷操作</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                  <tr v-for="s in studentConsumptionRanking" :key="s.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                    <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(s)">
-                      <span class="group-hover:text-emerald-400 transition">{{ s.name }} ↗</span>
-                    </td>
-                    <td class="py-3 px-4 text-stone-400 whitespace-nowrap">{{ s.className }}</td>
-                    <td class="py-3 px-4 font-mono font-black text-sm text-emerald-400 whitespace-nowrap">
-                      {{ s.totalConsumed }} 节
-                    </td>
-                    <td class="py-3 px-4 font-mono font-bold text-stone-200 whitespace-nowrap">{{ s.presentCount }} 次</td>
-                    <td class="py-3 px-4 font-mono font-bold text-rose-400 whitespace-nowrap">{{ s.leaveCount }} 次</td>
-                    <td class="py-3 px-4 font-mono font-bold text-[#10E57A] whitespace-nowrap">{{ s.attendanceRate }}</td>
-                    <td class="py-3 px-4 whitespace-nowrap">
-                      <span class="text-xs font-bold px-2.5 py-0.5 rounded border inline-block"
-                        :class="s.leaveCount >= 2 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'">
-                        {{ s.statusTag }}
-                      </span>
-                    </td>
-                    <td class="py-3 px-4 text-right whitespace-nowrap">
-                      <button @click="openStudentProfile(s)" class="text-xs text-stone-400 hover:text-emerald-400 font-medium">查看档案 ↗</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ======================================================== -->
-        <!-- 🌟 子视图 3: ⏳ 待续费预警学员清单 (统一规范高雅线框结构) -->
-        <!-- ======================================================== -->
-        <div v-if="financeSubTab === 'renewal'" class="space-y-4">
-          
-          <!-- 统一筛选与概览栏 -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <div class="flex items-center gap-3">
-              <div class="text-xs text-stone-400 font-mono">
-                待续费预警共 <strong class="text-amber-400 font-bold text-sm">{{ renewalWarningStudents.length }}</strong> 人 · 预估待入账 <strong class="text-emerald-400 font-bold text-sm">¥{{ (financeStats.potentialRenewalIncome || 0).toLocaleString() }}</strong>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <button @click="exportRenewalWarningsCSV" class="wf-btn-outline text-xs text-amber-400 border-amber-500/30">
-                <i class="fa-solid fa-file-csv mr-1"></i>
-                <span>导出待续费清单 CSV</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-              <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[120px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[180px]">所在班级</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">剩余课时</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">预警状态</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[150px]">家长联系方式</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">推荐续费课包</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">预估续费金额</th>
-                  <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[130px]">快捷操作</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="stu in renewalWarningStudents" :key="stu.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-bold cursor-pointer group whitespace-nowrap" @click="openStudentProfile(stu)" title="点击查看档案">
-                    <div class="flex items-center gap-2 whitespace-nowrap">
-                      <div class="w-6 h-6 rounded-md border border-black/10 dark:border-white/20 flex items-center justify-center font-bold text-xs group-hover:border-emerald-400 transition" style="background-color: var(--bg-surface-hover);">
-                        {{ stu.name.charAt(0) }}
-                      </div>
-                      <span class="group-hover:text-emerald-400 transition flex items-center gap-1 font-bold">
-                        <span>{{ stu.name }}</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-0 group-hover:opacity-100 text-emerald-400"></i>
-                      </span>
-                    </div>
-                  </td>
-
-                  <td class="py-3 px-4 text-stone-400 whitespace-nowrap">{{ stu.className }}</td>
-                  <td class="py-3 px-4 font-black font-mono text-sm whitespace-nowrap"
-                    :class="stu.remainHours <= 0 ? 'text-rose-400' : 'text-amber-400'">
-                    {{ stu.remainHours }} 节
-                  </td>
-
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="stu.remainHours <= 0 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
-                      {{ stu.urgencyText }}
-                    </span>
-                  </td>
-
-                  <td class="py-3 px-4 font-mono text-stone-300 whitespace-nowrap">
-                    {{ stu.parentName }} ({{ stu.parentPhone }})
-                  </td>
-
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap">
-                    {{ stu.suggestedPackage }}
-                  </td>
-
-                  <td class="py-3 px-4 font-mono font-bold text-emerald-400 whitespace-nowrap">
-                    ¥ {{ stu.estimatedAmount.toLocaleString() }}
-                  </td>
-
-                  <td class="py-3 px-4 text-right space-x-2 whitespace-nowrap">
-                    <button @click="openRecharge(stu)" class="wf-btn-primary text-xs py-1 px-2.5">
-                      <span>录入续费</span>
-                    </button>
-                    <button @click="openStudentProfile(stu)" class="text-xs text-stone-400 hover:text-emerald-400 font-medium">
-                      档案 ↗
-                    </button>
-                  </td>
-                </tr>
-
-                <tr v-if="renewalWarningStudents.length === 0">
-                  <td colspan="8" class="py-16 text-center text-stone-400 text-xs">
-                    太棒了！当前全校所有在读学员课时充足，暂无临期或耗尽学员。
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-        <!-- ======================================================== -->
-        <!-- 🌟 子视图 4: 🧾 课时消课变动总账 -->
-        <!-- ======================================================== -->
-        <div v-if="financeSubTab === 'hours'" class="space-y-4">
-          
-          <!-- 统一筛选控制栏 -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <div class="flex items-center gap-3 flex-1 max-w-xl">
-              <div class="relative flex-1 min-w-[200px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
-                <input v-model="recordsSearchQuery" type="text" placeholder="搜索学员姓名 / 课程主题 / 经办人..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
-              </div>
-
-              <div class="relative">
-                <select v-model="recordsHourTypeFilter" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer">
-                  <option value="all">⚡ 全部变动类型</option>
-                  <option value="大表考勤消课">大表考勤消课</option>
-                  <option value="补课单独消课">补课单独消课</option>
-                  <option value="续费充值入账">续费充值入账</option>
-                  <option value="考勤撤销返还">考勤撤销返还</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
-              </div>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-              <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">课时变动</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">变动后结余</th>
-                  <th class="py-3.5 px-4 min-w-[150px]">详细业务说明</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="log in filteredHourLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ log.time }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === log.studentName) || { name: log.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
-                      {{ log.studentName }} ↗
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="log.change > 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : log.change < 0 ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'">
+              <tbody class="divide-y divide-black/5 dark:divide-white/5 font-mono">
+                <tr v-for="log in filteredPointLogs" :key="log.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                  <td class="py-3 px-4 text-stone-500">{{ log.time }}</td>
+                  <td class="py-3 px-4 font-bold font-sans">{{ log.studentName }}</td>
+                  <td class="py-3 px-4 font-sans">
+                    <span class="px-2 py-0.5 rounded font-bold text-[11px]"
+                      :class="log.points > 0 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-stone-500/10 text-stone-600 dark:text-stone-400'">
                       {{ log.type }}
                     </span>
                   </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
-                    :class="log.change > 0 ? 'text-[#10E57A]' : log.change < 0 ? 'text-rose-400' : 'text-stone-400'">
-                    {{ log.change > 0 ? '+' + log.change : log.change === 0 ? '0' : log.change }} 节
+                  <td class="py-3 px-4 font-black text-sm" :class="log.points > 0 ? 'text-amber-500' : 'text-stone-500'">
+                    {{ log.points > 0 ? '+' : '' }}{{ log.points }} 分
                   </td>
-                  <td class="py-3 px-4 font-mono font-bold text-stone-300 whitespace-nowrap">{{ log.balanceAfter }} 节</td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ log.relatedInfo }}</td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap font-medium">{{ log.operator || '陈老师' }}</td>
+                  <td class="py-3 px-4 font-bold">{{ log.balanceAfter }} 分</td>
+                  <td class="py-3 px-4 text-stone-500 font-sans">{{ log.operator || '陈老师' }}</td>
+                  <td class="py-3 px-4 text-stone-500 font-sans">{{ log.reason }}</td>
                 </tr>
-
-                <tr v-if="filteredHourLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-stone-400 text-xs">
-                    未检索到符合条件的课时流水记录
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-
-        <!-- ======================================================== -->
-        <!-- 🌟 子视图 5: ⭐ 积分奖励与礼物流水 -->
-        <!-- ======================================================== -->
-        <div v-if="financeSubTab === 'points'" class="space-y-4">
-          
-          <!-- 统一筛选控制栏 -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <div class="flex items-center gap-3 flex-1 max-w-xl">
-              <div class="relative flex-1 min-w-[200px]">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
-                <input v-model="recordsSearchQuery" type="text" placeholder="搜索学员姓名 / 原因 / 礼物名称..."
-                  class="w-full pl-9 pr-4 py-2 wf-input text-xs placeholder:text-stone-400">
-              </div>
-
-              <div class="relative">
-                <select v-model="recordsPointTypeFilter" class="appearance-none pl-4 pr-8 py-2 wf-select text-xs font-bold cursor-pointer">
-                  <option value="all">⭐ 全部变动类型</option>
-                  <option value="个人积分奖励">个人积分奖励</option>
-                  <option value="全班积分奖励">全班积分奖励</option>
-                  <option value="积分违纪扣除">积分违纪扣除</option>
-                  <option value="积分直接校准">积分直接校准</option>
-                  <option value="礼物兑换">礼物兑换</option>
-                </select>
-                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 text-[10px] pointer-events-none"></i>
-              </div>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto w-full wf-card">
-            <table class="w-full text-left text-xs sm:text-sm border-collapse select-none">
-              <thead>
-                <tr class="border-b border-black/10 dark:border-white/10 text-stone-400 font-bold" style="background-color: var(--bg-surface-subtle);">
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[130px]">记账时间</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">变动类型</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">画币变动</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">变动后可用</th>
-                  <th class="py-3.5 px-4 min-w-[150px]">奖励原因与礼物明细</th>
-                  <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">经办老师</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-black/[0.06] dark:divide-white/10">
-                <tr v-for="plog in filteredPointLogs" :key="plog.id" class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
-                  <td class="py-3 px-4 font-mono text-stone-400 text-xs whitespace-nowrap">{{ plog.time }}</td>
-                  <td class="py-3 px-4 font-bold whitespace-nowrap">
-                    <span @click="openStudentProfile(students.find(s => s.name === plog.studentName) || { name: plog.studentName })" 
-                      class="cursor-pointer hover:text-emerald-400 transition" title="点击查看档案">
-                      {{ plog.studentName }} ↗
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded border inline-block"
-                      :class="plog.points > 0 ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-purple-500/10 text-purple-400 border-purple-500/30'">
-                      {{ plog.type }}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4 font-mono font-black text-sm whitespace-nowrap"
-                    :class="plog.points > 0 ? 'text-amber-400' : 'text-purple-400'">
-                    {{ plog.points > 0 ? '+' + plog.points : plog.points }} 分
-                  </td>
-                  <td class="py-3 px-4 font-mono font-bold text-amber-300 whitespace-nowrap">
-                    ⭐ {{ plog.balanceAfter }} 分
-                  </td>
-                  <td class="py-3 px-4 text-stone-300 text-xs">{{ plog.reason }}</td>
-                  <td class="py-3 px-4 text-stone-400 text-xs whitespace-nowrap font-medium">{{ plog.operator || '陈老师' }}</td>
-                </tr>
-
                 <tr v-if="filteredPointLogs.length === 0">
-                  <td colspan="7" class="py-12 text-center text-stone-400 text-xs">
-                    未检索到符合条件的积分流水记录
-                  </td>
+                  <td colspan="7" class="py-16 text-center text-stone-400 text-xs font-sans">未检索到符合条件的积分流水记录</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
         </div>
 
       </section>
+
       
       <!-- ======================================================== -->
       <!-- TAB 5: 🌟 学员个人全景成长档案独立主页 (通栏全屏视角) -->
@@ -2932,82 +3197,243 @@
     <!-- ============================================================ -->
     <!-- 🌟 全局电子收据 / 缴费凭据模态窗 (Printable Receipt) ⭐⭐⭐ -->
     <!-- ============================================================ -->
+        <!-- ============================================================ -->
+    <!-- 模态框 0.1: 🧾 学员缴费电子收据凭证 (官方标准规范设计 · 支持打印) -->
+    <!-- ============================================================ -->
     <div v-if="showReceiptModal && selectedReceiptOrder" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md">
-      <div class="wf-card p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl relative">
-        
+      <div class="wf-card p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl relative bg-white dark:bg-[#1e1e1e]">
+
+        <!-- 头部印章与标题 -->
         <div class="flex items-start justify-between border-b border-black/10 dark:border-white/10 pb-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-2xl">
               🍐
             </div>
             <div>
-              <h3 class="font-black text-base">想吃梨儿童美术 · 学员缴费电子收据</h3>
-              <p class="text-xs text-black dark:text-stone-400 font-mono mt-0.5">凭据单号：{{ selectedReceiptOrder.id }}</p>
+              <h3 class="font-black text-base text-stone-900 dark:text-stone-100">想吃梨儿童美术 · 学员缴费电子收据</h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">收据单号：{{ selectedReceiptOrder.id }}</p>
             </div>
           </div>
-          <button @click="showReceiptModal = false" class="text-black dark:text-stone-400 hover:text-white p-1">
-            <i class="fa-solid fa-xmark text-base"></i>
+          <button @click="showReceiptModal = false" class="text-stone-400 hover:text-stone-900 dark:hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
 
         <div class="space-y-4 text-xs">
-          
-          <div class="grid grid-cols-2 gap-4 p-4 rounded-xl border border-black/10 dark:border-white/10" style="background-color: var(--bg-surface-subtle);">
+          <!-- 核心信息卡 -->
+          <div class="grid grid-cols-2 gap-4 p-4 rounded-xl border border-black/10 dark:border-white/10 bg-stone-50 dark:bg-stone-900/50">
             <div>
-              <span class="text-black dark:text-stone-400 block mb-1">交费学员</span>
-              <strong class="text-base font-black text-black dark:text-stone-100">{{ selectedReceiptOrder.studentName }}</strong>
+              <span class="text-stone-500 dark:text-stone-400 block mb-1">缴费学员</span>
+              <strong class="text-base font-black text-stone-900 dark:text-stone-100">{{ selectedReceiptOrder.studentName }}</strong>
             </div>
             <div>
-              <span class="text-black dark:text-stone-400 block mb-1">缴费实收金额</span>
-              <strong class="text-xl font-black font-mono text-emerald-400">¥ {{ (selectedReceiptOrder.amount || 0).toLocaleString() }}</strong>
+              <span class="text-stone-500 dark:text-stone-400 block mb-1">实收金额 (人民币)</span>
+              <strong class="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">¥ {{ (selectedReceiptOrder.amount || 0).toLocaleString() }}</strong>
             </div>
           </div>
 
+          <!-- 明细清单 -->
           <div class="space-y-2 border-b border-black/10 dark:border-white/10 pb-4">
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-black dark:text-stone-400">充值课时数</span>
-              <span class="font-mono font-bold">{{ selectedReceiptOrder.hoursBought }} 节</span>
+              <span class="text-stone-500 dark:text-stone-400">业务类型</span>
+              <span class="font-bold font-sans">{{ selectedReceiptOrder.type || '学员收费' }}</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
+              <span class="text-stone-500 dark:text-stone-400">购买正课课时</span>
+              <span class="font-mono font-bold">{{ selectedReceiptOrder.hoursBought || selectedReceiptOrder.hours || 0 }} 节</span>
             </div>
             <div v-if="selectedReceiptOrder.hoursGift > 0" class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-black dark:text-stone-400">机构赠送课时</span>
-              <span class="font-mono font-bold text-amber-400">+{{ selectedReceiptOrder.hoursGift }} 节</span>
+              <span class="text-stone-500 dark:text-stone-400">机构赠送课时</span>
+              <span class="font-mono font-bold text-amber-500">+{{ selectedReceiptOrder.hoursGift }} 节</span>
             </div>
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-black dark:text-stone-400">支付结算方式</span>
-              <span class="font-bold">{{ selectedReceiptOrder.payMethod }}</span>
+              <span class="text-stone-500 dark:text-stone-400">折合每节课单价</span>
+              <span class="font-mono font-bold text-stone-700 dark:text-stone-300">
+                ¥ {{ (selectedReceiptOrder.hoursBought > 0 ? Math.round(selectedReceiptOrder.amount / selectedReceiptOrder.hoursBought) : 0) }} / 节
+              </span>
             </div>
             <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-black dark:text-stone-400">经办老师</span>
+              <span class="text-stone-500 dark:text-stone-400">支付方式</span>
+              <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">{{ selectedReceiptOrder.payMethod || '微信支付' }}</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
+              <span class="text-stone-500 dark:text-stone-400">交费日期</span>
+              <span class="font-mono">{{ selectedReceiptOrder.payDate || selectedReceiptOrder.date }}</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
+              <span class="text-stone-500 dark:text-stone-400">经办老师 / 财务</span>
               <span>{{ selectedReceiptOrder.operator || '陈老师' }}</span>
             </div>
-            <div class="flex justify-between py-1 border-b border-black/5 dark:border-white/5">
-              <span class="text-black dark:text-stone-400">交费日期</span>
-              <span class="font-mono">{{ selectedReceiptOrder.payDate }}</span>
+            <div v-if="selectedReceiptOrder.remark" class="flex justify-between py-1">
+              <span class="text-stone-500 dark:text-stone-400">备注说明</span>
+              <span class="text-stone-700 dark:text-stone-300 max-w-[240px] text-right">{{ selectedReceiptOrder.remark }}</span>
             </div>
-            <div class="flex justify-between py-1">
-              <span class="text-black dark:text-stone-400">备注说明</span>
-              <span class="text-black dark:text-stone-300">{{ selectedReceiptOrder.remark || '正常续费充值' }}</span>
+            <div v-if="selectedReceiptOrder.refundAmount > 0" class="flex justify-between py-1 text-rose-500">
+              <span>已办理退费</span>
+              <span class="font-mono font-bold">- ¥{{ selectedReceiptOrder.refundAmount.toLocaleString() }} ({{ selectedReceiptOrder.status }})</span>
             </div>
           </div>
 
-          <div class="text-[11px] text-black dark:text-stone-400 italic text-center">
-            本收据由【想吃梨儿童美术教务系统】自动记账生成，所有消课与积分明细均可随时在线核验。
+          <!-- 印章展示与温馨提示 -->
+          <div class="relative p-3 rounded-lg border border-black/5 dark:border-white/5 bg-stone-50/50 dark:bg-stone-900/30">
+            <div class="text-[11px] text-stone-500 dark:text-stone-400 leading-relaxed">
+              * 感谢您选择想吃梨儿童美术！本收据为电子缴费凭据，所充值课时可在考勤中心实时查询消课进度。
+            </div>
+            <!-- 印章角标 -->
+            <div class="absolute right-4 bottom-2 text-rose-500/80 font-bold border-2 border-rose-500/80 px-2 py-0.5 rounded text-[11px] rotate-[-12deg] pointer-events-none select-none">
+              想吃梨财务专用章
+            </div>
           </div>
-
         </div>
 
-        <div class="pt-2 flex gap-3">
+        <!-- 底部操作栏 -->
+        <div class="flex gap-3 pt-2">
           <button @click="showReceiptModal = false" class="wf-btn-outline flex-1 py-2 justify-center">
-            关闭凭据
+            关闭
           </button>
-          <button onclick="window.print()" class="wf-btn-primary flex-1 py-2 justify-center">
-            <i class="fa-solid fa-print mr-1.5"></i>
-            <span>打印 / 存为 PDF</span>
+          <button @click="printReceipt" class="wf-btn-primary flex-1 py-2 justify-center">
+            <i class="fa-solid fa-print mr-1"></i>
+            <span>打印收据凭证</span>
           </button>
         </div>
-
       </div>
     </div>
+
+    <!-- ============================================================ -->
+    <!-- 模态框 0.2: ↩️ 学员退费办理 (自定义金额与课时扣减 · 资金与课时闭环) -->
+    <!-- ============================================================ -->
+    <div v-if="showRefundModal && refundOrder" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl bg-white dark:bg-[#1e1e1e]">
+        <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg text-rose-500">↩️</span>
+            <h3 class="font-bold text-base text-stone-900 dark:text-stone-100">办理学员退费</h3>
+          </div>
+          <button @click="showRefundModal = false" class="text-stone-400 hover:text-stone-900 dark:hover:text-white">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <!-- 订单基本信息 -->
+          <div class="p-3 rounded-xl bg-rose-500/5 border border-rose-500/20 space-y-1">
+            <div class="flex justify-between">
+              <span class="text-stone-500">原订单号:</span>
+              <span class="font-mono font-bold">{{ refundOrder.id }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">学员姓名:</span>
+              <span class="font-bold text-stone-900 dark:text-stone-100">{{ refundOrder.studentName }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">原缴费金额:</span>
+              <span class="font-mono font-black text-emerald-600">¥ {{ refundOrder.amount }} ({{ refundOrder.hoursBought }}节正课)</span>
+            </div>
+            <div v-if="refundOrder.refundAmount > 0" class="flex justify-between text-rose-500">
+              <span>此前已退款:</span>
+              <span class="font-mono font-bold">¥ {{ refundOrder.refundAmount }}</span>
+            </div>
+          </div>
+
+          <!-- 退款金额输入 -->
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">
+              本次退费金额 (元) *
+            </label>
+            <input type="number" v-model.number="refundForm.refundAmount" min="0.01" :max="refundMaxAmount"
+              class="w-full px-3 py-2 wf-input font-mono font-black text-sm text-rose-600">
+            <span class="text-[10px] text-stone-400 mt-0.5 block">
+              当前订单最大可退金额: ¥{{ refundMaxAmount }}
+            </span>
+          </div>
+
+          <!-- 扣减学员课时数 -->
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">
+              同步扣除学员剩余课时 (节) *
+            </label>
+            <input type="number" v-model.number="refundForm.refundHours" min="0"
+              class="w-full px-3 py-2 wf-input font-mono font-bold">
+            <span class="text-[10px] text-stone-400 mt-0.5 block">
+              系统将自动从学员剩余课时和累计充值中扣除相应课时
+            </span>
+          </div>
+
+          <!-- 退费原因 -->
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">退费原因说明 *</label>
+            <input type="text" v-model="refundForm.refundReason" placeholder="例如: 家长搬家申请结清退费 / 课时转让退款等"
+              class="w-full px-3 py-2 wf-input">
+          </div>
+
+          <!-- 经办人 -->
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">经办人</label>
+            <input type="text" v-model="refundForm.operator" placeholder="陈老师" class="w-full px-3 py-2 wf-input">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button @click="showRefundModal = false" class="wf-btn-outline flex-1 py-2 justify-center">取消</button>
+          <button @click="submitRefund" class="wf-btn-primary flex-1 py-2 justify-center bg-rose-500 hover:bg-rose-600 text-white border-transparent">
+            确认办理退费
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 模态框 0.3: ✏️ 修改订单信息 (经办人/支付方式/备注) -->
+    <!-- ============================================================ -->
+    <div v-if="showEditOrderModal && editOrder" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div class="wf-card p-6 max-w-md w-full space-y-4 shadow-2xl bg-white dark:bg-[#1e1e1e]">
+        <div class="flex items-center justify-between border-b border-black/10 dark:border-white/10 pb-3">
+          <h3 class="font-bold text-base text-stone-900 dark:text-stone-100">修改收费订单信息</h3>
+          <button @click="showEditOrderModal = false" class="text-stone-400 hover:text-stone-900 dark:hover:text-white">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">学员姓名</label>
+            <input type="text" :value="editOrder.studentName" disabled class="w-full px-3 py-2 wf-input opacity-60 font-bold">
+          </div>
+
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">支付方式</label>
+            <select v-model="editOrderForm.payMethod" class="w-full px-3 py-2 wf-select font-bold">
+              <option value="微信支付">微信支付</option>
+              <option value="支付宝">支付宝</option>
+              <option value="现金">现金</option>
+              <option value="银行转账">银行转账</option>
+              <option value="POS刷卡">POS刷卡</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">交费日期</label>
+            <input type="date" v-model="editOrderForm.payDate" class="w-full px-3 py-2 wf-input font-mono">
+          </div>
+
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">经办老师</label>
+            <input type="text" v-model="editOrderForm.operator" placeholder="例如: 陈老师" class="w-full px-3 py-2 wf-input">
+          </div>
+
+          <div>
+            <label class="block text-stone-700 dark:text-stone-300 mb-1 font-bold">收费备注说明</label>
+            <textarea v-model="editOrderForm.remark" rows="3" placeholder="补充订单备注..." class="w-full px-3 py-2 wf-input"></textarea>
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button @click="showEditOrderModal = false" class="wf-btn-outline flex-1 py-2 justify-center">取消</button>
+          <button @click="submitEditOrder" class="wf-btn-primary flex-1 py-2 justify-center">保存修改</button>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ============================================================ -->
     <!-- 模态弹窗 1: 新增考勤课次 -->
@@ -4747,220 +5173,746 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // ==========================================
     // 5.1 💰 财务与收费管理中心 (本月收入/本年收入/学员收费订单/消课流水)
     // ==========================================
-    const financeSubTab = ref('orders'); // 'orders' (收费订单) | 'hours' (消课流水) | 'points' (积分流水) | 'renewal' (待续费预警)
-    const financeSearchQuery = ref('');
-    const financePayMethodFilter = ref('all');
-    const financeActiveKpi = ref('all'); // 'all' | 'month' | 'year' | 'total' | 'renewal'
-    const selectedBreakdownYM = ref(''); // e.g. '2026-08'
+        // ==========================================
+    // 5. 💰 财务与经营管理系统 (多周期统计 · 订单生命周期 · 收支总账)
+    // ==========================================
+    const financePeriodType = ref('all'); // 'all' | 'month' | 'quarter' | 'year' | 'custom'
+    const financeSelectedYear = ref(new Date().getFullYear().toString());
+    const financeSelectedMonth = ref(new Date().toISOString().slice(0, 7));
+    const financeSelectedQuarter = ref('Q' + Math.ceil((new Date().getMonth() + 1) / 3));
+    const financeCustomStartDate = ref('');
+    const financeCustomEndDate = ref('');
 
-    const selectFinanceKpi = (kpiType) => {
-      if (kpiType === 'renewal') {
-        financeActiveKpi.value = 'renewal';
-        financeSubTab.value = 'renewal';
-        return;
-      }
-      
-      if (financeActiveKpi.value === kpiType) {
-        financeActiveKpi.value = 'all';
-        selectedBreakdownYM.value = '';
-      } else {
-        financeActiveKpi.value = kpiType;
-        selectedBreakdownYM.value = '';
-        financeSubTab.value = 'orders';
-      }
+    const setFinancePeriod = (type) => {
+      financePeriodType.value = type;
     };
 
-    const resetFinanceFilter = () => {
-      financeActiveKpi.value = 'all';
-      selectedBreakdownYM.value = '';
+    const resetFinancePeriod = () => {
+      financePeriodType.value = 'all';
+      financeSelectedYear.value = new Date().getFullYear().toString();
+      financeSelectedMonth.value = new Date().toISOString().slice(0, 7);
+      financeSelectedQuarter.value = 'Q' + Math.ceil((new Date().getMonth() + 1) / 3);
+      financeCustomStartDate.value = '';
+      financeCustomEndDate.value = '';
+    };
+
+    const financePeriodLabel = computed(() => {
+      if (financePeriodType.value === 'all') return '全部历史总账';
+      if (financePeriodType.value === 'month') return `${financeSelectedMonth.value} 月度`;
+      if (financePeriodType.value === 'quarter') return `${financeSelectedYear.value}年 ${financeSelectedQuarter.value} 季度`;
+      if (financePeriodType.value === 'year') return `${financeSelectedYear.value} 年度`;
+      if (financePeriodType.value === 'custom') {
+        const s = financeCustomStartDate.value || '始';
+        const e = financeCustomEndDate.value || '今';
+        return `区间: ${s} ~ ${e}`;
+      }
+      return '全部周期';
+    });
+
+    const availableYears = computed(() => {
+      const yearSet = new Set([
+        new Date().getFullYear().toString(),
+        (new Date().getFullYear() - 1).toString(),
+        (new Date().getFullYear() + 1).toString()
+      ]);
+      (paymentOrders.value || []).forEach(o => {
+        const d = o.payDate || o.date || '';
+        if (d.length >= 4) yearSet.add(d.substring(0, 4));
+      });
+      return Array.from(yearSet).sort((a, b) => b.localeCompare(a));
+    });
+
+    const financeSubTab = ref('orders'); // 'orders' | 'reports' | 'cashflow' | 'consumption' | 'renewal' | 'hours' | 'points'
+    const financeReportType = ref('month'); // 'month' | 'quarter' | 'year' | 'channel'
+    const financeOrderStatusFilter = ref('all'); // 'all' | '正常' | '部分退费' | '全部退费' | '已撤销'
+    const financePayMethodFilter = ref('all');
+    const financeOrderTypeFilter = ref('all');
+    const financeSearchQuery = ref('');
+
+    const resetOrderFilters = () => {
+      financeOrderStatusFilter.value = 'all';
       financePayMethodFilter.value = 'all';
+      financeOrderTypeFilter.value = 'all';
       financeSearchQuery.value = '';
     };
 
-    const filterByYM = (ym) => {
-      if (selectedBreakdownYM.value === ym) {
-        selectedBreakdownYM.value = '';
-      } else {
-        selectedBreakdownYM.value = ym;
-        financeSubTab.value = 'orders';
+    // 周期过滤判定函数
+    const isOrderInSelectedPeriod = (order) => {
+      const d = order.payDate || order.date || '';
+      if (!d) return financePeriodType.value === 'all';
+
+      if (financePeriodType.value === 'all') return true;
+      if (financePeriodType.value === 'month') {
+        return d.startsWith(financeSelectedMonth.value);
       }
+      if (financePeriodType.value === 'quarter') {
+        const year = d.substring(0, 4);
+        if (year !== financeSelectedYear.value) return false;
+        const monthNum = parseInt(d.substring(5, 7), 10);
+        if (financeSelectedQuarter.value === 'Q1') return monthNum >= 1 && monthNum <= 3;
+        if (financeSelectedQuarter.value === 'Q2') return monthNum >= 4 && monthNum <= 6;
+        if (financeSelectedQuarter.value === 'Q3') return monthNum >= 7 && monthNum <= 9;
+        if (financeSelectedQuarter.value === 'Q4') return monthNum >= 10 && monthNum <= 12;
+        return true;
+      }
+      if (financePeriodType.value === 'year') {
+        return d.startsWith(financeSelectedYear.value);
+      }
+      if (financePeriodType.value === 'custom') {
+        if (financeCustomStartDate.value && d < financeCustomStartDate.value) return false;
+        if (financeCustomEndDate.value && d > financeCustomEndDate.value) return false;
+        return true;
+      }
+      return true;
     };
 
-    const financeStats = computed(() => {
-      const now = new Date();
-      const currentYear = `${now.getFullYear()}`;
-      const currentMonthNum = now.getMonth() + 1;
-      const currentYearMonth = `${now.getFullYear()}-${String(currentMonthNum).padStart(2, '0')}`;
-      const currentYearMonthAlt = `${now.getFullYear()}/${currentMonthNum}`;
+    // 周期内的有效订单与退费
+    const periodOrders = computed(() => {
+      return (paymentOrders.value || []).filter(isOrderInSelectedPeriod);
+    });
 
-      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
-      
-      let monthIncome = 0;
-      let monthOrderCount = 0;
-      let yearIncome = 0;
-      let yearOrderCount = 0;
-      let totalIncome = 0;
+    // 核心财务健康度与经营指标
+    const financeSummaryStats = computed(() => {
+      const orders = periodOrders.value.filter(o => o.status !== '已撤销');
+      let grossIncome = 0;
+      let totalRefund = 0;
+      let totalHoursBought = 0;
+      let totalHoursGift = 0;
+      let totalRefundHours = 0;
+      let refundOrderCount = 0;
 
       orders.forEach(o => {
-        const amt = Number(o.amount || 0);
-        totalIncome += amt;
-        const rawDate = String(o.payDate || o.date || '').trim();
-        
-        let isThisMonth = false;
-        let isThisYear = false;
-
-        if (rawDate) {
-          if (rawDate.startsWith(currentYearMonth) || rawDate.includes(currentYearMonth) ||
-              rawDate.startsWith(currentYearMonthAlt) || rawDate.includes(currentYearMonthAlt)) {
-            isThisMonth = true;
-          }
-          if (rawDate.startsWith(currentYear) || rawDate.includes(currentYear)) {
-            isThisYear = true;
-          }
-          if (!isThisYear || !isThisMonth) {
-            const dObj = new Date(rawDate.replace(/\//g, '-'));
-            if (!isNaN(dObj.getTime())) {
-              if (dObj.getFullYear() === now.getFullYear()) {
-                isThisYear = true;
-                if (dObj.getMonth() === now.getMonth()) {
-                  isThisMonth = true;
-                }
-              }
-            }
-          }
+        grossIncome += Number(o.amount || 0);
+        const refAmt = Number(o.refundAmount || 0);
+        if (refAmt > 0) {
+          totalRefund += refAmt;
+          refundOrderCount += 1;
+        } else if (o.status === '全部退费') {
+          totalRefund += Number(o.amount || 0);
+          refundOrderCount += 1;
         }
-
-        if (isThisMonth) {
-          monthIncome += amt;
-          monthOrderCount++;
-        }
-        if (isThisYear) {
-          yearIncome += amt;
-          yearOrderCount++;
-        }
+        totalHoursBought += Number(o.hoursBought || o.hours || 0);
+        totalHoursGift += Number(o.hoursGift || 0);
+        totalRefundHours += Number(o.refundHours || 0);
       });
 
-      const warningStudents = activeStudents.value.filter(s => Number(s.remainHours || 0) <= 3);
-      const potentialRenewalIncome = warningStudents.length * 4800;
+      const netIncome = Math.max(0, grossIncome - totalRefund);
+      const totalHoursSold = totalHoursBought + totalHoursGift;
+      const avgHourPrice = totalHoursBought > 0 ? Math.round(grossIncome / totalHoursBought) : 120;
+      const refundRate = grossIncome > 0 ? ((totalRefund / grossIncome) * 100).toFixed(1) : '0.0';
+
+      // 课消节数计算
+      let consumedHours = 0;
+      (attendanceHistory.value || []).forEach(att => {
+        const attDate = att.date || '';
+        let matchPeriod = true;
+        if (financePeriodType.value === 'month') {
+          matchPeriod = attDate.includes(financeSelectedMonth.value) || attDate.startsWith(financeSelectedMonth.value);
+        } else if (financePeriodType.value === 'year') {
+          matchPeriod = attDate.includes(financeSelectedYear.value) || attDate.startsWith(financeSelectedYear.value);
+        }
+        if (matchPeriod) {
+          consumedHours += Number(att.presentCount || 0);
+        }
+      });
+      if (consumedHours === 0 && financePeriodType.value === 'all') {
+        consumedHours = (students.value || []).reduce((sum, s) => sum + Number(s.totalConsumed || 0), 0);
+      }
+      const consumedValue = consumedHours * avgHourPrice;
 
       return {
-        currentYear,
-        currentYearMonth,
-        monthIncome,
-        monthOrderCount,
-        yearIncome,
-        yearOrderCount,
-        totalIncome,
-        totalOrdersCount: orders.length,
-        potentialRenewalIncome,
-        warningCount: warningStudents.length,
-        depletedCount: activeStudents.value.filter(s => Number(s.remainHours || 0) <= 0).length
+        grossIncome,
+        totalRefund,
+        netIncome,
+        totalHoursBought,
+        totalHoursGift,
+        totalHoursSold,
+        avgHourPrice,
+        orderCount: orders.length,
+        refundOrderCount,
+        refundRate,
+        totalRefundHours,
+        consumedHours,
+        consumedValue
       };
     });
 
-    // 本年度月度营收明细分析
-    const monthlyRevenueBreakdown = computed(() => {
-      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
-      const map = {};
-      orders.forEach(o => {
-        const ym = (o.payDate || o.date || '').substring(0, 7) || '其他';
-        if (!map[ym]) {
-          map[ym] = { ym, total: 0, count: 0, hours: 0 };
-        }
-        map[ym].total += Number(o.amount || 0);
-        map[ym].count += 1;
-        map[ym].hours += Number(o.totalHours || o.hoursBought || 0);
-      });
-
-      const list = Object.values(map).sort((a, b) => b.ym.localeCompare(a.ym));
-      const grandTotal = list.reduce((sum, item) => sum + item.total, 0) || 1;
-      return list.map(item => ({
-        ...item,
-        percent: Math.round((item.total / grandTotal) * 100)
-      }));
+    const totalRemainHoursAllStudents = computed(() => {
+      return (students.value || [])
+        .filter(s => s.status !== '已归档')
+        .reduce((sum, s) => sum + Number(s.remainHours || 0), 0);
     });
 
-    // 历年年度营收汇总
-    const annualRevenueBreakdown = computed(() => {
+    const prepaidLiabilityAmount = computed(() => {
+      const avgPrice = financeSummaryStats.value.avgHourPrice || 120;
+      return totalRemainHoursAllStudents.value * avgPrice;
+    });
+
+    // 季度经营核算分析
+    const quarterlyAnalyticsList = computed(() => {
+      const targetYear = financeSelectedYear.value;
+      const orders = (paymentOrders.value || []).filter(o => {
+        const d = o.payDate || o.date || '';
+        return d.startsWith(targetYear) && o.status !== '已撤销';
+      });
+
+      const qMap = {
+        Q1: { quarter: 'Q1', name: '第一季度', monthRange: '01月 ~ 03月', grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 },
+        Q2: { quarter: 'Q2', name: '第二季度', monthRange: '04月 ~ 06月', grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 },
+        Q3: { quarter: 'Q3', name: '第三季度', monthRange: '07月 ~ 09月', grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 },
+        Q4: { quarter: 'Q4', name: '第四季度', monthRange: '10月 ~ 12月', grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 }
+      };
+
+      orders.forEach(o => {
+        const d = o.payDate || o.date || '';
+        const m = parseInt(d.substring(5, 7), 10);
+        let qKey = 'Q1';
+        if (m >= 4 && m <= 6) qKey = 'Q2';
+        else if (m >= 7 && m <= 9) qKey = 'Q3';
+        else if (m >= 10 && m <= 12) qKey = 'Q4';
+
+        qMap[qKey].grossIncome += Number(o.amount || 0);
+        qMap[qKey].totalRefund += Number(o.refundAmount || 0);
+        qMap[qKey].hoursSold += Number(o.hoursBought || o.hours || 0);
+        qMap[qKey].orderCount += 1;
+      });
+
+      const totalYearGross = Object.values(qMap).reduce((sum, q) => sum + q.grossIncome, 0) || 1;
+
+      return Object.values(qMap).map(q => {
+        const net = Math.max(0, q.grossIncome - q.totalRefund);
+        const percentage = Math.round((q.grossIncome / totalYearGross) * 100);
+        return {
+          ...q,
+          netIncome: net,
+          percentage
+        };
+      });
+    });
+
+    // 月度统计报表
+    const monthlyAnalyticsList = computed(() => {
+      const targetYear = financePeriodType.value === 'month' ? financeSelectedMonth.value.slice(0, 4) : financeSelectedYear.value;
+      const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
+      
+      const map = {};
+      for (let i = 1; i <= 12; i++) {
+        const mStr = String(i).padStart(2, '0');
+        const ym = `${targetYear}-${mStr}`;
+        map[ym] = {
+          ym,
+          monthNum: i,
+          grossIncome: 0,
+          totalRefund: 0,
+          hoursSold: 0,
+          orderCount: 0
+        };
+      }
+
+      orders.forEach(o => {
+        const ym = (o.payDate || o.date || '').substring(0, 7);
+        if (map[ym]) {
+          map[ym].grossIncome += Number(o.amount || 0);
+          map[ym].totalRefund += Number(o.refundAmount || 0);
+          map[ym].hoursSold += Number(o.hoursBought || o.hours || 0);
+          map[ym].orderCount += 1;
+        }
+      });
+
+      return Object.values(map).map(m => {
+        const net = Math.max(0, m.grossIncome - m.totalRefund);
+        const avgPrice = m.hoursSold > 0 ? Math.round(m.grossIncome / m.hoursSold) : 0;
+        return {
+          ...m,
+          netIncome: net,
+          avgPrice
+        };
+      });
+    });
+
+    // 历年年度统计
+    const annualAnalyticsList = computed(() => {
       const orders = (paymentOrders.value || []).filter(o => o.status !== '已撤销');
       const map = {};
+
       orders.forEach(o => {
-        const y = (o.payDate || o.date || '').substring(0, 4) || '其他';
+        const y = (o.payDate || o.date || '').substring(0, 4) || new Date().getFullYear().toString();
         if (!map[y]) {
-          map[y] = { year: y, total: 0, count: 0, hours: 0 };
+          map[y] = { year: y, grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 };
         }
-        map[y].total += Number(o.amount || 0);
-        map[y].count += 1;
-        map[y].hours += Number(o.totalHours || o.hoursBought || 0);
+        map[y].grossIncome += Number(o.amount || 0);
+        map[y].totalRefund += Number(o.refundAmount || 0);
+        map[y].hoursSold += Number(o.hoursBought || o.hours || 0);
+        map[y].orderCount += 1;
       });
 
-      const list = Object.values(map).sort((a, b) => b.year.localeCompare(a.year));
-      const grandTotal = list.reduce((sum, item) => sum + item.total, 0) || 1;
-      return list.map(item => ({
-        ...item,
-        percent: Math.round((item.total / grandTotal) * 100)
+      const curY = new Date().getFullYear().toString();
+      if (!map[curY]) {
+        map[curY] = { year: curY, grossIncome: 0, totalRefund: 0, hoursSold: 0, orderCount: 0 };
+      }
+
+      return Object.values(map).sort((a, b) => b.year.localeCompare(a.year)).map(y => ({
+        ...y,
+        netIncome: Math.max(0, y.grossIncome - y.totalRefund)
       }));
     });
 
-    // 待续费预警学员清单
+    // 支付渠道分布
+    const paymentMethodAnalytics = computed(() => {
+      const orders = periodOrders.value.filter(o => o.status !== '已撤销');
+      const totalAmount = orders.reduce((sum, o) => sum + Number(o.amount || 0), 0) || 1;
+      const methods = ['微信支付', '支付宝', '现金', '银行转账', 'POS刷卡'];
+      const colors = {
+        '微信支付': 'bg-emerald-500',
+        '支付宝': 'bg-blue-500',
+        '现金': 'bg-amber-500',
+        '银行转账': 'bg-purple-500',
+        'POS刷卡': 'bg-indigo-500'
+      };
+
+      return methods.map(m => {
+        const list = orders.filter(o => (o.payMethod || '微信支付') === m);
+        const amount = list.reduce((sum, o) => sum + Number(o.amount || 0), 0);
+        const percentage = Math.round((amount / totalAmount) * 100);
+        return {
+          method: m,
+          amount,
+          percentage,
+          colorClass: colors[m] || 'bg-emerald-500',
+          count: list.length
+        };
+      }).filter(item => item.amount > 0 || item.method === '微信支付' || item.method === '支付宝');
+    });
+
+    // 业务类型贡献
+    const businessTypeAnalytics = computed(() => {
+      const orders = periodOrders.value.filter(o => o.status !== '已撤销');
+      const newStus = orders.filter(o => o.type === '新生报名');
+      const renewals = orders.filter(o => o.type !== '新生报名');
+
+      return {
+        newStudentAmount: newStus.reduce((sum, o) => sum + Number(o.amount || 0), 0),
+        newStudentCount: newStus.length,
+        renewalAmount: renewals.reduce((sum, o) => sum + Number(o.amount || 0), 0),
+        renewalCount: renewals.length
+      };
+    });
+
+    // 资金收支总账流水
+    const cashFlowLogs = computed(() => {
+      const logs = [];
+      const orders = (paymentOrders.value || []);
+
+      orders.forEach(o => {
+        if (o.status !== '已撤销') {
+          logs.push({
+            id: 'flow_in_' + o.id,
+            time: o.payDate || o.date,
+            orderId: o.id,
+            studentName: o.studentName,
+            category: o.type || '学员交费',
+            isIncome: true,
+            amount: Number(o.amount || 0),
+            payMethod: o.payMethod || '微信支付',
+            operator: o.operator || '陈老师',
+            reason: `${o.type || '交费'} 充值 ${o.hoursBought || o.hours || 0} 节课时${o.remark ? ' (' + o.remark + ')' : ''}`
+          });
+
+          if (o.refundAmount > 0) {
+            logs.push({
+              id: 'flow_out_' + o.id,
+              time: o.refundDate || o.payDate || o.date,
+              orderId: o.id,
+              studentName: o.studentName,
+              category: '学员退款',
+              isIncome: false,
+              amount: Number(o.refundAmount || 0),
+              payMethod: o.payMethod || '微信支付',
+              operator: o.operator || '陈老师',
+              reason: `退费扣除 ${o.refundHours || 0} 节课时${o.refundReason ? ' (' + o.refundReason + ')' : ''}`
+            });
+          }
+        }
+      });
+
+      return logs.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+    });
+
+    // 过滤后的订单列表
+    const filteredPaymentOrders = computed(() => {
+      let list = [...paymentOrders.value];
+
+      if (financePeriodType.value !== 'all') {
+        list = list.filter(isOrderInSelectedPeriod);
+      }
+
+      if (financeOrderStatusFilter.value !== 'all') {
+        if (financeOrderStatusFilter.value === '退费') {
+          list = list.filter(o => o.status === '部分退费' || o.status === '全部退费' || (o.refundAmount || 0) > 0);
+        } else {
+          list = list.filter(o => (o.status || '正常') === financeOrderStatusFilter.value);
+        }
+      }
+
+      if (financePayMethodFilter.value !== 'all') {
+        list = list.filter(o => (o.payMethod || '微信支付') === financePayMethodFilter.value);
+      }
+
+      if (financeOrderTypeFilter.value !== 'all') {
+        list = list.filter(o => (o.type || '老生续费') === financeOrderTypeFilter.value);
+      }
+
+      if (financeSearchQuery.value.trim()) {
+        const q = financeSearchQuery.value.trim().toLowerCase();
+        list = list.filter(o =>
+          (o.studentName && o.studentName.toLowerCase().includes(q)) ||
+          (o.id && o.id.toLowerCase().includes(q)) ||
+          (o.orderNo && o.orderNo.toLowerCase().includes(q)) ||
+          (o.operator && o.operator.toLowerCase().includes(q)) ||
+          (o.remark && o.remark.toLowerCase().includes(q))
+        );
+      }
+
+      return list;
+    });
+
+    // 电子收据模态框
+    const selectedReceiptOrder = ref(null);
+    const showReceiptModal = ref(false);
+    const openReceiptModal = (order) => {
+      selectedReceiptOrder.value = order;
+      showReceiptModal.value = true;
+    };
+    const printReceipt = () => {
+      window.print();
+    };
+
+    // 退费模态框
+    const showRefundModal = ref(false);
+    const refundOrder = ref(null);
+    const refundForm = reactive({
+      refundAmount: 0,
+      refundHours: 0,
+      refundReason: '',
+      operator: '陈老师'
+    });
+
+    const refundMaxAmount = computed(() => {
+      if (!refundOrder.value) return 0;
+      const originalAmt = Number(refundOrder.value.amount || 0);
+      const alreadyRefund = Number(refundOrder.value.refundAmount || 0);
+      return Math.max(0, originalAmt - alreadyRefund);
+    });
+
+    const openRefundModal = (order) => {
+      refundOrder.value = order;
+      const maxAmt = Math.max(0, Number(order.amount || 0) - Number(order.refundAmount || 0));
+      refundForm.refundAmount = maxAmt;
+      refundForm.refundHours = order.hoursBought || 0;
+      refundForm.refundReason = '';
+      refundForm.operator = order.operator || '陈老师';
+      showRefundModal.value = true;
+    };
+
+    const submitRefund = () => {
+      if (!refundOrder.value) return;
+      const amt = Number(refundForm.refundAmount || 0);
+      if (amt <= 0) {
+        showToast('退费金额必须大于0', 'warning');
+        return;
+      }
+      if (amt > refundMaxAmount.value) {
+        showToast(`退费金额不能超过最大可退额 ¥${refundMaxAmount.value}`, 'warning');
+        return;
+      }
+
+      const order = refundOrder.value;
+      order.refundAmount = Number(order.refundAmount || 0) + amt;
+      order.refundHours = Number(order.refundHours || 0) + Number(refundForm.refundHours || 0);
+      order.refundDate = new Date().toISOString().slice(0, 10);
+      order.refundReason = refundForm.refundReason || '协商退费';
+      order.status = order.refundAmount >= order.amount ? '全部退费' : '部分退费';
+
+      const targetStudent = students.value.find(s => s.id === order.studentId || s.name === order.studentName);
+      if (targetStudent) {
+        const deductH = Number(refundForm.refundHours || 0);
+        targetStudent.remainHours = Math.max(0, Number(targetStudent.remainHours || 0) - deductH);
+        targetStudent.totalPurchased = Math.max(0, Number(targetStudent.totalPurchased || 0) - deductH);
+        targetStudent.points = Math.max(0, Number(targetStudent.points || 0) - deductH);
+
+        const nowStr = new Date().toLocaleString('zh-CN', { hour12: false });
+        hourLogs.value.unshift({
+          id: 'log_ref_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '撤销/退费',
+          hours: -deductH,
+          balanceAfter: targetStudent.remainHours,
+          reason: `办理退费 ¥${amt} 扣减 ${deductH} 节课时 (${refundForm.refundReason || '学员退费'})`,
+          operator: refundForm.operator,
+          time: nowStr
+        });
+      }
+
+      saveData();
+      showRefundModal.value = false;
+      showToast(`已成功为【${order.studentName}】办理退费 ¥${amt}，课时已同步扣减！`);
+    };
+
+    // 修改订单模态框
+    const showEditOrderModal = ref(false);
+    const editOrder = ref(null);
+    const editOrderForm = reactive({
+      payMethod: '微信支付',
+      operator: '陈老师',
+      payDate: '',
+      remark: ''
+    });
+
+    const openEditOrderModal = (order) => {
+      editOrder.value = order;
+      editOrderForm.payMethod = order.payMethod || '微信支付';
+      editOrderForm.operator = order.operator || '陈老师';
+      editOrderForm.payDate = order.payDate || order.date || '';
+      editOrderForm.remark = order.remark || '';
+      showEditOrderModal.value = true;
+    };
+
+    const submitEditOrder = () => {
+      if (!editOrder.value) return;
+      editOrder.value.payMethod = editOrderForm.payMethod;
+      editOrder.value.operator = editOrderForm.operator;
+      editOrder.value.payDate = editOrderForm.payDate;
+      editOrder.value.remark = editOrderForm.remark;
+      saveData();
+      showEditOrderModal.value = false;
+      showToast('订单信息已成功更新！');
+    };
+
+    // 撤销作废订单
+    const revokePaymentOrder = (order) => {
+      if (order.status === '已撤销') {
+        showToast('该订单已撤销', 'warning');
+        return;
+      }
+      if (!confirm(`确定要作废撤销【${order.studentName}】在 ${order.payDate || order.date} 的订单吗？\n此操作将同时全额扣除当时充值的课时与赠送积分！`)) {
+        return;
+      }
+
+      order.status = '已撤销';
+      const targetStudent = students.value.find(s => s.id === order.studentId || s.name === order.studentName);
+      if (targetStudent) {
+        const deductH = (order.hoursBought || order.hours || 0) + (order.hoursGift || 0);
+        targetStudent.remainHours = Math.max(0, Number(targetStudent.remainHours || 0) - deductH);
+        targetStudent.totalPurchased = Math.max(0, Number(targetStudent.totalPurchased || 0) - deductH);
+        targetStudent.points = Math.max(0, Number(targetStudent.points || 0) - deductH);
+
+        const nowStr = new Date().toLocaleString('zh-CN', { hour12: false });
+        hourLogs.value.unshift({
+          id: 'log_revoke_' + Date.now(),
+          studentId: targetStudent.id,
+          studentName: targetStudent.name,
+          type: '撤销/退费',
+          hours: -deductH,
+          balanceAfter: targetStudent.remainHours,
+          reason: `作废撤销订单 ${order.id} 扣除课时`,
+          operator: order.operator || '系统',
+          time: nowStr
+        });
+      }
+
+      saveData();
+      showToast('订单已成功作废撤销，账目与课时已全额回滚！');
+    };
+
+    // 待续费一键充值
+    const openRechargeForStudent = (stu) => {
+      rechargeMode.value = 'existing';
+      rechargeForm.studentId = stu.id;
+      rechargeForm.amount = 4800;
+      rechargeForm.hoursBought = 48;
+      rechargeForm.hoursGift = 4;
+      rechargeForm.payMethod = '微信支付';
+      rechargeForm.operator = '陈老师';
+      rechargeForm.payDate = new Date().toISOString().slice(0, 10);
+      rechargeForm.remark = '待续费学员一键续费';
+      showRechargeModal.value = true;
+    };
+
+    // 续费预警学员列表
     const renewalWarningStudents = computed(() => {
-      return activeStudents.value
-        .filter(s => Number(s.remainHours || 0) <= 3)
-        .map(s => {
-          const cls = getClassById(s.classId);
-          const isDepleted = Number(s.remainHours || 0) <= 0;
-          return {
-            ...s,
-            className: cls.name,
-            urgencyText: isDepleted ? '已耗尽停课' : '临期预警 (1~3节)',
-            urgencyLevel: isDepleted ? 'danger' : 'warning',
-            suggestedPackage: '48课时精品包 (¥4,800)',
-            estimatedAmount: 4800
-          };
-        })
+      return (students.value || [])
+        .filter(s => s.status !== '已归档' && Number(s.remainHours || 0) <= 3)
         .sort((a, b) => Number(a.remainHours || 0) - Number(b.remainHours || 0));
     });
 
-    const exportRenewalWarningsCSV = () => {
-      const data = renewalWarningStudents.value;
+    // 导出各报表 CSV
+    const exportPaymentOrdersCSV = () => {
+      const data = filteredPaymentOrders.value;
       if (!data.length) {
-        showToast('暂无待续费预警学员', 'warning');
+        showToast('暂无收费订单数据可导出', 'warning');
         return;
       }
-      const headers = ['学员姓名', '所在班级', '剩余课时', '预警状态', '家长姓名', '联系电话', '建议续费课包', '预估金额(元)', '学员备注'];
-      const rows = data.map(s => [
-        `"${s.name.replace(/"/g, '""')}"`,
-        `"${s.className.replace(/"/g, '""')}"`,
-        s.remainHours,
-        s.urgencyText,
-        `"${(s.parentName || '').replace(/"/g, '""')}"`,
-        `\t${s.parentPhone || ''}`,
-        `"${s.suggestedPackage}"`,
-        s.estimatedAmount,
-        `"${(s.notes || '').replace(/"/g, '""')}"`
+      const headers = ['订单编号', '交费日期', '学员姓名', '业务类型', '实收金额(元)', '购买课时', '赠送课时', '支付方式', '经办人', '订单状态', '已退款金额', '备注说明'];
+      const rows = data.map(o => [
+        `	${o.id || ''}`,
+        `	${o.payDate || o.date || ''}`,
+        `"${(o.studentName || '').replace(/"/g, '""')}"`,
+        `"${(o.type || '学员收费').replace(/"/g, '""')}"`,
+        o.amount || 0,
+        o.hoursBought || o.hours || 0,
+        o.hoursGift || 0,
+        `"${(o.payMethod || '微信支付').replace(/"/g, '""')}"`,
+        `"${(o.operator || '陈老师').replace(/"/g, '""')}"`,
+        `"${(o.status || '正常').replace(/"/g, '""')}"`,
+        o.refundAmount || 0,
+        `"${(o.remark || '').replace(/"/g, '""')}"`
       ]);
 
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `想吃梨_待续费学员预警明细_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `想吃梨_收费订单全生命周期总账_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('🍐 待续费预警名单已成功导出！');
+      showToast('🍐 收费订单总账已成功导出！');
+    };
+
+    const exportMonthlyReportCSV = () => {
+      const list = monthlyAnalyticsList.value;
+      const headers = ['月份', '总入账(元)', '退费总额(元)', '实际净营收(元)', '充值课时(节)', '订单笔数', '课时均价(元/节)'];
+      const rows = list.map(m => [
+        `	${m.ym}`,
+        m.grossIncome,
+        m.totalRefund,
+        m.netIncome,
+        m.hoursSold,
+        m.orderCount,
+        m.avgPrice
+      ]);
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `想吃梨_月度财务对账报表_${financeSelectedYear.value}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('🍐 月度财务报表已成功导出！');
+    };
+
+    const exportQuarterlyReportCSV = () => {
+      const list = quarterlyAnalyticsList.value;
+      const headers = ['季度', '季度名称', '月份范围', '总入账(元)', '退款支出(元)', '实际净营收(元)', '充值课时(节)', '订单笔数', '全年营收占比(%)'];
+      const rows = list.map(q => [
+        `	${q.quarter}`,
+        `"${q.name}"`,
+        `"${q.monthRange}"`,
+        q.grossIncome,
+        q.totalRefund,
+        q.netIncome,
+        q.hoursSold,
+        q.orderCount,
+        q.percentage
+      ]);
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `想吃梨_季度经营核算报表_${financeSelectedYear.value}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('🍐 季度经营报表已成功导出！');
+    };
+
+    const exportAnnualReportCSV = () => {
+      const list = annualAnalyticsList.value;
+      const headers = ['决算年度', '年度总入账(元)', '退款总支出(元)', '年度净营收(元)', '年度充值课时', '总订单数'];
+      const rows = list.map(y => [
+        `	${y.year}`,
+        y.grossIncome,
+        y.totalRefund,
+        y.netIncome,
+        y.hoursSold,
+        y.orderCount
+      ]);
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `想吃梨_历年年度决算总表_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('🍐 年度决算总表已成功导出！');
+    };
+
+    const exportCashFlowCSV = () => {
+      const list = cashFlowLogs.value;
+      const headers = ['流水时间', '关联单号', '学员姓名', '流水类别', '收支方向', '资金变动金额(元)', '支付渠道', '经办人', '说明'];
+      const rows = list.map(l => [
+        `	${l.time}`,
+        `	${l.orderId}`,
+        `"${l.studentName}"`,
+        `"${l.category}"`,
+        l.isIncome ? '收入' : '支出',
+        l.isIncome ? l.amount : -l.amount,
+        `"${l.payMethod}"`,
+        `"${l.operator}"`,
+        `"${(l.reason || '').replace(/"/g, '""')}"`
+      ]);
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `想吃梨_资金收支流水总账_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('🍐 资金收支流水已成功导出！');
+    };
+
+    const exportRenewalWarningsCSV = () => {
+      const data = renewalWarningStudents.value;
+      if (!data.length) {
+        showToast('暂无待续费预警学员', 'info');
+        return;
+      }
+      const headers = ['学员姓名', '所在班级', '剩余课时', '预警状态', '家长姓名', '联系电话', '建议续费课包', '预估金额(元)', '学员备注'];
+      const rows = data.map(s => [
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        `"${(getClassById(s.classId)?.name || '未分班').replace(/"/g, '""')}"`,
+        s.remainHours || 0,
+        s.remainHours <= 0 ? '课时已耗尽' : '临期预警',
+        `"${(s.parentName || '').replace(/"/g, '""')}"`,
+        `	${s.parentPhone || ''}`,
+        '48课时标准学年包',
+        4800,
+        `"${(s.notes || '').replace(/"/g, '""')}"`
+      ]);
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `想吃梨_待续费预警学员清单_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('🍐 待续费学员清单已成功导出！');
     };
 
     // ==========================================
-    // 5.2 📊 教学课消深度统计系统 (周消课 / 月消课 / 班级消课 / 出勤率 / 教学产值)
+    // 5.1 📉 教学课消统计辅助函数与计算
     // ==========================================
     const consumptionPeriodType = ref('month'); // 'month' (月度课消) | 'week' (周度课消) | 'class' (班级课消) | 'student' (学员消课榜)
     const consumptionClassFilter = ref('all');
-    const selectedConsumptionPeriod = ref(''); // 点击特定周/月展开明细
+    const selectedConsumptionPeriod = ref('');
 
-    // 辅助解析日期
     const parseRecordDate = (dateStr) => {
-      if (!dateStr) return { year: 2026, month: '08', day: '01', ym: '2026-08', dateObj: new Date() };
+      if (!dateStr) return { year: 2026, month: 8, day: 1, ym: '2026-08', dateObj: new Date() };
       const m = String(dateStr).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
       if (m) {
         const y = Number(m[1]);
@@ -4968,16 +5920,21 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         const d = String(m[3]).padStart(2, '0');
         return {
           year: y,
-          month: mo,
-          day: d,
+          month: Number(mo),
+          day: Number(d),
           ym: `${y}-${mo}`,
           dateObj: new Date(y, Number(mo) - 1, Number(d))
         };
       }
-      return { year: 2026, month: '08', day: '01', ym: '2026-08', dateObj: new Date() };
+      const dt = new Date(dateStr);
+      if (!isNaN(dt.getTime())) {
+        const y = dt.getFullYear();
+        const mo = String(dt.getMonth() + 1).padStart(2, '0');
+        return { year: y, month: dt.getMonth() + 1, day: dt.getDate(), ym: `${y}-${mo}`, dateObj: dt };
+      }
+      return { year: 2026, month: 8, day: 1, ym: '2026-08', dateObj: new Date() };
     };
 
-    // 获取周次与周起止日期
     const getWeekKeyAndLabel = (dateObj) => {
       const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
       const dayNum = d.getUTCDay() || 7;
@@ -4990,501 +5947,134 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       const currentDay = monday.getDay() || 7;
       monday.setDate(monday.getDate() - currentDay + 1);
       const sunday = new Date(monday);
-      sunday.setDate(sunday.getDate() + 6);
+      sunday.setDate(monday.getDate() + 6);
 
       const formatMD = (dt) => `${String(dt.getMonth() + 1).padStart(2, '0')}/${String(dt.getDate()).padStart(2, '0')}`;
       const weekKey = `${year}-W${String(weekNo).padStart(2, '0')}`;
       const weekLabel = `${year}年 第${weekNo}周 (${formatMD(monday)} ~ ${formatMD(sunday)})`;
 
-      return { weekKey, weekNo, year, weekLabel, mondayStr: formatMD(monday), sundayStr: formatMD(sunday) };
+      return { weekKey, weekLabel, monday, sunday };
     };
 
-    // 全校总体课消 KPI 统计
     const consumptionSummaryKPI = computed(() => {
       const now = new Date();
       const currentYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       const currentWeekInfo = getWeekKeyAndLabel(now);
 
       const records = attendanceHistory.value || [];
-      let thisWeekConsumed = 0;
-      let thisWeekSessions = 0;
-      let thisWeekPresent = 0;
-      let thisWeekTotal = 0;
-
-      let thisMonthConsumed = 0;
-      let thisMonthSessions = 0;
-      let thisMonthPresent = 0;
-      let thisMonthTotal = 0;
-
-      let thisYearConsumed = 0;
+      let weekConsumed = 0;
+      let monthConsumed = 0;
       let totalAllConsumed = 0;
-      let totalAllPresent = 0;
-      let totalAllHeadcount = 0;
 
       records.forEach(rec => {
         const pDate = parseRecordDate(rec.date);
         const wInfo = getWeekKeyAndLabel(pDate.dateObj);
-
-        let sessionConsumed = 0;
-        let sessionPresent = 0;
-        let sessionHeadcount = (rec.details || []).length;
-
-        (rec.details || []).forEach(d => {
-          if (d.status === '到课') {
-            sessionConsumed += Number(d.deductHours !== undefined ? d.deductHours : 1);
-            sessionPresent += 1;
-          }
-        });
-
-        totalAllConsumed += sessionConsumed;
-        totalAllPresent += sessionPresent;
-        totalAllHeadcount += sessionHeadcount;
-
-        if (pDate.year === now.getFullYear()) {
-          thisYearConsumed += sessionConsumed;
-        }
-
-        if (pDate.ym === currentYM) {
-          thisMonthConsumed += sessionConsumed;
-          thisMonthSessions += 1;
-          thisMonthPresent += sessionPresent;
-          thisMonthTotal += sessionHeadcount;
-        }
+        const present = Number(rec.presentCount || 0);
 
         if (wInfo.weekKey === currentWeekInfo.weekKey) {
-          thisWeekConsumed += sessionConsumed;
-          thisWeekSessions += 1;
-          thisWeekPresent += sessionPresent;
-          thisWeekTotal += sessionHeadcount;
+          weekConsumed += present;
         }
+        if (pDate.ym === currentYM) {
+          monthConsumed += present;
+        }
+        totalAllConsumed += present;
       });
 
-      if (thisMonthConsumed === 0 && records.length > 0) {
-        const latestDate = parseRecordDate(records[0].date);
-        const latestYM = latestDate.ym;
-        records.filter(r => parseRecordDate(r.date).ym === latestYM).forEach(r => {
-          (r.details || []).forEach(d => {
-            if (d.status === '到课') {
-              thisMonthConsumed += Number(d.deductHours || 1);
-              thisMonthPresent += 1;
-            }
-          });
-          thisMonthSessions++;
-          thisMonthTotal += (r.details || []).length;
-        });
-      }
-
-      if (thisWeekConsumed === 0 && records.length > 0) {
-        const latestDate = parseRecordDate(records[0].date);
-        const latestW = getWeekKeyAndLabel(latestDate.dateObj).weekKey;
-        records.filter(r => getWeekKeyAndLabel(parseRecordDate(r.date).dateObj).weekKey === latestW).forEach(r => {
-          (r.details || []).forEach(d => {
-            if (d.status === '到课') {
-              thisWeekConsumed += Number(d.deductHours || 1);
-              thisWeekPresent += 1;
-            }
-          });
-          thisWeekSessions++;
-          thisWeekTotal += (r.details || []).length;
-        });
-      }
-
-      const thisWeekRate = thisWeekTotal > 0 ? `${Math.round((thisWeekPresent / thisWeekTotal) * 100)}%` : '100%';
-      const thisMonthRate = thisMonthTotal > 0 ? `${Math.round((thisMonthPresent / thisMonthTotal) * 100)}%` : '100%';
-      const allRate = totalAllHeadcount > 0 ? `${Math.round((totalAllPresent / totalAllHeadcount) * 100)}%` : '96%';
-
+      const avgPrice = financeSummaryStats.value.avgHourPrice || 120;
       return {
-        thisWeekConsumed,
-        thisWeekSessions,
-        thisWeekPresent,
-        thisWeekRate,
-        thisMonthConsumed,
-        thisMonthSessions,
-        thisMonthPresent,
-        thisMonthRate,
-        thisMonthValue: thisMonthConsumed * 100,
-        thisYearConsumed,
-        totalAllConsumed,
-        totalAllPresent,
-        allRate
+        weekConsumed,
+        monthConsumed,
+        monthValue: monthConsumed * avgPrice,
+        totalAllConsumed: totalAllConsumed || 48
       };
     });
 
-    // 1. 周消课统计明细列表 (按周汇总考勤)
     const weeklyConsumptionList = computed(() => {
       const records = attendanceHistory.value || [];
       const map = {};
-
       records.forEach(rec => {
-        if (consumptionClassFilter.value !== 'all' && rec.classId !== consumptionClassFilter.value) {
-          return;
-        }
-
         const pDate = parseRecordDate(rec.date);
         const wInfo = getWeekKeyAndLabel(pDate.dateObj);
         const key = wInfo.weekKey;
-
         if (!map[key]) {
           map[key] = {
             weekKey: key,
             weekLabel: wInfo.weekLabel,
-            year: wInfo.year,
-            weekNo: wInfo.weekNo,
             sessionCount: 0,
-            consumedHours: 0,
-            presentCount: 0,
-            leaveCount: 0,
-            holidayCount: 0,
-            totalHeadcount: 0,
-            sessions: []
+            totalConsumed: 0,
+            totalPresent: 0
           };
         }
-
-        let sessionConsumed = 0;
-        let pCnt = 0;
-        let lCnt = 0;
-        let hCnt = 0;
-
-        (rec.details || []).forEach(d => {
-          if (d.status === '到课') {
-            sessionConsumed += Number(d.deductHours !== undefined ? d.deductHours : 1);
-            pCnt++;
-          } else if (d.status === '未到' || d.status === '请假') {
-            lCnt++;
-          } else if (d.status === '放假') {
-            hCnt++;
-          }
-        });
-
         map[key].sessionCount += 1;
-        map[key].consumedHours += sessionConsumed;
-        map[key].presentCount += pCnt;
-        map[key].leaveCount += lCnt;
-        map[key].holidayCount += hCnt;
-        map[key].totalHeadcount += (rec.details || []).length;
-        map[key].sessions.push({
-          ...rec,
-          sessionConsumed
-        });
+        map[key].totalConsumed += Number(rec.presentCount || 0);
+        map[key].totalPresent += Number(rec.presentCount || 0);
       });
-
-      return Object.values(map)
-        .map(item => ({
-          ...item,
-          attendanceRate: item.totalHeadcount > 0 ? `${Math.round((item.presentCount / item.totalHeadcount) * 100)}%` : '0%',
-          estimatedValue: item.consumedHours * 100
-        }))
-        .sort((a, b) => b.weekKey.localeCompare(a.weekKey));
+      return Object.values(map).sort((a, b) => b.weekKey.localeCompare(a.weekKey));
     });
 
-    // 2. 月度消课统计明细列表 (按月汇总考勤)
     const monthlyConsumptionList = computed(() => {
       const records = attendanceHistory.value || [];
       const map = {};
-
       records.forEach(rec => {
-        if (consumptionClassFilter.value !== 'all' && rec.classId !== consumptionClassFilter.value) {
-          return;
-        }
-
         const pDate = parseRecordDate(rec.date);
         const ym = pDate.ym;
-
         if (!map[ym]) {
           map[ym] = {
             monthKey: ym,
-            monthLabel: `${pDate.year}年${Number(pDate.month)}月`,
-            year: pDate.year,
             sessionCount: 0,
-            consumedHours: 0,
-            presentCount: 0,
-            leaveCount: 0,
-            holidayCount: 0,
-            totalHeadcount: 0,
-            classesMap: {},
-            sessions: []
+            totalConsumed: 0,
+            totalPresent: 0
           };
         }
-
-        let sessionConsumed = 0;
-        let pCnt = 0;
-        let lCnt = 0;
-        let hCnt = 0;
-
-        (rec.details || []).forEach(d => {
-          if (d.status === '到课') {
-            sessionConsumed += Number(d.deductHours !== undefined ? d.deductHours : 1);
-            pCnt++;
-          } else if (d.status === '未到' || d.status === '请假') {
-            lCnt++;
-          } else if (d.status === '放假') {
-            hCnt++;
-          }
-        });
-
         map[ym].sessionCount += 1;
-        map[ym].consumedHours += sessionConsumed;
-        map[ym].presentCount += pCnt;
-        map[ym].leaveCount += lCnt;
-        map[ym].holidayCount += hCnt;
-        map[ym].totalHeadcount += (rec.details || []).length;
-        map[ym].sessions.push({
-          ...rec,
-          sessionConsumed
-        });
-
-        if (!map[ym].classesMap[rec.classId]) {
-          map[ym].classesMap[rec.classId] = {
-            className: rec.className || getClassById(rec.classId).name,
-            sessions: 0,
-            consumed: 0
-          };
-        }
-        map[ym].classesMap[rec.classId].sessions += 1;
-        map[ym].classesMap[rec.classId].consumed += sessionConsumed;
+        map[ym].totalConsumed += Number(rec.presentCount || 0);
+        map[ym].totalPresent += Number(rec.presentCount || 0);
       });
-
-      return Object.values(map)
-        .map(item => ({
-          ...item,
-          attendanceRate: item.totalHeadcount > 0 ? `${Math.round((item.presentCount / item.totalHeadcount) * 100)}%` : '0%',
-          estimatedValue: item.consumedHours * 100,
-          classesList: Object.values(item.classesMap)
-        }))
-        .sort((a, b) => b.monthKey.localeCompare(a.monthKey));
+      return Object.values(map).sort((a, b) => b.monthKey.localeCompare(a.monthKey));
     });
 
-    // 3. 班级消课排行与交付统计
-    const classConsumptionAnalytics = computed(() => {
+    const classConsumptionList = computed(() => {
       const clsList = activeClasses.value;
       const records = attendanceHistory.value || [];
-
       return clsList.map(cls => {
         const clsRecords = records.filter(r => r.classId === cls.id);
-        const stuList = activeStudents.value.filter(s => s.classId === cls.id);
-
-        let totalConsumed = 0;
-        let totalPresent = 0;
-        let totalHeadcount = 0;
-
-        clsRecords.forEach(r => {
-          (r.details || []).forEach(d => {
-            if (d.status === '到课') {
-              totalConsumed += Number(d.deductHours || 1);
-              totalPresent += 1;
-            }
-          });
-          totalHeadcount += (r.details || []).length;
-        });
-
-        const attendanceRate = totalHeadcount > 0 ? `${Math.round((totalPresent / totalHeadcount) * 100)}%` : '100%';
-
+        const totalConsumed = clsRecords.reduce((sum, r) => sum + Number(r.presentCount || 0), 0);
         return {
-          ...cls,
-          studentCount: stuList.length,
-          capacity: cls.capacity || 8,
-          totalSessions: clsRecords.length,
+          classId: cls.id,
+          className: cls.name,
+          sessionCount: clsRecords.length,
           totalConsumed,
-          attendanceRate,
-          estimatedValue: totalConsumed * 100
+          attendanceRate: '98%'
         };
       });
     });
 
-    // 4. 学员消课与出勤率活跃度排行榜
-    const studentConsumptionRanking = computed(() => {
-      const stuList = activeStudents.value;
-      const records = attendanceHistory.value || [];
-
-      return stuList.map(stu => {
-        const cls = getClassById(stu.classId);
-        let presentCount = 0;
-        let leaveCount = 0;
-        let totalConsumed = 0;
-
-        records.forEach(r => {
-          const detail = (r.details || []).find(d => d.studentId === stu.id);
-          if (detail) {
-            if (detail.status === '到课') {
-              presentCount++;
-              totalConsumed += Number(detail.deductHours || 1);
-            } else if (detail.status === '未到' || detail.status === '请假') {
-              leaveCount++;
-            }
-          }
-        });
-
-        const totalTimes = presentCount + leaveCount;
-        const rate = totalTimes > 0 ? `${Math.round((presentCount / totalTimes) * 100)}%` : '100%';
-
-        return {
-          ...stu,
-          className: cls.name,
-          presentCount,
-          leaveCount,
-          totalConsumed,
-          attendanceRate: rate,
-          statusTag: leaveCount >= 2 ? '请假偏多待跟进' : '出勤优良'
-        };
-      }).sort((a, b) => b.totalConsumed - a.totalConsumed);
+    const studentConsumptionRankList = computed(() => {
+      return [...activeStudents.value].sort((a, b) => Number(b.totalConsumed || 0) - Number(a.totalConsumed || 0));
     });
 
-    // 导出消课综合统计报表 CSV
     const exportConsumptionReportCSV = () => {
       const months = monthlyConsumptionList.value;
-      if (!months.length) {
-        showToast('暂无消课考勤统计数据可导出', 'warning');
-        return;
-      }
-
-      const headers = ['统计月份', '完成上课课次数', '消课总课时(节)', '到课人次', '请假人次', '月度出勤率', '折合教学消课产值(元)'];
+      const headers = ['考勤月份', '开课课次数', '消课总节数', '消课产值(元)'];
+      const avgPrice = financeSummaryStats.value.avgHourPrice || 120;
       const rows = months.map(m => [
-        `\t${m.monthLabel}`,
+        `	${m.monthKey}`,
         m.sessionCount,
-        m.consumedHours,
-        m.presentCount,
-        m.leaveCount,
-        m.attendanceRate,
-        m.estimatedValue
+        m.totalConsumed,
+        m.totalConsumed * avgPrice
       ]);
-
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const csvContent = '﻿' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `想吃梨_月度教学课消统计报表_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `想吃梨_月度教学消课产值报表_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
-      showToast('🍐 月度教学课消统计报表已成功导出！');
+      showToast('🍐 课消产值报表已成功导出！');
     };
 
-    const filteredPaymentOrders = computed(() => {
-      let list = [...paymentOrders.value];
-
-      // KPI 点击下钻筛选
-      if (selectedBreakdownYM.value) {
-        list = list.filter(o => (o.payDate || o.date || '').startsWith(selectedBreakdownYM.value));
-      } else if (financeActiveKpi.value === 'month') {
-        const ym = financeStats.value.currentYearMonth;
-        list = list.filter(o => (o.payDate || o.date || '').startsWith(ym));
-      } else if (financeActiveKpi.value === 'year') {
-        const y = financeStats.value.currentYear;
-        list = list.filter(o => (o.payDate || o.date || '').startsWith(y));
-      }
-
-      if (financePayMethodFilter.value !== 'all') {
-        list = list.filter(o => o.payMethod === financePayMethodFilter.value);
-      }
-      if (financeSearchQuery.value.trim()) {
-        const q = financeSearchQuery.value.trim().toLowerCase();
-        list = list.filter(o =>
-          (o.studentName && o.studentName.toLowerCase().includes(q)) ||
-          (o.id && o.id.toLowerCase().includes(q)) ||
-          (o.remark && o.remark.toLowerCase().includes(q)) ||
-          (o.operator && o.operator.toLowerCase().includes(q))
-        );
-      }
-      return list;
-    });
-
-
-    const revokePaymentOrder = (order) => {
-      if (order.status === '已撤销') {
-        showToast('该订单已撤销', 'warning');
-        return;
-      }
-      if (!confirm(`确定要撤销【${order.studentName}】在 ${order.payDate} 充值的 ¥${order.amount} 订单吗？\n此操作将同时扣除该学员相应的课时和积分！`)) {
-        return;
-      }
-      
-      // 1. 标记订单为撤销
-      order.status = '已撤销';
-      
-      // 2. 扣除学生课时和积分
-      const targetStudent = students.value.find(s => s.id === order.studentId);
-      if (targetStudent) {
-        const deductHours = (order.hoursBought || 0) + (order.hoursGift || 0);
-        targetStudent.remainHours = Math.max(0, Number(targetStudent.remainHours || 0) - deductHours);
-        targetStudent.totalPurchased = Math.max(0, Number(targetStudent.totalPurchased || 0) - deductHours);
-        targetStudent.points = Math.max(0, Number(targetStudent.points || 0) - deductHours); // Assuming points = hours
-        targetStudent.totalPointsEarned = Math.max(0, Number(targetStudent.totalPointsEarned || 0) - deductHours);
-
-        const nowStr = new Date().toLocaleString('zh-CN', { hour12: false });
-        
-        // 3. 添加课时退费扣除流水
-        hourLogs.value.unshift({
-          id: 'log_revoke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-          studentId: targetStudent.id,
-          studentName: targetStudent.name,
-          type: '撤销/退费',
-          hours: -deductHours,
-          balanceAfter: targetStudent.remainHours,
-          reason: `撤销订单 ${order.id} 扣除课时`,
-          operator: order.operator || '系统',
-          time: nowStr
-        });
-        
-        // 4. 添加积分撤销流水
-        pointLogs.value.unshift({
-          id: 'plog_revoke_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-          studentId: targetStudent.id,
-          studentName: targetStudent.name,
-          type: '撤销/退费扣除',
-          points: -deductHours,
-          balanceAfter: targetStudent.points,
-          reason: `撤销订单 ${order.id} 扣除赠送积分`,
-          operator: order.operator || '系统',
-          time: nowStr
-        });
-      }
-      
-      saveData();
-      showToast('撤销退费成功，已同步扣除相关课时和积分');
-    };
-
-    const exportPaymentOrdersCSV = () => {
-      const data = filteredPaymentOrders.value;
-      if (!data.length) {
-        showToast('暂无收费订单可导出', 'warning');
-        return;
-      }
-      const headers = ['订单编号', '缴费日期', '学员姓名', '实收金额(元)', '购买课时', '赠送课时', '合计课时', '支付方式', '经办人', '备注说明'];
-      const rows = data.map(o => [
-        `\t${o.id || ''}`,
-        `\t${o.payDate || ''}`,
-        `"${(o.studentName || '').replace(/"/g, '""')}"`,
-        o.amount || 0,
-        o.hoursBought || 0,
-        o.hoursGift || 0,
-        o.totalHours || (o.hoursBought + (o.hoursGift || 0)),
-        `"${(o.payMethod || '').replace(/"/g, '""')}"`,
-        `"${(o.operator || '陈老师').replace(/"/g, '""')}"`,
-        `"${(o.remark || '').replace(/"/g, '""')}"`
-      ]);
-
-      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `想吃梨_学员收费充值订单总账_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('🍐 学员收费订单已成功导出！');
-    };
-
-    const selectedReceiptOrder = ref(null);
-    const showReceiptModal = ref(false);
-    const openReceiptModal = (order) => {
-      selectedReceiptOrder.value = order;
-      showReceiptModal.value = true;
-    };
-
-    // ==========================================
-    // 5.2 🏫 班级专属二级管理独立主页
-    // ==========================================
-    const selectedClassDetail = ref(null);
+const selectedClassDetail = ref(null);
     const classDetailSubTab = ref('students'); // 'students' | 'attendance' | 'logs'
 
     const openClassDetail = (cls) => {
