@@ -1366,101 +1366,99 @@
             <!-- ======================================================== -->
       <!-- TAB 4: 💰 财务收费管理中心 (极简直观 · 月/季/年统计 · 单条直接编辑与删除) -->
       <!-- ======================================================== -->
+            <!-- ======================================================== -->
+      <!-- TAB 4: 财务收费管理中心 (极简典雅 · 统一字体配色 · 无过度符号) -->
+      <!-- ======================================================== -->
       <section v-if="currentTab === 'records'" class="max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6">
         
         <!-- 顶部通栏标题与操作 -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/10 dark:border-white/10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800">
           <div>
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">💰</span>
-              <h2 class="text-xl font-black text-stone-900 dark:text-stone-100">财务收费管理中心</h2>
-              <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-mono">
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-bold text-stone-900 dark:text-stone-100">财务收费管理</h2>
+              <span class="text-xs px-2.5 py-0.5 rounded font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                 {{ activePeriodLabel }}
               </span>
             </div>
-            <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">
-              直观查看月度、季度与年度财务统计；支持单条收费记录的直接修改、删除与全自动课时同步。
+            <p class="text-xs text-stone-500 mt-1">
+              按月度、季度与年度统计收费数据，支持单条收费记录直接修改与删除。
             </p>
           </div>
 
-          <!-- 右侧快捷按钮 -->
+          <!-- 右侧操作 -->
           <div class="flex items-center gap-3">
-            <button @click="exportPaymentOrdersCSV" class="wf-btn-outline text-xs py-2 px-3 flex items-center gap-1.5 text-stone-700 dark:text-stone-300">
-              <i class="fa-solid fa-file-csv text-emerald-500 text-sm"></i>
-              <span>导出收费表格 (CSV)</span>
+            <button @click="exportPaymentOrdersCSV" class="wf-btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700">
+              <i class="fa-solid fa-file-csv text-xs text-stone-500"></i>
+              <span>导出表格 (CSV)</span>
             </button>
-            <button @click="openRechargeModal" class="wf-btn-primary text-xs py-2 px-4 flex items-center gap-1.5 shadow-sm">
-              <i class="fa-solid fa-plus-circle text-sm"></i>
-              <span>＋ 录入收费 / 充值开单</span>
+            <button @click="openRechargeModal" class="wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>录入收费</span>
             </button>
           </div>
         </div>
 
-        <!-- 极简周期统计切换栏 -->
-        <div class="wf-card p-4 space-y-3 bg-stone-50/70 dark:bg-stone-900/40">
+        <!-- 周期统计切换控制栏 -->
+        <div class="wf-card p-3.5 space-y-3 bg-stone-50/50 dark:bg-stone-900/20 border border-stone-200 dark:border-stone-800">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <!-- 周期切换药丸 -->
-            <div class="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 p-1 rounded-xl font-bold text-xs">
+            <!-- 周期切换按钮组 -->
+            <div class="flex items-center gap-1 bg-stone-200/60 dark:bg-stone-800/80 p-1 rounded-lg text-xs font-medium">
               <button @click="statPeriodMode = 'month'"
-                :class="statPeriodMode === 'month' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                <i class="fa-solid fa-calendar-days"></i>
-                <span>🗓️ 按月统计</span>
+                :class="statPeriodMode === 'month' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded transition">
+                按月统计
               </button>
 
               <button @click="statPeriodMode = 'quarter'"
-                :class="statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>📊 按季度统计</span>
+                :class="statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded transition">
+                按季度统计
               </button>
 
               <button @click="statPeriodMode = 'year'"
-                :class="statPeriodMode === 'year' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>📅 按年统计</span>
+                :class="statPeriodMode === 'year' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded transition">
+                按年统计
               </button>
 
               <button @click="statPeriodMode = 'all'"
-                :class="statPeriodMode === 'all' ? 'bg-white dark:bg-stone-800 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-stone-500 hover:text-stone-900 dark:hover:text-stone-100'"
-                class="px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
-                <i class="fa-solid fa-globe"></i>
-                <span>🌐 全部历史</span>
+                :class="statPeriodMode === 'all' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                class="px-3 py-1.5 rounded transition">
+                全部历史
               </button>
             </div>
 
-            <!-- 联动选择控件 -->
+            <!-- 联动选择器 -->
             <div class="flex items-center gap-2 text-xs flex-wrap">
-              <!-- 按月: 年份 + 月份选择 -->
+              <!-- 按月 -->
               <div v-if="statPeriodMode === 'month'" class="flex items-center gap-2">
-                <label class="font-bold text-stone-600 dark:text-stone-400">选择月份:</label>
-                <input type="month" v-model="selectedMonthStr" class="px-3 py-1.5 wf-input font-mono font-bold text-xs bg-white dark:bg-stone-800">
-                <button @click="selectedMonthStr = currentYearMonth" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
+                <span class="text-stone-500">月份:</span>
+                <input type="month" v-model="selectedMonthStr" class="px-2.5 py-1 wf-input font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
+                <button @click="selectedMonthStr = currentYearMonth" class="text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:underline">
                   返回当月
                 </button>
               </div>
 
-              <!-- 按季: 年份 + 季度选择 -->
+              <!-- 按季 -->
               <div v-if="statPeriodMode === 'quarter'" class="flex items-center gap-2">
-                <label class="font-bold text-stone-600 dark:text-stone-400">年份:</label>
-                <select v-model="selectedYearStr" class="px-2.5 py-1.5 wf-select font-mono font-bold text-xs bg-white dark:bg-stone-800">
+                <span class="text-stone-500">年份:</span>
+                <select v-model="selectedYearStr" class="px-2 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
                   <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年</option>
                 </select>
-                <div class="flex items-center bg-black/5 dark:bg-white/5 p-0.5 rounded-lg border border-black/5 dark:border-white/10 font-mono font-bold">
+                <div class="flex items-center bg-stone-200/60 dark:bg-stone-800/80 p-0.5 rounded text-xs font-mono font-medium">
                   <button v-for="q in ['Q1', 'Q2', 'Q3', 'Q4']" :key="q"
                     @click="selectedQuarterStr = q"
-                    :class="selectedQuarterStr === q ? 'bg-emerald-500 text-white shadow-sm' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
-                    class="px-2.5 py-1 rounded-md transition text-xs">
+                    :class="selectedQuarterStr === q ? 'bg-emerald-600 text-white font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'"
+                    class="px-2 py-0.5 rounded transition">
                     {{ q }} ({{ q === 'Q1' ? '1-3月' : q === 'Q2' ? '4-6月' : q === 'Q3' ? '7-9月' : '10-12月' }})
                   </button>
                 </div>
               </div>
 
-              <!-- 按年: 年份选择 -->
+              <!-- 按年 -->
               <div v-if="statPeriodMode === 'year'" class="flex items-center gap-2">
-                <label class="font-bold text-stone-600 dark:text-stone-400">选择年份:</label>
-                <select v-model="selectedYearStr" class="px-3 py-1.5 wf-select font-mono font-bold text-xs bg-white dark:bg-stone-800">
+                <span class="text-stone-500">年份:</span>
+                <select v-model="selectedYearStr" class="px-2.5 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700">
                   <option v-for="y in availableStatYears" :key="y" :value="y">{{ y }} 年度</option>
                 </select>
               </div>
@@ -1468,102 +1466,95 @@
           </div>
         </div>
 
-                <!-- 4 维核心财务统计卡片 (点击任意卡片均可联动过滤下方列表) -->
+        <!-- 4 维核心统计卡片 (统一色调 · 统一字号 · 纯粹典雅) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           
-          <!-- 1. 实收总额 -->
+          <!-- 1. 实收金额 -->
           <div @click="cardFilterMode = 'all'"
-            :class="cardFilterMode === 'all' ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
-            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-200">💰 周期实收总额</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
-                :class="cardFilterMode === 'all' ? 'bg-emerald-500 text-white' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'">
-                {{ periodStatSummary.orderCount }} 笔入账
+            :class="cardFilterMode === 'all' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
+            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-stone-600 dark:text-stone-400">实收总额</span>
+              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">
+                {{ periodStatSummary.orderCount }} 笔
               </span>
             </div>
-            <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
               ¥ {{ periodStatSummary.totalAmount.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
-              <span>周期实际收入总和</span>
-              <span class="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">显示全部 ↗</span>
+            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
+              <span>周期实收资金</span>
+              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">显示全部</span>
             </div>
           </div>
 
-          <!-- 2. 购买正课课时 -->
+          <!-- 2. 正课课时 -->
           <div @click="cardFilterMode = 'bought'"
-            :class="cardFilterMode === 'bought' ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
-            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-200">⏳ 充值正课课时</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
-                :class="cardFilterMode === 'bought' ? 'bg-emerald-500 text-white' : 'bg-black/5 dark:bg-white/10 text-stone-700 dark:text-stone-300'">
-                正课
-              </span>
+            :class="cardFilterMode === 'bought' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
+            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-stone-600 dark:text-stone-400">正课课时</span>
+              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">正课</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
-              {{ periodStatSummary.totalHoursBought }} <span class="text-xs font-normal text-stone-400">节</span>
+            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
+              {{ periodStatSummary.totalHoursBought }} <span class="text-xs font-normal text-stone-500">节</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
-              <span>折合均价: ¥{{ periodStatSummary.avgHourPrice }}/节</span>
-              <span class="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">过滤查看 ↗</span>
+            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
+              <span>均价: ¥{{ periodStatSummary.avgHourPrice }}/节</span>
+              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">过滤正课</span>
             </div>
           </div>
 
           <!-- 3. 赠送课时 -->
           <div @click="cardFilterMode = 'gift'"
-            :class="cardFilterMode === 'gift' ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30' : 'hover:border-amber-500/40'"
-            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-200">🎁 机构赠送课时</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
-                :class="cardFilterMode === 'gift' ? 'bg-amber-500 text-black font-black' : 'bg-amber-500/20 text-amber-600'">
-                赠送
-              </span>
+            :class="cardFilterMode === 'gift' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'"
+            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-stone-600 dark:text-stone-400">赠送课时</span>
+              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">赠送</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-black font-mono text-amber-500">
-              {{ periodStatSummary.totalHoursGift }} <span class="text-xs font-normal text-stone-400">节</span>
+            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
+              {{ periodStatSummary.totalHoursGift }} <span class="text-xs font-normal text-stone-500">节</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
-              <span>合计充值: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节</span>
-              <span class="text-amber-500 font-bold hover:underline">只看有赠课 ↗</span>
+            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
+              <span>合计: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节</span>
+              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">只看赠课</span>
             </div>
           </div>
 
-          <!-- 4. 收费订单笔数 -->
+          <!-- 4. 收费笔数 -->
           <div @click="cardFilterMode = 'all'"
-            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm hover:border-blue-500/40">
-            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-800 dark:text-stone-200">🧾 收费订单总笔数</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 font-bold font-mono">单量</span>
+            class="wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-stone-600 dark:text-stone-400">收费笔数</span>
+              <span class="text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800">笔数</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-black font-mono text-blue-600 dark:text-blue-400">
-              {{ periodStatSummary.orderCount }} <span class="text-xs font-normal text-stone-400">笔</span>
+            <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
+              {{ periodStatSummary.orderCount }} <span class="text-xs font-normal text-stone-500">笔</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
-              <span>笔均金额: ¥{{ periodStatSummary.avgOrderAmount }}</span>
-              <span class="text-blue-500 font-bold hover:underline">刷新总表 ↗</span>
+            <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
+              <span>笔均: ¥{{ periodStatSummary.avgOrderAmount }}</span>
+              <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">刷新全部</span>
             </div>
           </div>
 
         </div>
 
         <!-- 搜索与筛选工具栏 -->
-        <div class="wf-card p-4 space-y-3">
+        <div class="wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <!-- 搜索框 -->
             <div class="relative flex-1 min-w-[240px]">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
               <input v-model="feeSearchQuery" type="text"
-                placeholder="快速搜索学员姓名 / 订单号 / 经办人 / 备注说明..."
-                class="w-full pl-9 pr-4 py-2 wf-input text-xs">
+                placeholder="搜索学员姓名、单号、经办人、备注..."
+                class="w-full pl-9 pr-4 py-1.5 wf-input text-xs border-stone-200 dark:border-stone-700">
             </div>
 
             <!-- 筛选下拉 -->
             <div class="flex items-center gap-2.5 text-xs flex-wrap">
               <!-- 支付方式 -->
-              <select v-model="feePayMethodFilter" class="px-3 py-2 wf-select font-bold">
+              <select v-model="feePayMethodFilter" class="px-2.5 py-1.5 wf-select text-xs font-medium border-stone-200 dark:border-stone-700">
                 <option value="all">全部支付方式</option>
                 <option value="微信支付">微信支付</option>
                 <option value="支付宝">支付宝</option>
@@ -1573,48 +1564,47 @@
               </select>
 
               <!-- 业务类型 -->
-              <select v-model="feeTypeFilter" class="px-3 py-2 wf-select font-bold">
+              <select v-model="feeTypeFilter" class="px-2.5 py-1.5 wf-select text-xs font-medium border-stone-200 dark:border-stone-700">
                 <option value="all">全部业务类型</option>
                 <option value="新生报名">新生报名</option>
                 <option value="老生续费">老生续费</option>
               </select>
 
-              <button v-if="feeSearchQuery || feePayMethodFilter !== 'all' || feeTypeFilter !== 'all'"
-                @click="feeSearchQuery = ''; feePayMethodFilter = 'all'; feeTypeFilter = 'all'"
-                class="wf-btn-outline py-2 px-3 text-stone-500 hover:text-stone-900 dark:hover:text-stone-100">
-                <i class="fa-solid fa-rotate-left mr-1"></i>
-                <span>重置筛选</span>
+              <button v-if="feeSearchQuery || feePayMethodFilter !== 'all' || feeTypeFilter !== 'all' || cardFilterMode !== 'all'"
+                @click="feeSearchQuery = ''; feePayMethodFilter = 'all'; feeTypeFilter = 'all'; cardFilterMode = 'all'"
+                class="wf-btn-outline py-1.5 px-2.5 text-xs text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 border-stone-200 dark:border-stone-700">
+                重置
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 📋 收费记录管理总表 (单条直接编辑与删除) -->
-        <div class="wf-card border-none shadow-sm overflow-x-auto">
+        <!-- 收费记录表格 (统一字号 · 吸附右侧清晰操作列) -->
+        <div class="wf-card border border-stone-200 dark:border-stone-800 shadow-none overflow-x-auto">
           <table class="w-full text-xs text-left">
-            <thead class="text-stone-600 dark:text-stone-400 bg-stone-100/60 dark:bg-stone-800/60 font-bold border-b border-black/5 dark:border-white/5">
+            <thead class="text-stone-500 bg-stone-50/80 dark:bg-stone-900/60 font-medium border-b border-stone-200 dark:border-stone-800">
               <tr>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">订单编号</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">缴费时间</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[100px]">学员姓名</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">业务类型</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">实收金额</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[110px]">购买正课</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">赠送课时</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">支付方式</th>
-                <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">经办人</th>
-                <th class="py-3.5 px-4 min-w-[130px]">备注说明</th>
-                <th class="py-3.5 px-4 text-center whitespace-nowrap sticky right-0 bg-stone-100 dark:bg-stone-800 shadow-[-4px_0_8px_rgba(0,0,0,0.06)] min-w-[160px] z-10 font-bold">
-                  操作管理
+                <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">订单编号</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[110px]">缴费时间</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[90px]">学员姓名</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[80px]">业务类型</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[100px]">实收金额</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[80px]">购买正课</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[70px]">赠送课时</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[80px]">支付方式</th>
+                <th class="py-3 px-4 whitespace-nowrap min-w-[80px]">经办人</th>
+                <th class="py-3 px-4 min-w-[130px]">备注说明</th>
+                <th class="py-3 px-4 text-center whitespace-nowrap sticky right-0 bg-stone-50 dark:bg-stone-900 shadow-[-4px_0_6px_rgba(0,0,0,0.03)] min-w-[140px] z-10 font-medium">
+                  操作
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-black/5 dark:divide-white/5">
+            <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
               <tr v-for="order in displayedPaymentOrders" :key="order.id"
-                class="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition">
+                class="hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition">
                 
                 <!-- 订单编号 -->
-                <td class="py-3 px-4 font-mono font-bold text-stone-400 whitespace-nowrap">
+                <td class="py-3 px-4 font-mono text-stone-400 whitespace-nowrap">
                   {{ order.id }}
                 </td>
 
@@ -1624,75 +1614,69 @@
                 </td>
 
                 <!-- 学员姓名 -->
-                <td class="py-3 px-4 font-bold whitespace-nowrap">
+                <td class="py-3 px-4 font-medium whitespace-nowrap">
                   <span @click="openStudentProfile(students.find(s => s.name === order.studentName) || { name: order.studentName })" 
-                    class="cursor-pointer text-stone-900 dark:text-stone-100 hover:text-emerald-500 transition flex items-center gap-1">
+                    class="cursor-pointer text-stone-900 dark:text-stone-100 hover:text-emerald-600 dark:hover:text-emerald-400 transition inline-flex items-center gap-1">
                     <span>{{ order.studentName }}</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-stone-400"></i>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-stone-400"></i>
                   </span>
                 </td>
 
                 <!-- 业务类型 -->
                 <td class="py-3 px-4 whitespace-nowrap">
-                  <span class="px-2 py-0.5 rounded font-bold text-[11px]"
-                    :class="order.type === '新生报名' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300">
                     {{ order.type || '老生续费' }}
                   </span>
                 </td>
 
                 <!-- 实收金额 -->
-                <td class="py-3 px-4 font-mono font-black text-sm text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                <td class="py-3 px-4 font-mono font-bold text-stone-900 dark:text-stone-100 whitespace-nowrap">
                   ¥ {{ (order.amount || 0).toLocaleString() }}
                 </td>
 
                 <!-- 购买正课 -->
-                <td class="py-3 px-4 font-mono font-bold text-stone-900 dark:text-stone-100 whitespace-nowrap">
+                <td class="py-3 px-4 font-mono text-stone-800 dark:text-stone-200 whitespace-nowrap">
                   {{ order.hoursBought || order.hours || 0 }} 节
                 </td>
 
                 <!-- 赠送课时 -->
-                <td class="py-3 px-4 font-mono whitespace-nowrap">
-                  <span v-if="order.hoursGift > 0" class="text-amber-500 font-bold">+{{ order.hoursGift }} 节</span>
-                  <span v-else class="text-stone-400">-</span>
+                <td class="py-3 px-4 font-mono whitespace-nowrap text-stone-500">
+                  <span v-if="order.hoursGift > 0" class="text-stone-700 dark:text-stone-300 font-medium">+{{ order.hoursGift }} 节</span>
+                  <span v-else>-</span>
                 </td>
 
                 <!-- 支付方式 -->
-                <td class="py-3 px-4 whitespace-nowrap">
-                  <span class="px-2 py-0.5 rounded border inline-block font-mono font-bold text-[11px]"
-                    :class="order.payMethod === '微信支付' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : order.payMethod === '支付宝' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30' : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'">
-                    {{ order.payMethod || '微信支付' }}
-                  </span>
+                <td class="py-3 px-4 whitespace-nowrap font-mono text-stone-600 dark:text-stone-400">
+                  {{ order.payMethod || '微信支付' }}
                 </td>
 
                 <!-- 经办人 -->
                 <td class="py-3 px-4 text-stone-600 dark:text-stone-400 whitespace-nowrap">{{ order.operator || '陈老师' }}</td>
 
                 <!-- 备注说明 -->
-                <td class="py-3 px-4 text-stone-500 dark:text-stone-400 text-xs">
+                <td class="py-3 px-4 text-stone-500 text-xs">
                   {{ order.remark || '-' }}
                 </td>
 
-                <!-- 操作管理按钮 (直接编辑与直接删除 · 始终吸附右侧) -->
-                <td class="py-3 px-4 whitespace-nowrap text-center space-x-2 font-bold sticky right-0 bg-white dark:bg-[#1e1e1e] shadow-[-4px_0_8px_rgba(0,0,0,0.06)] z-10">
-                  <!-- ✏️ 编辑按钮 -->
+                <!-- 操作管理按钮 (极简精致 · 固定吸附) -->
+                <td class="py-3 px-4 whitespace-nowrap text-center space-x-1.5 sticky right-0 bg-white dark:bg-[#1a1a1a] shadow-[-4px_0_6px_rgba(0,0,0,0.03)] z-10">
+                  <!-- 编辑 -->
                   <button @click.stop="openDirectEditModal(order)"
-                    class="px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 transition inline-flex items-center gap-1 shadow-sm text-xs font-bold" title="直接修改单条金额/课时/时间">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <span>编辑</span>
+                    class="px-2.5 py-1 rounded text-xs font-medium text-stone-700 dark:text-stone-300 hover:text-stone-900 bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-700 transition" title="修改记录">
+                    编辑
                   </button>
 
-                  <!-- 🗑️ 删除按钮 -->
+                  <!-- 删除 -->
                   <button @click.stop="directDeleteOrder(order)"
-                    class="px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white transition inline-flex items-center gap-1 shadow-sm text-xs font-bold" title="直接删除此条记录并扣减学员课时">
-                    <i class="fa-solid fa-trash"></i>
-                    <span>删除</span>
+                    class="px-2.5 py-1 rounded text-xs font-medium text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60 transition" title="删除记录">
+                    删除
                   </button>
                 </td>
               </tr>
 
               <tr v-if="displayedPaymentOrders.length === 0">
-                <td colspan="11" class="py-16 text-center text-stone-400 text-xs">
-                  当前统计周期暂无收费记录，请切换周期或点击右上角【＋ 录入收费】
+                <td colspan="11" class="py-12 text-center text-stone-400 text-xs">
+                  暂无收费记录
                 </td>
               </tr>
             </tbody>
@@ -1700,6 +1684,7 @@
         </div>
 
       </section>
+
 
 
       
