@@ -3757,13 +3757,37 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // ==========================================
     // 2. 活跃与归档状态划分
     // ==========================================
-    const activeClasses = computed(() => {
-      return classes.value.filter(c => c.status !== 'archived');
-    });
+    const getClassSortValue = (name) => {
+  if (!name) return '8_9999_';
+  let day = 8;
+  const weekMap = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '日': 7, '天': 7 };
+  const dayMatch = name.match(/周([一二三四五六日天])/);
+  if (dayMatch) {
+    day = weekMap[dayMatch[1]];
+  }
+  
+  let timeVal = '9999';
+  const timeMatch = name.match(/(\d{1,2})[:：]?(\d{2})/);
+  if (timeMatch) {
+    let h = parseInt(timeMatch[1], 10);
+    let m = parseInt(timeMatch[2], 10);
+    timeVal = (h < 10 ? '0' + h : h) + '' + (m < 10 ? '0' + m : m);
+  }
+  
+  return `${day}_${timeVal}_${name}`;
+};
 
-    const archivedClasses = computed(() => {
-      return classes.value.filter(c => c.status === 'archived');
-    });
+const activeClasses = computed(() => {
+  return classes.value
+    .filter(c => c.status !== 'archived')
+    .sort((a, b) => getClassSortValue(a.name).localeCompare(getClassSortValue(b.name), 'zh-Hans-CN'));
+});
+
+const archivedClasses = computed(() => {
+  return classes.value
+    .filter(c => c.status === 'archived')
+    .sort((a, b) => getClassSortValue(a.name).localeCompare(getClassSortValue(b.name), 'zh-Hans-CN'));
+});
 
     const activeStudents = computed(() => {
   return students.value
