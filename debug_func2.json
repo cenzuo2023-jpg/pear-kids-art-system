@@ -1,0 +1,30 @@
+[
+  [
+    1367,
+    "<button @click=\"openRechargeModal\" class=\"wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5\">"
+  ],
+  [
+    2573,
+    "<div v-if=\"showRechargeModal\" class=\"recharge-drawer-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md\">"
+  ],
+  [
+    2577,
+    "<button @click=\"showRechargeModal = false\" class=\"text-black dark:text-stone-400 hover:text-white\"><i class=\"fa-solid fa-xmark\"></i></button>"
+  ],
+  [
+    2699,
+    "<button @click=\"showRechargeModal = false\" class=\"wf-btn-outline flex-1 py-2 justify-center\">取消</button>"
+  ],
+  [
+    6003,
+    "const showRechargeModal = ref(false);"
+  ],
+  [
+    6044,
+    "showRechargeModal.value = true;"
+  ],
+  [
+    6155,
+    "showRechargeModal.value = false;"
+  ]
+]

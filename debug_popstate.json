@@ -1,0 +1,22 @@
+[
+  "6396: // ==========================================",
+  "6397: const isSyncingHash = ref(false);",
+  "6398: ",
+  "6399: const syncStateFromHash = () => {",
+  "6400: isSyncingHash.value = true;",
+  "6401: const rawHash = window.location.hash || '';",
+  "6402: ",
+  "6403: if (rawHash.startsWith('#student-')) {",
+  "6404: const sid = rawHash.replace('#student-', '');",
+  "6405: const stu = students.value.find(s => s.id === sid);",
+  "6406: if (stu) {",
+  "6407: profileStudent.value = stu;",
+  "6408: currentTab.value = 'profile';",
+  "6409: } else {",
+  "6410: profileStudent.value = null;",
+  "6411: currentTab.value = 'attendance';",
+  "6412: window.history.replaceState(null, '', '#attendance');",
+  "6413: }",
+  "6414: } else if (rawHash.startsWith('#class-')) {",
+  "6415: const cid = rawHash.replace('#class-', '');"
+]

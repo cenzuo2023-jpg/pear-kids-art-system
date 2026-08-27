@@ -1,0 +1,46 @@
+[
+  [
+    6030,
+    "rechargeForm.studentName = activeStudents.value[0]?.name || '';"
+  ],
+  [
+    6031,
+    "}"
+  ],
+  [
+    6032,
+    "rechargeForm.newStudentName = '';"
+  ],
+  [
+    6033,
+    "rechargeForm.newStudentClassId = activeClasses.value[0]?.id || '';"
+  ],
+  [
+    6034,
+    "rechargeForm.newStudentGender = '女';"
+  ],
+  [
+    6035,
+    "rechargeForm.newStudentAge = 5;"
+  ],
+  [
+    6036,
+    "rechargeForm.newStudentParentPhone = '';"
+  ],
+  [
+    6037,
+    "rechargeForm.hoursBought = 48;"
+  ],
+  [
+    6038,
+    "rechargeForm.hoursGift = 0;"
+  ],
+  [
+    6039,
+    "rechargeForm.amount = 4800;"
+  ],
+  [
+    6040,
+    "rechargeForm.payMethod = '微信支付';"
+  ]
+]

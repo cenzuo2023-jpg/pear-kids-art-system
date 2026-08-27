@@ -1,0 +1,9 @@
+[
+  "124: 🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)",
+  "413: <option v-for=\"c in activeClasses\" :key=\"c.id\" :value=\"c.id\">{{ c.name }}</option>",
+  "551: <option v-for=\"c in activeClasses\" :key=\"c.id\" :value=\"c.id\">{{ c.name }}</option>",
+  "809: 🎨 {{ c.name }} ({{ activeStudents.filter(s => s.classId === c.id).length }}人)",
+  "2545: <option v-for=\"c in activeClasses\" :key=\"c.id\" :value=\"c.id\">{{ c.name }}</option>",
+  "2617: <option v-for=\"c in activeClasses\" :key=\"c.id\" :value=\"c.id\">🎨 {{ c.name }}</option>",
+  "2739: <option v-for=\"c in activeClasses\" :key=\"c.id\" :value=\"c.id\">{{ c.name }}</option>"
+]

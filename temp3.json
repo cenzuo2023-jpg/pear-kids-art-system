@@ -1,0 +1,82 @@
+[
+  [
+    300,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-50 border border-emerald-300' : ''\">"
+  ],
+  [
+    301,
+    "<span class=\"flex items-center gap-1.5\"><span>🟢</span> 到课</span>"
+  ],
+  [
+    302,
+    "</button>"
+  ],
+  [
+    303,
+    ""
+  ],
+  [
+    304,
+    "<button @click.stop=\"selectCellStatusFromDropdown(att, stu, '未到')\""
+  ],
+  [
+    305,
+    "class=\"w-full flex items-center px-2.5 py-1.5 rounded text-xs font-bold hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/30 transition\""
+  ],
+  [
+    306,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-50 border border-rose-300' : ''\">"
+  ],
+  [
+    307,
+    "<span class=\"flex items-center gap-1.5\"><span>🔴</span> 请假/未到</span>"
+  ],
+  [
+    308,
+    "</button>"
+  ],
+  [
+    309,
+    ""
+  ],
+  [
+    310,
+    "<button @click.stop=\"selectCellStatusFromDropdown(att, stu, '放假')\""
+  ],
+  [
+    311,
+    "class=\"w-full flex items-center px-2.5 py-1.5 rounded text-xs font-bold hover:bg-purple-50 text-purple-700 dark:hover:bg-purple-950/30 transition\""
+  ],
+  [
+    312,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-50 border border-purple-300' : ''\">"
+  ],
+  [
+    313,
+    "<span class=\"flex items-center gap-1.5\"><span>🟣</span> 全班放假</span>"
+  ],
+  [
+    314,
+    "</button>"
+  ],
+  [
+    315,
+    ""
+  ],
+  [
+    316,
+    ""
+  ],
+  [
+    317,
+    "</div>"
+  ],
+  [
+    318,
+    "</td>"
+  ],
+  [
+    319,
+    ""
+  ]
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "line": 189,
+    "content": "<!-- 01 课程主题 (固定左侧第1列 · 160px 宽 · 绝不挤压) -->"
+  },
+  {
+    "line": 193,
+    "content": "<span class=\"text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]\">课程主题</span>"
+  },
+  {
+    "line": 253,
+    "content": "<!-- 🌟 课程主题 (固定第1列 · 160px · 单行快速修改) -->"
+  },
+  {
+    "line": 257,
+    "content": "title=\"点击修改课程主题与上课日期\">"
+  },
+  {
+    "line": 270,
+    "content": "title=\"点击修改上课日期与课程主题\">"
+  },
+  {
+    "line": 1900,
+    "content": "<span>修改课程主题与上课日期</span>"
+  },
+  {
+    "line": 1917,
+    "content": "<label class=\"block text-black dark:text-stone-400 mb-1 font-semibold\">任课主讲老师</label>"
+  },
+  {
+    "line": 2805,
+    "content": "<label class=\"block text-black dark:text-stone-400 mb-1 font-semibold\">任课主讲老师 *</label>"
+  },
+  {
+    "line": 4845,
+    "content": "const headers = ['学员姓名', '上课日期', '课程绘画主题', '所在班级', '出勤状态', '消课课时', '任课主讲老师', '出勤与请假备注说明'];"
+  },
+  {
+    "line": 5303,
+    "content": "// 🌟 课程主题与上课日期编辑中心 (Row Edit Modal)"
+  }
+]

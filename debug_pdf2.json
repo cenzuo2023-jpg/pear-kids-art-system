@@ -1,0 +1,22 @@
+[
+  "5101: </div>",
+  "5102: ",
+  "5103: <!-- 4 维核心课时统计 -->",
+  "5104: <div class=\"stats-cards\">",
+  "5105: <div class=\"stat-card\">",
+  "5106: <div class=\"label\">累计购课总量</div>",
+  "5107: <div class=\"value\">${stu.totalPurchased || (Number(stu.remainHours || 0) + Number(stu.totalConsumed || 0))} <span style=\"font-size:12px; font-weight:normal;\">节</span></div>",
+  "5108: </div>",
+  "5109: <div class=\"stat-card\">",
+  "5110: <div class=\"label\">累计出勤消课</div>",
+  "5105: <div class=\"stat-card\">",
+  "5106: <div class=\"label\">累计购课总量</div>",
+  "5107: <div class=\"value\">${stu.totalPurchased || (Number(stu.remainHours || 0) + Number(stu.totalConsumed || 0))} <span style=\"font-size:12px; font-weight:normal;\">节</span></div>",
+  "5108: </div>",
+  "5109: <div class=\"stat-card\">",
+  "5110: <div class=\"label\">累计出勤消课</div>",
+  "5111: <div class=\"value\">${stu.totalConsumed || presentCount} <span style=\"font-size:12px; font-weight:normal;\">节</span></div>",
+  "5112: </div>",
+  "5113: <div class=\"stat-card green\">",
+  "5114: <div class=\"label\">当前剩余课时</div>"
+]

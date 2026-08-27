@@ -1,0 +1,20 @@
+1481: </div>
+1482: <div class="text-2xl font-bold font-mono text-stone-900 dark:text-stone-100">
+1483: ¥ {{ periodStatSummary.totalAmount.toLocaleString() }}
+1484: </div>
+1485: <div class="text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between">
+1486: <span>周期实收资金</span>
+1487: <span class="text-stone-400 hover:text-stone-700 dark:hover:text-stone-300">显示全部</span>
+1488: </div>
+1489: </div>
+1490: 
+1491: 
+1492: </div>
+1493: 
+1494: <!-- 搜索与筛选工具栏 -->
+1495: <div class="wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800">
+1496: <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+1497: <!-- 搜索框 -->
+1498: <div class="relative flex-1 min-w-[240px]">
+1499: <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+1500: <input v-model="feeSearchQuery" type="text"

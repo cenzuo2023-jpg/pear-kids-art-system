@@ -1,0 +1,4 @@
+{
+  "sync": "const syncStatus = ref('loading'); // loading | pending | syncing | connected | offline\n    const syncErrorMessage = ref('');\n    const syncStatusLabel = computed(() => ({\n      loading: '正在读取云端…',\n      pending: '等待云端保存',\n      syncing: '正在同步…',\n      connected: '已保存到云端',\n      offline: '云端保存失败 · 点击重试'\n    }",
+  "api": null
+}

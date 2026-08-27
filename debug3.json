@@ -1,0 +1,16 @@
+[
+  "1461: </div>",
+  "1462: </div>",
+  "1463: ",
+  "1464: ",
+  "1465: </div>",
+  "1466: ",
+  "1467: <!-- 搜索与筛选工具栏 -->",
+  "1468: <div class=\"wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800\">",
+  "1469: <div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-3\">",
+  "1470: <!-- 搜索框 -->",
+  "1471: <div class=\"relative flex-1 min-w-[240px]\">",
+  "1472: <i class=\"fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs\"></i>",
+  "1473: <input v-model=\"feeSearchQuery\" type=\"text\"",
+  "1474: placeholder=\"搜索学员姓名、单号、经办人、备注...\""
+]

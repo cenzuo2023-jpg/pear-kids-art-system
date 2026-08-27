@@ -1,0 +1,122 @@
+[
+  [
+    938,
+    "<button @click=\"openEditStudent(s)\" class=\"px-2 py-1 rounded text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition\">"
+  ],
+  [
+    939,
+    "编辑"
+  ],
+  [
+    940,
+    "</button>"
+  ],
+  [
+    941,
+    "<button @click=\"archiveStudent(s)\" title=\"归档该学员\" class=\"px-2 py-1 rounded text-xs font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition\">"
+  ],
+  [
+    942,
+    "归档"
+  ],
+  [
+    943,
+    "</button>"
+  ],
+  [
+    944,
+    "<button @click=\"deleteStudent(s)\" class=\"px-2 py-1 rounded text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition\">"
+  ],
+  [
+    945,
+    "删除"
+  ],
+  [
+    946,
+    "</button>"
+  ],
+  [
+    947,
+    "</td>"
+  ],
+  [
+    948,
+    ""
+  ],
+  [
+    949,
+    "</tr>"
+  ],
+  [
+    950,
+    ""
+  ],
+  [
+    951,
+    "<tr v-if=\"currentClassStudentsList.length === 0\">"
+  ],
+  [
+    952,
+    "<td colspan=\"8\" class=\"py-12 text-center text-gray-500 text-sm\">"
+  ],
+  [
+    953,
+    "未找到符合条件的学员，点击右上角【录入新学员】建档"
+  ],
+  [
+    954,
+    "</td>"
+  ],
+  [
+    955,
+    "</tr>"
+  ],
+  [
+    956,
+    "</tbody>"
+  ],
+  [
+    957,
+    "</table>"
+  ],
+  [
+    958,
+    "</div>"
+  ],
+  [
+    959,
+    ""
+  ],
+  [
+    960,
+    "</div>"
+  ],
+  [
+    961,
+    ""
+  ],
+  [
+    962,
+    "<!-- 视图 3: 🗄️ 双向归档历史中心 -->"
+  ],
+  [
+    963,
+    "<div v-if=\"rosterSubTab === 'archive'\" class=\"space-y-6\">"
+  ],
+  [
+    964,
+    ""
+  ],
+  [
+    965,
+    "<div class=\"wf-card p-4 space-y-1\">"
+  ],
+  [
+    966,
+    "<h4 class=\"font-bold text-sm\">🗄️ 教务历史归档库</h4>"
+  ],
+  [
+    967,
+    "<p class=\"text-xs text-black dark:text-stone-400\">已结课班级与毕业学员档案安全存放，所有历史考勤、积分流水与账单永久留存，可随时一键恢复。</p>"
+  ]
+]

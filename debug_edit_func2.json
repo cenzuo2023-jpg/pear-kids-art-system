@@ -1,0 +1,122 @@
+[
+  [
+    6195,
+    "const openEditStudent = (s) => {"
+  ],
+  [
+    6196,
+    "isEditStudent.value = true;"
+  ],
+  [
+    6197,
+    "Object.assign(studentForm, JSON.parse(JSON.stringify(s)));"
+  ],
+  [
+    6198,
+    "showStudentModal.value = true;"
+  ],
+  [
+    6199,
+    "};"
+  ],
+  [
+    6200,
+    ""
+  ],
+  [
+    6201,
+    "const saveStudent = () => {"
+  ],
+  [
+    6202,
+    "if (!studentForm.name.trim()) {"
+  ],
+  [
+    6203,
+    "showToast('请输入学员姓名', 'warning');"
+  ],
+  [
+    6204,
+    "return;"
+  ],
+  [
+    6205,
+    "}"
+  ],
+  [
+    6206,
+    "if (isEditStudent.value) {"
+  ],
+  [
+    6207,
+    "const idx = students.value.findIndex(s => s.id === studentForm.id);"
+  ],
+  [
+    6208,
+    "if (idx !== -1) {"
+  ],
+  [
+    6209,
+    "const old = students.value[idx];"
+  ],
+  [
+    6210,
+    "const diff = Number(studentForm.remainHours) - Number(old.remainHours);"
+  ],
+  [
+    6211,
+    "if (diff !== 0) {"
+  ],
+  [
+    6212,
+    "hourLogs.value.unshift({"
+  ],
+  [
+    6213,
+    "id: 'log_' + Date.now(),"
+  ],
+  [
+    6214,
+    "studentId: old.id,"
+  ],
+  [
+    6215,
+    "studentName: studentForm.name,"
+  ],
+  [
+    6216,
+    "type: '教务手动调整',"
+  ],
+  [
+    6217,
+    "hours: diff,"
+  ],
+  [
+    6218,
+    "balanceAfter: Number(studentForm.remainHours),"
+  ],
+  [
+    6219,
+    "reason: `修改档案课时 (备注: ${studentForm.notes || '无备注'})`,"
+  ],
+  [
+    6220,
+    "operator: '陈老师',"
+  ],
+  [
+    6221,
+    "time: new Date().toLocaleString('zh-CN', { hour12: false })"
+  ],
+  [
+    6222,
+    "});"
+  ],
+  [
+    6223,
+    "}"
+  ],
+  [
+    6224,
+    "students.value[idx] = {"
+  ]
+]

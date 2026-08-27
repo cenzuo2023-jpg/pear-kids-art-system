@@ -1,0 +1,58 @@
+[
+  [
+    1178,
+    "全员可用画币奖励总额"
+  ],
+  [
+    1438,
+    "{{ financeActiveKpi === 'total' ? '已下钻 ▾' : '历史总额 ↗' }}"
+  ],
+  [
+    3310,
+    "<span class=\"text-black dark:text-stone-400\">机构赠送课时</span>"
+  ],
+  [
+    3464,
+    "<!-- 模态弹窗 2: 续费充值 (含积分赠送) -->"
+  ],
+  [
+    3550,
+    "<!-- 课时数与赠送 -->"
+  ],
+  [
+    3557,
+    "<label class=\"block text-black dark:text-stone-400 mb-1 font-semibold\">赠送课时</label>"
+  ],
+  [
+    3579,
+    "<!-- 赠送积分提示 -->"
+  ],
+  [
+    3581,
+    "<span>🎁 充值将赠送画币积分：</span>"
+  ],
+  [
+    3650,
+    "<div class=\"font-bold text-[11px] text-emerald-400\">初始课时与赠送画币</div>"
+  ],
+  [
+    3657,
+    "<label class=\"block text-black dark:text-stone-400 mb-1 font-semibold\">新生赠送画币</label>"
+  ],
+  [
+    5735,
+    "const headers = ['订单编号', '缴费日期', '学员姓名', '实收金额(元)', '购买课时', '赠送课时', '合计课时', '支付方式', '经办人', '备注说明'];"
+  ],
+  [
+    7430,
+    "type: rechargeMode.value === 'new' ? '新生赠送积分' : '续费赠送积分',"
+  ],
+  [
+    7433,
+    "reason: `${rechargeMode.value === 'new' ? '新生报名' : '续费'} ${addHours} 课时赠送画币积分`,"
+  ],
+  [
+    7560,
+    "showToast(`🎉 成功录入学员【${newS.name}】并赠送 ${newS.points} 新生积分！`);"
+  ]
+]

@@ -1,0 +1,330 @@
+[
+  [
+    1489,
+    "</div>"
+  ],
+  [
+    1490,
+    ""
+  ],
+  [
+    1491,
+    "<!-- 2. 正课课时 -->"
+  ],
+  [
+    1492,
+    "<div @click=\"cardFilterMode = 'bought'\""
+  ],
+  [
+    1493,
+    ":class=\"cardFilterMode === 'bought' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'\""
+  ],
+  [
+    1494,
+    "class=\"wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between\">"
+  ],
+  [
+    1495,
+    "<div class=\"flex items-center justify-between text-xs\">"
+  ],
+  [
+    1496,
+    "<span class=\"font-medium text-stone-600 dark:text-stone-400\">正课课时</span>"
+  ],
+  [
+    1497,
+    "<span class=\"text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800\">正课</span>"
+  ],
+  [
+    1498,
+    "</div>"
+  ],
+  [
+    1499,
+    "<div class=\"text-2xl font-bold font-mono text-stone-900 dark:text-stone-100\">"
+  ],
+  [
+    1500,
+    "{{ periodStatSummary.totalHoursBought }} <span class=\"text-xs font-normal text-stone-500\">节</span>"
+  ],
+  [
+    1501,
+    "</div>"
+  ],
+  [
+    1502,
+    "<div class=\"text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between\">"
+  ],
+  [
+    1503,
+    "<span>均价: ¥{{ periodStatSummary.avgHourPrice }}/节</span>"
+  ],
+  [
+    1504,
+    "<span class=\"text-stone-400 hover:text-stone-700 dark:hover:text-stone-300\">过滤正课</span>"
+  ],
+  [
+    1505,
+    "</div>"
+  ],
+  [
+    1506,
+    "</div>"
+  ],
+  [
+    1507,
+    ""
+  ],
+  [
+    1508,
+    "<!-- 3. 赠送课时 -->"
+  ],
+  [
+    1509,
+    "<div @click=\"cardFilterMode = 'gift'\""
+  ],
+  [
+    1510,
+    ":class=\"cardFilterMode === 'gift' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'\""
+  ],
+  [
+    1511,
+    "class=\"wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between\">"
+  ],
+  [
+    1512,
+    "<div class=\"flex items-center justify-between text-xs\">"
+  ],
+  [
+    1513,
+    "<span class=\"font-medium text-stone-600 dark:text-stone-400\">赠送课时</span>"
+  ],
+  [
+    1514,
+    "<span class=\"text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800\">赠送</span>"
+  ],
+  [
+    1515,
+    "</div>"
+  ],
+  [
+    1516,
+    "<div class=\"text-2xl font-bold font-mono text-stone-900 dark:text-stone-100\">"
+  ],
+  [
+    1517,
+    "{{ periodStatSummary.totalHoursGift }} <span class=\"text-xs font-normal text-stone-500\">节</span>"
+  ],
+  [
+    1518,
+    "</div>"
+  ],
+  [
+    1519,
+    "<div class=\"text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between\">"
+  ],
+  [
+    1520,
+    "<span>合计: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节</span>"
+  ],
+  [
+    1521,
+    "<span class=\"text-stone-400 hover:text-stone-700 dark:hover:text-stone-300\">只看赠课</span>"
+  ],
+  [
+    1522,
+    "</div>"
+  ],
+  [
+    1523,
+    "</div>"
+  ],
+  [
+    1524,
+    ""
+  ],
+  [
+    1525,
+    "<!-- 4. 收费笔数 -->"
+  ],
+  [
+    1526,
+    "<div @click=\"cardFilterMode = 'all'\""
+  ],
+  [
+    1527,
+    "class=\"wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700\">"
+  ],
+  [
+    1528,
+    "<div class=\"flex items-center justify-between text-xs\">"
+  ],
+  [
+    1529,
+    "<span class=\"font-medium text-stone-600 dark:text-stone-400\">收费笔数</span>"
+  ],
+  [
+    1530,
+    "<span class=\"text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800\">笔数</span>"
+  ],
+  [
+    1531,
+    "</div>"
+  ],
+  [
+    1532,
+    "<div class=\"text-2xl font-bold font-mono text-stone-900 dark:text-stone-100\">"
+  ],
+  [
+    1533,
+    "{{ periodStatSummary.orderCount }} <span class=\"text-xs font-normal text-stone-500\">笔</span>"
+  ],
+  [
+    1534,
+    "</div>"
+  ],
+  [
+    1535,
+    "<div class=\"text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between\">"
+  ],
+  [
+    1536,
+    "<span>笔均: ¥{{ periodStatSummary.avgOrderAmount }}</span>"
+  ],
+  [
+    1537,
+    "<span class=\"text-stone-400 hover:text-stone-700 dark:hover:text-stone-300\">刷新全部</span>"
+  ],
+  [
+    1538,
+    "</div>"
+  ],
+  [
+    1539,
+    "</div>"
+  ],
+  [
+    1540,
+    ""
+  ],
+  [
+    1541,
+    "</div>"
+  ],
+  [
+    1542,
+    ""
+  ],
+  [
+    1543,
+    "<!-- 搜索与筛选工具栏 -->"
+  ],
+  [
+    1544,
+    "<div class=\"wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800\">"
+  ],
+  [
+    1545,
+    "<div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-3\">"
+  ],
+  [
+    1546,
+    "<!-- 搜索框 -->"
+  ],
+  [
+    1547,
+    "<div class=\"relative flex-1 min-w-[240px]\">"
+  ],
+  [
+    1548,
+    "<i class=\"fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs\"></i>"
+  ],
+  [
+    1549,
+    "<input v-model=\"feeSearchQuery\" type=\"text\""
+  ],
+  [
+    1550,
+    "placeholder=\"搜索学员姓名、单号、经办人、备注...\""
+  ],
+  [
+    1551,
+    "class=\"w-full pl-9 pr-4 py-1.5 wf-input text-xs border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1552,
+    "</div>"
+  ],
+  [
+    1553,
+    ""
+  ],
+  [
+    1554,
+    "<!-- 筛选下拉 -->"
+  ],
+  [
+    1555,
+    "<div class=\"flex items-center gap-2.5 text-xs flex-wrap\">"
+  ],
+  [
+    1556,
+    "<!-- 支付方式 -->"
+  ],
+  [
+    1557,
+    "<select v-model=\"feePayMethodFilter\" class=\"px-2.5 py-1.5 wf-select text-xs font-medium border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1558,
+    "<option value=\"all\">全部支付方式</option>"
+  ],
+  [
+    1559,
+    "<option value=\"微信支付\">微信支付</option>"
+  ],
+  [
+    1560,
+    "<option value=\"支付宝\">支付宝</option>"
+  ],
+  [
+    1561,
+    "<option value=\"现金\">现金</option>"
+  ],
+  [
+    1562,
+    "<option value=\"银行转账\">银行转账</option>"
+  ],
+  [
+    1563,
+    "<option value=\"POS刷卡\">POS刷卡</option>"
+  ],
+  [
+    1564,
+    "</select>"
+  ],
+  [
+    1565,
+    ""
+  ],
+  [
+    1566,
+    "<!-- 业务类型 -->"
+  ],
+  [
+    1567,
+    "<select v-model=\"feeTypeFilter\" class=\"px-2.5 py-1.5 wf-select text-xs font-medium border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1568,
+    "<option value=\"all\">全部业务类型</option>"
+  ],
+  [
+    1569,
+    "<option value=\"新生报名\">新生报名</option>"
+  ],
+  [
+    1570,
+    "<option value=\"老生续费\">老生续费</option>"
+  ]
+]

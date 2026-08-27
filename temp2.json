@@ -1,0 +1,242 @@
+[
+  [
+    294,
+    "<div v-if=\"activeCellDropdownKey === (att.id + '_' + stu.id)\""
+  ],
+  [
+    295,
+    "class=\"absolute z-50 top-full left-1/2 -translate-x-1/2 mt-1 w-48 p-2 rounded-lg border border-[#e2e2e0] dark:border-[#444] shadow-xl space-y-1 text-left\""
+  ],
+  [
+    296,
+    "style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    297,
+    ""
+  ],
+  [
+    298,
+    "<div class=\"px-2 py-1 text-xs text-gray-500 font-mono border-b border-[#e2e2e0] dark:border-[#333] flex justify-between items-center\">"
+  ],
+  [
+    299,
+    "<span>修改考勤</span>"
+  ],
+  [
+    300,
+    "<span class=\"font-bold text-emerald-600\">{{ stu.name }}</span>"
+  ],
+  [
+    301,
+    "</div>"
+  ],
+  [
+    302,
+    ""
+  ],
+  [
+    303,
+    "<button @click.stop=\"selectCellStatusFromDropdown(att, stu, '到课')\""
+  ],
+  [
+    304,
+    "class=\"w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-emerald-50 text-emerald-700 dark:hover:bg-emerald-950/30 transition\""
+  ],
+  [
+    305,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '到课' ? 'bg-emerald-50 border border-emerald-300' : ''\">"
+  ],
+  [
+    306,
+    "<span class=\"flex items-center gap-1.5\"><span>🟢</span> 到课</span>"
+  ],
+  [
+    307,
+    "<span class=\"text-xs text-gray-500 font-mono\">消课-1</span>"
+  ],
+  [
+    308,
+    "</button>"
+  ],
+  [
+    309,
+    ""
+  ],
+  [
+    310,
+    "<button @click.stop=\"selectCellStatusFromDropdown(att, stu, '未到')\""
+  ],
+  [
+    311,
+    "class=\"w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-rose-50 text-rose-700 dark:hover:bg-rose-950/30 transition\""
+  ],
+  [
+    312,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '未到' || getStudentAttendanceCell(stu.id, att).status === '请假' ? 'bg-rose-50 border border-rose-300' : ''\">"
+  ],
+  [
+    313,
+    "<span class=\"flex items-center gap-1.5\"><span>🔴</span> 请假/未到</span>"
+  ],
+  [
+    314,
+    "<span class=\"text-xs text-gray-500 font-mono\">不扣课</span>"
+  ],
+  [
+    315,
+    "</button>"
+  ],
+  [
+    316,
+    ""
+  ],
+  [
+    317,
+    "<button @click.stop=\"selectCellStatusFromDropdown(att, stu, '放假')\""
+  ],
+  [
+    318,
+    "class=\"w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-bold hover:bg-purple-50 text-purple-700 dark:hover:bg-purple-950/30 transition\""
+  ],
+  [
+    319,
+    ":class=\"getStudentAttendanceCell(stu.id, att).status === '放假' ? 'bg-purple-50 border border-purple-300' : ''\">"
+  ],
+  [
+    320,
+    "<span class=\"flex items-center gap-1.5\"><span>🟣</span> 全班放假</span>"
+  ],
+  [
+    321,
+    "<span class=\"text-xs text-gray-500\">休假</span>"
+  ],
+  [
+    322,
+    "</button>"
+  ],
+  [
+    323,
+    ""
+  ],
+  [
+    324,
+    "<div class=\"border-t border-[#e2e2e0] dark:border-[#333] my-1\"></div>"
+  ],
+  [
+    325,
+    ""
+  ],
+  [
+    326,
+    "<button @click.stop=\"openIndividualPointModal(stu, 'add'); activeCellDropdownKey = null\""
+  ],
+  [
+    327,
+    "class=\"w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-bold transition\">"
+  ],
+  [
+    328,
+    "<i class=\"fa-solid fa-star text-xs\"></i>"
+  ],
+  [
+    329,
+    "<span>变更【{{ stu.name }}】积分</span>"
+  ],
+  [
+    330,
+    "</button>"
+  ],
+  [
+    331,
+    ""
+  ],
+  [
+    332,
+    "<button @click.stop=\"openNoteFromDropdown(att, stu)\""
+  ],
+  [
+    333,
+    "class=\"w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition\">"
+  ],
+  [
+    334,
+    "<i class=\"fa-solid fa-pen text-xs text-gray-400\"></i>"
+  ],
+  [
+    335,
+    "<span>填写/修改备注</span>"
+  ],
+  [
+    336,
+    "</button>"
+  ],
+  [
+    337,
+    ""
+  ],
+  [
+    338,
+    "<button @click.stop=\"openStudentProfile(stu); activeCellDropdownKey = null\""
+  ],
+  [
+    339,
+    "class=\"w-full flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 font-bold transition\">"
+  ],
+  [
+    340,
+    "<i class=\"fa-solid fa-id-card text-xs\"></i>"
+  ],
+  [
+    341,
+    "<span>查看个人档案 ↗</span>"
+  ],
+  [
+    342,
+    "</button>"
+  ],
+  [
+    343,
+    ""
+  ],
+  [
+    344,
+    "</div>"
+  ],
+  [
+    345,
+    "</td>"
+  ],
+  [
+    346,
+    ""
+  ],
+  [
+    347,
+    "<!-- 操作列 (固定右侧) -->"
+  ],
+  [
+    348,
+    "<td class=\"py-2 px-2 text-center whitespace-nowrap sticky right-0 z-10 shadow-sm\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    349,
+    "<div class=\"flex items-center justify-center gap-1.5\">"
+  ],
+  [
+    350,
+    "<button @click=\"openEditAttendanceRow(att)\" class=\"p-1 text-gray-500 hover:text-black dark:hover:text-white transition\" title=\"编辑整行考勤\">"
+  ],
+  [
+    351,
+    "<i class=\"fa-solid fa-pen text-xs\"></i>"
+  ],
+  [
+    352,
+    "</button>"
+  ],
+  [
+    353,
+    "<button @click=\"deleteMatrixRow(att)\" class=\"p-1 text-gray-400 hover:text-rose-600 transition\" title=\"删除该次排课\">"
+  ]
+]

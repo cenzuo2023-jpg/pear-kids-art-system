@@ -1,0 +1,5 @@
+{
+  "att": "          deductHours: detail.deductHours !== undefined ? detail.deductHours : (detail.status === '到课' ? 1 : 0),\n              note: detail.note || ''",
+  "logs": "if (!profileStudent.value) return [];\n      return hourLogs.value.filter(l => l.studentId === profileStudent.value.id);",
+  "points": "if (!profileStudent.value) return [];\n      return pointLogs.value.filter(l => l.studentId === profileStudent.value.id);"
+}

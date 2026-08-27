@@ -1,0 +1,17 @@
+[
+  "4964: const rowsHtml = finalAttList.length > 0 ? finalAttList.map((a, idx) => {",
+  "4965: const badgeClass = a.status === '到课' ? 'badge-green' : a.status === '请假' || a.status === '未到' ? 'badge-yellow' : 'badge-purple';",
+  "4966: return `<tr>",
+  "4967: <td style=\"text-align:center; font-family:monospace; font-weight:600; color:#6b7280;\">#${String(idx + 1).padStart(2, '0')}</td>",
+  "4968: <td style=\"font-family:monospace; font-weight:600; white-space:nowrap;\">${a.date}</td>",
+  "4969: <td>${a.className}</td>",
+  "4970: <td style=\"text-align:center;\"><span class=\"badge ${badgeClass}\">${a.status}</span></td>",
+  "4971: <td style=\"text-align:center; font-family:monospace; font-weight:700; color:${a.deductHours > 0 ? '#b91c1c' : '#4b5563'};\">${a.deductHours > 0 ? '-' + a.deductHours + '节' : '0节'}</td>",
+  "4972: <td style=\"color:#4b5563; font-size:12px;\">${a.note || '-'}</td>",
+  "4973: </tr>`;",
+  "4974: }).join('') : `<tr><td colspan=\"8\" style=\"text-align:center; padding:30px; color:#9ca3af;\">暂无考勤历史记录</td></tr>`;",
+  "4975: ",
+  "4976: const printHtml = `<!DOCTYPE html>",
+  "4977: <html>",
+  "4978: <head>"
+]

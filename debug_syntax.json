@@ -1,0 +1,82 @@
+[
+  [
+    1340,
+    "      <!-- TAB 4: 💰 财务收费管理中心 (极简直观 · 月/季/年统计 · 单条直接编辑与删除) -->"
+  ],
+  [
+    1341,
+    "      <!-- ======================================================== -->"
+  ],
+  [
+    1342,
+    "            <!-- ======================================================== -->"
+  ],
+  [
+    1343,
+    "      <!-- TAB 4: 财务收费管理中心 (极简典雅 · 统一字体配色 · 无过度符号) -->"
+  ],
+  [
+    1344,
+    "      <!-- ======================================================== -->"
+  ],
+  [
+    1345,
+    "      <section v-if=\"currentTab === 'records'\" class=\"max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6\">"
+  ],
+  [
+    1346,
+    ""
+  ],
+  [
+    1347,
+    "        <!-- 顶部通栏标题与操作 -->"
+  ],
+  [
+    1348,
+    "        <div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800\">"
+  ],
+  [
+    1349,
+    "          <div>"
+  ],
+  [
+    1350,
+    "            <div class=\"flex items-center gap-3\">"
+  ],
+  [
+    1351,
+    "              <h2 class=\"text-lg font-bold text-stone-900 dark:text-stone-100\">财务收费管理</h2>"
+  ],
+  [
+    1352,
+    "              <span class=\"text-xs px-2.5 py-0.5 rounded font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800\">"
+  ],
+  [
+    1353,
+    "                {{ activePeriodLabel }}"
+  ],
+  [
+    1354,
+    "              </span>"
+  ],
+  [
+    1355,
+    "            </div>"
+  ],
+  [
+    1356,
+    "            <p class=\"text-xs text-stone-500 mt-1\">"
+  ],
+  [
+    1357,
+    "              按月度、季度与年度统计收费数据，支持单条收费记录直接修改与删除。"
+  ],
+  [
+    1358,
+    "            </p>"
+  ],
+  [
+    1359,
+    "          </div>"
+  ]
+]

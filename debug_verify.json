@@ -1,0 +1,7 @@
+{
+  "theme_count": 4,
+  "teacher_count": 0,
+  "colspan_8": true,
+  "colspan_6": true,
+  "csv_headers": "const headers = ['学员姓名', '上课日期', '所在班级', '出勤状态', '消课课时', '出勤与请假备注说明'];"
+}

@@ -1,0 +1,122 @@
+[
+  [
+    250,
+    "<tbody class=\"divide-y divide-[#e2e2e0] dark:divide-[#333]\" style=\"background-color: var(--bg-page);\">"
+  ],
+  [
+    251,
+    "<tr v-for=\"att in matrixAttendanceRecords\" :key=\"att.id\" class=\"hover:bg-[#f7f7f5] dark:hover:bg-[#222] transition-colors\">"
+  ],
+  [
+    252,
+    ""
+  ],
+  [
+    253,
+    "<!-- 🌟 课程主题 (固定第1列 · 160px · 单行快速修改) -->"
+  ],
+  [
+    254,
+    "<td class=\"py-2.5 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-10 shadow-sm\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    255,
+    "<div @click=\"openEditAttendanceRow(att)\""
+  ],
+  [
+    256,
+    "class=\"cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap\""
+  ],
+  [
+    257,
+    "title=\"点击修改课程主题与上课日期\">"
+  ],
+  [
+    258,
+    "<div class=\"flex items-center gap-1.5 truncate max-w-[130px]\">"
+  ],
+  [
+    259,
+    "<i class=\"fa-regular fa-file-lines text-gray-400 text-xs flex-shrink-0\"></i>"
+  ],
+  [
+    260,
+    "<span class=\"font-bold text-sm text-[#111827] dark:text-[#f3f4f6] group-hover:text-emerald-600 transition-colors truncate\">{{ att.theme }}</span>"
+  ],
+  [
+    261,
+    "</div>"
+  ],
+  [
+    262,
+    "<i class=\"fa-solid fa-pen text-xs text-gray-400 opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0\"></i>"
+  ],
+  [
+    263,
+    "</div>"
+  ],
+  [
+    264,
+    "</td>"
+  ],
+  [
+    265,
+    ""
+  ],
+  [
+    266,
+    "<!-- 🌟 上课日期 (固定第2列 · 145px · 单行快速修改) -->"
+  ],
+  [
+    267,
+    "<td class=\"py-2.5 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    268,
+    "<div @click=\"openEditAttendanceRow(att)\""
+  ],
+  [
+    269,
+    "class=\"cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap\""
+  ],
+  [
+    270,
+    "title=\"点击修改上课日期与课程主题\">"
+  ],
+  [
+    271,
+    "<div class=\"flex items-center gap-1.5 truncate\">"
+  ],
+  [
+    272,
+    "<i class=\"fa-regular fa-calendar text-gray-400 text-xs flex-shrink-0\"></i>"
+  ],
+  [
+    273,
+    "<span class=\"font-mono text-sm text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 transition-colors whitespace-nowrap\">{{ att.date }}</span>"
+  ],
+  [
+    274,
+    "</div>"
+  ],
+  [
+    275,
+    "<i class=\"fa-solid fa-pen text-xs text-gray-400 opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0\"></i>"
+  ],
+  [
+    276,
+    "</div>"
+  ],
+  [
+    277,
+    "</td>"
+  ],
+  [
+    278,
+    ""
+  ],
+  [
+    279,
+    "<!-- 🌟 考勤状态单元格 (110px 宽度 · O(1)极速状态匹配 · 点击快速下拉) -->"
+  ]
+]

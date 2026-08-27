@@ -1,0 +1,362 @@
+[
+  [
+    1372,
+    "</div>"
+  ],
+  [
+    1373,
+    ""
+  ],
+  [
+    1374,
+    "<!-- 周期统计切换控制栏 -->"
+  ],
+  [
+    1375,
+    "<div class=\"wf-card p-3.5 space-y-3 bg-stone-50/50 dark:bg-stone-900/20 border border-stone-200 dark:border-stone-800\">"
+  ],
+  [
+    1376,
+    "<div class=\"flex flex-col md:flex-row md:items-center justify-between gap-3\">"
+  ],
+  [
+    1377,
+    "<!-- 周期切换按钮组 -->"
+  ],
+  [
+    1378,
+    "<div class=\"flex items-center gap-1 bg-stone-200/60 dark:bg-stone-800/80 p-1 rounded-lg text-xs font-medium\">"
+  ],
+  [
+    1379,
+    "<button @click=\"statPeriodMode = 'month'\""
+  ],
+  [
+    1380,
+    ":class=\"statPeriodMode === 'month' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1381,
+    "class=\"px-3 py-1.5 rounded transition\">"
+  ],
+  [
+    1382,
+    "按月统计"
+  ],
+  [
+    1383,
+    "</button>"
+  ],
+  [
+    1384,
+    ""
+  ],
+  [
+    1385,
+    "<button @click=\"statPeriodMode = 'quarter'\""
+  ],
+  [
+    1386,
+    ":class=\"statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1387,
+    "class=\"px-3 py-1.5 rounded transition\">"
+  ],
+  [
+    1388,
+    "按季度统计"
+  ],
+  [
+    1389,
+    "</button>"
+  ],
+  [
+    1390,
+    ""
+  ],
+  [
+    1391,
+    "<button @click=\"statPeriodMode = 'year'\""
+  ],
+  [
+    1392,
+    ":class=\"statPeriodMode === 'year' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1393,
+    "class=\"px-3 py-1.5 rounded transition\">"
+  ],
+  [
+    1394,
+    "按年统计"
+  ],
+  [
+    1395,
+    "</button>"
+  ],
+  [
+    1396,
+    ""
+  ],
+  [
+    1397,
+    "<button @click=\"statPeriodMode = 'all'\""
+  ],
+  [
+    1398,
+    ":class=\"statPeriodMode === 'all' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1399,
+    "class=\"px-3 py-1.5 rounded transition\">"
+  ],
+  [
+    1400,
+    "全部历史"
+  ],
+  [
+    1401,
+    "</button>"
+  ],
+  [
+    1402,
+    "</div>"
+  ],
+  [
+    1403,
+    ""
+  ],
+  [
+    1404,
+    "<!-- 联动选择器 -->"
+  ],
+  [
+    1405,
+    "<div class=\"flex items-center gap-2 text-xs flex-wrap\">"
+  ],
+  [
+    1406,
+    "<!-- 按月 -->"
+  ],
+  [
+    1407,
+    "<div v-if=\"statPeriodMode === 'month'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1408,
+    "<span class=\"text-stone-500\">月份:</span>"
+  ],
+  [
+    1409,
+    "<input type=\"month\" v-model=\"selectedMonthStr\" class=\"px-2.5 py-1 wf-input font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1410,
+    "<button @click=\"selectedMonthStr = currentYearMonth\" class=\"text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:underline\">"
+  ],
+  [
+    1411,
+    "返回当月"
+  ],
+  [
+    1412,
+    "</button>"
+  ],
+  [
+    1413,
+    "</div>"
+  ],
+  [
+    1414,
+    ""
+  ],
+  [
+    1415,
+    "<!-- 按季 -->"
+  ],
+  [
+    1416,
+    "<div v-if=\"statPeriodMode === 'quarter'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1417,
+    "<span class=\"text-stone-500\">年份:</span>"
+  ],
+  [
+    1418,
+    "<select v-model=\"selectedYearStr\" class=\"px-2 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1419,
+    "<option v-for=\"y in availableStatYears\" :key=\"y\" :value=\"y\">{{ y }} 年</option>"
+  ],
+  [
+    1420,
+    "</select>"
+  ],
+  [
+    1421,
+    "<div class=\"flex items-center bg-stone-200/60 dark:bg-stone-800/80 p-0.5 rounded text-xs font-mono font-medium\">"
+  ],
+  [
+    1422,
+    "<button v-for=\"q in ['Q1', 'Q2', 'Q3', 'Q4']\" :key=\"q\""
+  ],
+  [
+    1423,
+    "@click=\"selectedQuarterStr = q\""
+  ],
+  [
+    1424,
+    ":class=\"selectedQuarterStr === q ? 'bg-emerald-600 text-white font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1425,
+    "class=\"px-2 py-0.5 rounded transition\">"
+  ],
+  [
+    1426,
+    "{{ q }} ({{ q === 'Q1' ? '1-3月' : q === 'Q2' ? '4-6月' : q === 'Q3' ? '7-9月' : '10-12月' }})"
+  ],
+  [
+    1427,
+    "</button>"
+  ],
+  [
+    1428,
+    "</div>"
+  ],
+  [
+    1429,
+    "</div>"
+  ],
+  [
+    1430,
+    ""
+  ],
+  [
+    1431,
+    "<!-- 按年 -->"
+  ],
+  [
+    1432,
+    "<div v-if=\"statPeriodMode === 'year'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1433,
+    "<span class=\"text-stone-500\">年份:</span>"
+  ],
+  [
+    1434,
+    "<select v-model=\"selectedYearStr\" class=\"px-2.5 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1435,
+    "<option v-for=\"y in availableStatYears\" :key=\"y\" :value=\"y\">{{ y }} 年度</option>"
+  ],
+  [
+    1436,
+    "</select>"
+  ],
+  [
+    1437,
+    "</div>"
+  ],
+  [
+    1438,
+    "</div>"
+  ],
+  [
+    1439,
+    "</div>"
+  ],
+  [
+    1440,
+    "</div>"
+  ],
+  [
+    1441,
+    ""
+  ],
+  [
+    1442,
+    "<!-- 4 维核心统计卡片 (统一色调 · 统一字号 · 纯粹典雅) -->"
+  ],
+  [
+    1443,
+    "<div class=\"grid grid-cols-2 lg:grid-cols-4 gap-4\">"
+  ],
+  [
+    1444,
+    ""
+  ],
+  [
+    1445,
+    "<!-- 1. 实收金额 -->"
+  ],
+  [
+    1446,
+    "<div @click=\"cardFilterMode = 'all'\""
+  ],
+  [
+    1447,
+    ":class=\"cardFilterMode === 'all' ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30' : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'\""
+  ],
+  [
+    1448,
+    "class=\"wf-card p-4 space-y-2 cursor-pointer transition flex flex-col justify-between\">"
+  ],
+  [
+    1449,
+    "<div class=\"flex items-center justify-between text-xs\">"
+  ],
+  [
+    1450,
+    "<span class=\"font-medium text-stone-600 dark:text-stone-400\">实收总额</span>"
+  ],
+  [
+    1451,
+    "<span class=\"text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800\">"
+  ],
+  [
+    1452,
+    "{{ periodStatSummary.orderCount }} 笔"
+  ],
+  [
+    1453,
+    "</span>"
+  ],
+  [
+    1454,
+    "</div>"
+  ],
+  [
+    1455,
+    "<div class=\"text-2xl font-bold font-mono text-stone-900 dark:text-stone-100\">"
+  ],
+  [
+    1456,
+    "¥ {{ periodStatSummary.totalAmount.toLocaleString() }}"
+  ],
+  [
+    1457,
+    "</div>"
+  ],
+  [
+    1458,
+    "<div class=\"text-[11px] text-stone-500 font-mono pt-1.5 border-t border-stone-100 dark:border-stone-800/80 flex justify-between\">"
+  ],
+  [
+    1459,
+    "<span>周期实收资金</span>"
+  ],
+  [
+    1460,
+    "<span class=\"text-stone-400 hover:text-stone-700 dark:hover:text-stone-300\">显示全部</span>"
+  ],
+  [
+    1461,
+    "</div>"
+  ]
+]

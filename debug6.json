@@ -1,0 +1,162 @@
+[
+  [
+    180,
+    "<!-- 表格水平滚动容器 (支持多学员流畅横向滑动，前两列固定) -->"
+  ],
+  [
+    181,
+    "<div class=\"attendance-table-scroll w-full border-b border-[#e2e2e0] dark:border-[#333]\""
+  ],
+  [
+    182,
+    "style=\"overflow-x: auto !important; overflow-y: auto !important; max-width: 100vw; height: calc(100vh - 125px); -webkit-overflow-scrolling: touch; background-color: var(--bg-page);\">"
+  ],
+  [
+    183,
+    "<table class=\"attendance-matrix text-center text-sm border-collapse select-none\""
+  ],
+  [
+    184,
+    "style=\"width: max-content; min-width: 100%; border-spacing: 0; background-color: var(--bg-page);\">"
+  ],
+  [
+    185,
+    ""
+  ],
+  [
+    186,
+    "<!-- 表头 (14px 粗体 · 课程与日期固定置顶与左置) -->"
+  ],
+  [
+    187,
+    "<thead class=\"sticky top-0 z-30 shadow-sm border-b border-[#e2e2e0] dark:border-[#333]\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    188,
+    "<tr class=\"font-bold select-none\">"
+  ],
+  [
+    189,
+    "<!-- 01 课程主题 (固定左侧第1列 · 160px 宽 · 绝不挤压) -->"
+  ],
+  [
+    190,
+    "<th class=\"py-3 pl-4 pr-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[160px] w-[160px] whitespace-nowrap sticky left-0 z-30 shadow-sm\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    191,
+    "<div class=\"flex items-center gap-1.5 whitespace-nowrap\">"
+  ],
+  [
+    192,
+    "<span class=\"text-xs text-gray-500 font-mono font-bold\">01</span>"
+  ],
+  [
+    193,
+    "<span class=\"text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]\">课程主题</span>"
+  ],
+  [
+    194,
+    "<span class=\"text-xs text-gray-400 ml-0.5\">✏️</span>"
+  ],
+  [
+    195,
+    "</div>"
+  ],
+  [
+    196,
+    "</th>"
+  ],
+  [
+    197,
+    ""
+  ],
+  [
+    198,
+    "<!-- 02 上课日期 (固定左侧第2列 · 145px 宽 · 带排序) -->"
+  ],
+  [
+    199,
+    "<th class=\"py-3 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[145px] w-[145px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm\" style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    200,
+    "<div class=\"flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-600 transition\" @click=\"attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'\" title=\"点击切换时间排序\">"
+  ],
+  [
+    201,
+    "<span class=\"text-xs text-gray-500 font-mono font-bold\">02</span>"
+  ],
+  [
+    202,
+    "<span class=\"text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]\">上课日期</span>"
+  ],
+  [
+    203,
+    "<i class=\"fa-solid fa-sort text-xs opacity-50 group-hover:opacity-100 transition text-gray-600\" :class=\"attendanceSortOrder === 'desc' ? 'fa-sort-down text-emerald-600 opacity-100' : 'fa-sort-up text-emerald-600 opacity-100'\"></i>"
+  ],
+  [
+    204,
+    "<span class=\"text-xs text-gray-400 ml-0.5\">📅</span>"
+  ],
+  [
+    205,
+    "</div>"
+  ],
+  [
+    206,
+    "</th>"
+  ],
+  [
+    207,
+    ""
+  ],
+  [
+    208,
+    "<!-- 🌟 学员列 (固定宽度 110px · 16人横排可顺畅横向滚动 · 绝对不截断) -->"
+  ],
+  [
+    209,
+    "<th v-for=\"(stu, idx) in matrixStudents\" :key=\"'name_' + stu.id\""
+  ],
+  [
+    210,
+    "class=\"py-2.5 px-2 border-r border-[#e2e2e0] dark:border-[#333] min-w-[110px] w-[110px] whitespace-nowrap z-20\""
+  ],
+  [
+    211,
+    "style=\"background-color: var(--bg-surface);\">"
+  ],
+  [
+    212,
+    ""
+  ],
+  [
+    213,
+    "<div class=\"flex flex-col items-center justify-center gap-1\">"
+  ],
+  [
+    214,
+    "<!-- 序号与学员姓名 -->"
+  ],
+  [
+    215,
+    "<div @click=\"openStudentProfile(stu)\""
+  ],
+  [
+    216,
+    "class=\"cursor-pointer group flex items-center justify-center gap-1 font-bold text-sm text-[#111827] dark:text-[#f3f4f6] hover:text-emerald-600 transition whitespace-nowrap\""
+  ],
+  [
+    217,
+    ":title=\"'#' + (idx + 1) + ' ' + stu.name + ' (点击查看档案)'\">"
+  ],
+  [
+    218,
+    "<span class=\"text-xs font-mono text-gray-400 font-normal\">#{{ idx + 1 }}</span>"
+  ],
+  [
+    219,
+    "<span class=\"text-[14px]\">{{ stu.name }}</span>"
+  ]
+]

@@ -1,0 +1,342 @@
+[
+  [
+    1628,
+    "</button>"
+  ],
+  [
+    1629,
+    "<button @click=\"openRecharge(profileStudent)\" class=\"wf-btn-outline text-xs py-1.5 px-3\">"
+  ],
+  [
+    1630,
+    "<i class=\"fa-solid fa-plus text-xs text-emerald-400\"></i>"
+  ],
+  [
+    1631,
+    "<span>续费充值</span>"
+  ],
+  [
+    1632,
+    "</button>"
+  ],
+  [
+    1633,
+    "<button @click=\"openEditStudent(profileStudent)\" class=\"wf-btn-outline text-xs py-1.5 px-2.5\" title=\"编辑学员档案\">"
+  ],
+  [
+    1634,
+    "<i class=\"fa-solid fa-pen\"></i>"
+  ],
+  [
+    1635,
+    "</button>"
+  ],
+  [
+    1636,
+    "<button @click=\"archiveStudent(profileStudent); profileStudent = null\" class=\"wf-btn-outline text-xs py-1.5 px-3 text-amber-500 border-amber-500/30 hover:bg-amber-500/10\" title=\"归档该学员\">"
+  ],
+  [
+    1637,
+    "<i class=\"fa-solid fa-box-archive text-xs mr-1\"></i>"
+  ],
+  [
+    1638,
+    "<span>归档学员</span>"
+  ],
+  [
+    1639,
+    "</button>"
+  ],
+  [
+    1640,
+    "<button @click=\"openExportModal('student', profileStudent)\" class=\"wf-btn-outline text-xs py-1.5 px-3 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 flex items-center gap-1.5\" title=\"导出个人考勤档案 (支持选择时间范围与格式)\">"
+  ],
+  [
+    1641,
+    "<i class=\"fa-solid fa-file-export text-xs\"></i>"
+  ],
+  [
+    1642,
+    "<span>导出考勤档案</span>"
+  ],
+  [
+    1643,
+    "</button>"
+  ],
+  [
+    1644,
+    "</div>"
+  ],
+  [
+    1645,
+    "</div>"
+  ],
+  [
+    1646,
+    ""
+  ],
+  [
+    1647,
+    "<!-- 学员头部大信息卡 -->"
+  ],
+  [
+    1648,
+    "<div class=\"wf-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6\">"
+  ],
+  [
+    1649,
+    "<div class=\"flex items-center gap-4\">"
+  ],
+  [
+    1650,
+    "<div class=\"w-16 h-16 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-black text-2xl shadow-sm flex-shrink-0\">"
+  ],
+  [
+    1651,
+    "{{ profileStudent.name.charAt(0) }}"
+  ],
+  [
+    1652,
+    "</div>"
+  ],
+  [
+    1653,
+    "<div class=\"space-y-1.5\">"
+  ],
+  [
+    1654,
+    "<div class=\"flex items-center gap-3 flex-wrap\">"
+  ],
+  [
+    1655,
+    "<h3 class=\"text-2xl font-black\">{{ profileStudent.name }}</h3>"
+  ],
+  [
+    1656,
+    "<span class=\"text-xs px-2.5 py-0.5 rounded-full font-bold\""
+  ],
+  [
+    1657,
+    ":class=\"profileStudent.gender === '女' ? 'bg-pink-500/15 text-pink-400 border border-pink-500/30' : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'\">"
+  ],
+  [
+    1658,
+    "{{ profileStudent.gender }} · {{ profileStudent.age }}岁"
+  ],
+  [
+    1659,
+    "</span>"
+  ],
+  [
+    1660,
+    "<span class=\"text-xs px-2.5 py-0.5 rounded-full font-bold\""
+  ],
+  [
+    1661,
+    ":class=\"profileStudent.status === '在读' ? 'wf-badge-green' : 'wf-badge-red'\">"
+  ],
+  [
+    1662,
+    "{{ profileStudent.status || '在读' }}"
+  ],
+  [
+    1663,
+    "</span>"
+  ],
+  [
+    1664,
+    "</div>"
+  ],
+  [
+    1665,
+    "<p class=\"text-xs text-black dark:text-stone-400 flex items-center gap-2 flex-wrap\">"
+  ],
+  [
+    1666,
+    "<span>班级：<strong class=\"text-black dark:text-stone-200\">{{ getClassById(profileStudent.classId).name }}</strong></span>"
+  ],
+  [
+    1667,
+    "<span>·</span>"
+  ],
+  [
+    1668,
+    "<span>家长联系方式：<strong class=\"text-black dark:text-stone-200\">{{ profileStudent.parentName }}</strong> ({{ profileStudent.parentPhone }})</span>"
+  ],
+  [
+    1669,
+    "<span v-if=\"profileStudent.notes\">·</span>"
+  ],
+  [
+    1670,
+    "<span v-if=\"profileStudent.notes\" class=\"italic text-black dark:text-stone-300\">习惯备注：{{ profileStudent.notes }}</span>"
+  ],
+  [
+    1671,
+    "</p>"
+  ],
+  [
+    1672,
+    "</div>"
+  ],
+  [
+    1673,
+    "</div>"
+  ],
+  [
+    1674,
+    "</div>"
+  ],
+  [
+    1675,
+    ""
+  ],
+  [
+    1676,
+    "<!-- 4 维核心业务指标卡 (大号宽敞卡片) -->"
+  ],
+  [
+    1677,
+    "<div class=\"grid grid-cols-2 md:grid-cols-4 gap-4\">"
+  ],
+  [
+    1678,
+    ""
+  ],
+  [
+    1679,
+    "<div class=\"wf-card p-5 space-y-1\">"
+  ],
+  [
+    1680,
+    "<div class=\"text-xs text-black dark:text-stone-400\">当前剩余课时</div>"
+  ],
+  [
+    1681,
+    "<div class=\"text-3xl font-black font-mono\""
+  ],
+  [
+    1682,
+    ":class=\"profileStudent.remainHours <= 0 ? 'text-rose-400' : profileStudent.remainHours <= 3 ? 'text-amber-400' : 'text-emerald-400'\">"
+  ],
+  [
+    1683,
+    "{{ profileStudent.remainHours }} <span class=\"text-xs font-normal text-black dark:text-stone-400\">节</span>"
+  ],
+  [
+    1684,
+    "</div>"
+  ],
+  [
+    1685,
+    "<div class=\"text-[11px] text-black dark:text-stone-400 font-mono\">"
+  ],
+  [
+    1686,
+    "{{ profileStudent.remainHours <= 0 ? '已耗尽，需续费' : profileStudent.remainHours <= 3 ? '预警期，待提醒续费' : '课时充足' }}"
+  ],
+  [
+    1687,
+    "</div>"
+  ],
+  [
+    1688,
+    "</div>"
+  ],
+  [
+    1689,
+    ""
+  ],
+  [
+    1690,
+    "<div class=\"wf-card p-5 space-y-1\">"
+  ],
+  [
+    1691,
+    "<div class=\"text-xs text-black dark:text-stone-400 items-center justify-between flex\">"
+  ],
+  [
+    1692,
+    "<span>可用画币积分</span>"
+  ],
+  [
+    1693,
+    "<span @click=\"openIndividualPointModal(profileStudent, 'add')\" class=\"text-[10px] text-amber-400 cursor-pointer hover:underline\">变更 ✏️</span>"
+  ],
+  [
+    1694,
+    "</div>"
+  ],
+  [
+    1695,
+    "<div class=\"text-3xl font-black font-mono text-amber-400\">"
+  ],
+  [
+    1696,
+    "⭐ {{ profileStudent.points || 0 }} <span class=\"text-xs font-normal text-black dark:text-stone-400\">分</span>"
+  ],
+  [
+    1697,
+    "</div>"
+  ],
+  [
+    1698,
+    "<div class=\"text-[11px] text-black dark:text-stone-400\">"
+  ],
+  [
+    1699,
+    "累计总获得：{{ profileStudent.totalPointsEarned || 0 }} 分"
+  ],
+  [
+    1700,
+    "</div>"
+  ],
+  [
+    1701,
+    "</div>"
+  ],
+  [
+    1702,
+    ""
+  ],
+  [
+    1703,
+    "<div class=\"wf-card p-5 space-y-1\">"
+  ],
+  [
+    1704,
+    "<div class=\"text-xs text-black dark:text-stone-400\">出勤率统计</div>"
+  ],
+  [
+    1705,
+    "<div class=\"text-3xl font-black font-mono text-[#10E57A]\">"
+  ],
+  [
+    1706,
+    "{{ profileStudentStats.attendanceRate }}"
+  ],
+  [
+    1707,
+    "</div>"
+  ],
+  [
+    1708,
+    "<div class=\"text-[11px] text-black dark:text-stone-400 font-mono\">"
+  ],
+  [
+    1709,
+    "到课 {{ profileStudentStats.presentCount }} 节 · 请假未到 {{ profileStudentStats.leaveCount }} 节"
+  ],
+  [
+    1710,
+    "</div>"
+  ],
+  [
+    1711,
+    "</div>"
+  ],
+  [
+    1712,
+    ""
+  ]
+]

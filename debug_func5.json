@@ -1,0 +1,62 @@
+[
+  [
+    6015,
+    "amount: 4800,"
+  ],
+  [
+    6016,
+    "payMethod: '微信支付',"
+  ],
+  [
+    6017,
+    "payDate: new Date().toISOString().slice(0, 10),"
+  ],
+  [
+    6018,
+    "operator: '陈老师',"
+  ],
+  [
+    6019,
+    "remark: '常规续费充值'"
+  ],
+  [
+    6020,
+    "});"
+  ],
+  [
+    6021,
+    ""
+  ],
+  [
+    6022,
+    "const openRecharge = (student = {}) => {"
+  ],
+  [
+    6023,
+    "if (student && student.id) {"
+  ],
+  [
+    6024,
+    "rechargeMode.value = 'existing';"
+  ],
+  [
+    6025,
+    "rechargeForm.studentId = student.id;"
+  ],
+  [
+    6026,
+    "rechargeForm.studentName = student.name;"
+  ],
+  [
+    6027,
+    "} else {"
+  ],
+  [
+    6028,
+    "rechargeMode.value = 'existing';"
+  ],
+  [
+    6029,
+    "rechargeForm.studentId = activeStudents.value[0]?.id || '';"
+  ]
+]

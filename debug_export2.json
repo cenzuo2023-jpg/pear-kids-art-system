@@ -1,0 +1,5 @@
+{
+  "csv": "const headers = ['学员姓名', '上课日期', '课程绘画主题', '所在班级', '出勤状态', '消课课时', '任课主讲老师', '出勤与请假备注说明'];",
+  "rows": null,
+  "pdf": "<tr>\n          <th style=\"width:44px; text-align:center;\">序号</th>\n          <th style=\"width:90px;\">上课日期</th>\n          <th>课程绘画主题</th>\n          <th style=\"width:110px;\">所在班级</th>\n          <th style=\"width:68px; text-align:center;\">出勤状态</th>\n          <th style=\"width:72px; text-align:center;\">课时消课</th>\n          <th style=\"width:68px; text-align:center;\">主讲师</th>\n          <th>考勤备注与课堂表现</th>\n        </tr>"
+}

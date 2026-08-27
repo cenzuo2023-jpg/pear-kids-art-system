@@ -1,0 +1,42 @@
+[
+  [
+    6040,
+    "rechargeForm.payMethod = '微信支付';"
+  ],
+  [
+    6041,
+    "rechargeForm.payDate = new Date().toISOString().slice(0, 10);"
+  ],
+  [
+    6042,
+    "rechargeForm.operator = '陈老师';"
+  ],
+  [
+    6043,
+    "rechargeForm.remark = '常规充值交费';"
+  ],
+  [
+    6044,
+    "showRechargeModal.value = true;"
+  ],
+  [
+    6045,
+    "};"
+  ],
+  [
+    6046,
+    ""
+  ],
+  [
+    6047,
+    "const submitRecharge = () => {"
+  ],
+  [
+    6048,
+    "const addHours = Number(rechargeForm.hoursBought || 0) + Number(rechargeForm.hoursGift || 0);"
+  ],
+  [
+    6049,
+    "if (addHours <= 0) {"
+  ]
+]

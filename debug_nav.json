@@ -1,0 +1,22 @@
+[
+  "0: <template>",
+  "1: <div v-cloak class=\"notion-app-shell min-h-screen flex flex-col justify-between\">",
+  "2: ",
+  "3: <!-- ============================================================ -->",
+  "4: <!-- 1. 🌟 固定通栏顶栏 (极简纯粹设计 · 四大核心Tab · 最高置顶 z-50) -->",
+  "5: <!-- ============================================================ -->",
+  "6: <header class=\"notion-sidebar sticky top-0 z-50 border-b border-black/[0.08] dark:border-white/10 w-full transition-colors\"",
+  "7: style=\"background-color: var(--bg-surface);\">",
+  "8: <div class=\"notion-sidebar-inner w-full px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4\">",
+  "9: ",
+  "10: <!-- 品牌标识 (🍐 徽标 + 想吃梨儿童美术) -->",
+  "11: <div class=\"notion-brand flex items-center gap-3 cursor-pointer group select-none flex-shrink-0\" @click=\"currentTab = 'attendance'; profileStudent = null; selectedClassDetail = null;\">",
+  "12: <div class=\"w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center text-lg shadow-sm flex-shrink-0\">",
+  "13: 🍐",
+  "14: </div>",
+  "15: <div class=\"flex flex-col\">",
+  "16: <div class=\"flex items-center gap-2\">",
+  "17: <span class=\"font-black text-base sm:text-lg tracking-tight group-hover:text-emerald-400 transition-colors\">",
+  "18: {{ studioInfo.name }}",
+  "19: </span>"
+]

@@ -1,0 +1,522 @@
+[
+  [
+    1340,
+    "<!-- TAB 4: 💰 财务收费管理中心 (极简直观 · 月/季/年统计 · 单条直接编辑与删除) -->"
+  ],
+  [
+    1341,
+    "<!-- ======================================================== -->"
+  ],
+  [
+    1342,
+    "<!-- ======================================================== -->"
+  ],
+  [
+    1343,
+    "<!-- TAB 4: 财务收费管理中心 (极简典雅 · 统一字体配色 · 无过度符号) -->"
+  ],
+  [
+    1344,
+    "<!-- ======================================================== -->"
+  ],
+  [
+    1345,
+    "<section v-if=\"currentTab === 'records'\" class=\"max-w-[1500px] mx-auto px-4 sm:px-6 pt-6 space-y-6\">"
+  ],
+  [
+    1346,
+    ""
+  ],
+  [
+    1347,
+    "<!-- 顶部通栏标题与操作 -->"
+  ],
+  [
+    1348,
+    "<div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-stone-800\">"
+  ],
+  [
+    1349,
+    "<div>"
+  ],
+  [
+    1350,
+    "<div class=\"flex items-center gap-3\">"
+  ],
+  [
+    1351,
+    "<h2 class=\"text-lg font-bold text-stone-900 dark:text-stone-100\">财务收费管理</h2>"
+  ],
+  [
+    1352,
+    "<span class=\"text-xs px-2.5 py-0.5 rounded font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800\">"
+  ],
+  [
+    1353,
+    "{{ activePeriodLabel }}"
+  ],
+  [
+    1354,
+    "</span>"
+  ],
+  [
+    1355,
+    "</div>"
+  ],
+  [
+    1356,
+    "<p class=\"text-xs text-stone-500 mt-1\">"
+  ],
+  [
+    1357,
+    "按月度、季度与年度统计收费数据，支持单条收费记录直接修改与删除。"
+  ],
+  [
+    1358,
+    "</p>"
+  ],
+  [
+    1359,
+    "</div>"
+  ],
+  [
+    1360,
+    ""
+  ],
+  [
+    1361,
+    "<!-- 右侧操作 -->"
+  ],
+  [
+    1362,
+    "<div class=\"flex items-center gap-3\">"
+  ],
+  [
+    1363,
+    "<button @click=\"exportPaymentOrdersCSV\" class=\"wf-btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1364,
+    "<i class=\"fa-solid fa-file-csv text-xs text-stone-500\"></i>"
+  ],
+  [
+    1365,
+    "<span>导出表格 (CSV)</span>"
+  ],
+  [
+    1366,
+    "</button>"
+  ],
+  [
+    1367,
+    "<button @click=\"openRecharge\" class=\"wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5\">"
+  ],
+  [
+    1368,
+    "<i class=\"fa-solid fa-plus text-xs\"></i>"
+  ],
+  [
+    1369,
+    "<span>录入收费</span>"
+  ],
+  [
+    1370,
+    "</button>"
+  ],
+  [
+    1371,
+    "</div>"
+  ],
+  [
+    1372,
+    "</div>"
+  ],
+  [
+    1373,
+    ""
+  ],
+  [
+    1374,
+    "<!-- 财务概览与周期切换控制条 -->"
+  ],
+  [
+    1375,
+    "<div class=\"wf-card p-5 border border-stone-200 dark:border-stone-800 bg-stone-50/50 dark:bg-stone-900/20 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-2\">"
+  ],
+  [
+    1376,
+    ""
+  ],
+  [
+    1377,
+    "<!-- 左侧：核心数据（实收总额） -->"
+  ],
+  [
+    1378,
+    "<div class=\"flex-shrink-0\">"
+  ],
+  [
+    1379,
+    "<div class=\"flex items-center gap-2 mb-1.5\">"
+  ],
+  [
+    1380,
+    "<span class=\"font-medium text-stone-600 dark:text-stone-400 text-sm\">实收总额</span>"
+  ],
+  [
+    1381,
+    "<span class=\"text-[11px] px-1.5 py-0.5 rounded font-mono text-stone-500 bg-stone-100 dark:bg-stone-800\">"
+  ],
+  [
+    1382,
+    "{{ periodStatSummary.orderCount }} 笔"
+  ],
+  [
+    1383,
+    "</span>"
+  ],
+  [
+    1384,
+    "</div>"
+  ],
+  [
+    1385,
+    "<div class=\"text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400\">"
+  ],
+  [
+    1386,
+    "¥ {{ periodStatSummary.totalAmount.toLocaleString() }}"
+  ],
+  [
+    1387,
+    "</div>"
+  ],
+  [
+    1388,
+    "<div class=\"text-xs text-stone-500 font-mono mt-1.5\">"
+  ],
+  [
+    1389,
+    "周期实收资金"
+  ],
+  [
+    1390,
+    "</div>"
+  ],
+  [
+    1391,
+    "</div>"
+  ],
+  [
+    1392,
+    ""
+  ],
+  [
+    1393,
+    "<!-- 右侧：统计周期切换与选择器 -->"
+  ],
+  [
+    1394,
+    "<div class=\"flex flex-col items-start md:items-end gap-3\">"
+  ],
+  [
+    1395,
+    "<!-- 周期切换按钮组 -->"
+  ],
+  [
+    1396,
+    "<div class=\"flex items-center gap-1 bg-stone-200/60 dark:bg-stone-800/80 p-1 rounded-lg text-xs font-medium\">"
+  ],
+  [
+    1397,
+    "<button @click=\"statPeriodMode = 'month'\""
+  ],
+  [
+    1398,
+    ":class=\"statPeriodMode === 'month' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1399,
+    "class=\"px-3 py-1.5 rounded transition\">按月统计</button>"
+  ],
+  [
+    1400,
+    ""
+  ],
+  [
+    1401,
+    "<button @click=\"statPeriodMode = 'quarter'\""
+  ],
+  [
+    1402,
+    ":class=\"statPeriodMode === 'quarter' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1403,
+    "class=\"px-3 py-1.5 rounded transition\">按季度统计</button>"
+  ],
+  [
+    1404,
+    ""
+  ],
+  [
+    1405,
+    "<button @click=\"statPeriodMode = 'year'\""
+  ],
+  [
+    1406,
+    ":class=\"statPeriodMode === 'year' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1407,
+    "class=\"px-3 py-1.5 rounded transition\">按年统计</button>"
+  ],
+  [
+    1408,
+    ""
+  ],
+  [
+    1409,
+    "<button @click=\"statPeriodMode = 'all'\""
+  ],
+  [
+    1410,
+    ":class=\"statPeriodMode === 'all' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1411,
+    "class=\"px-3 py-1.5 rounded transition\">全部历史</button>"
+  ],
+  [
+    1412,
+    "</div>"
+  ],
+  [
+    1413,
+    ""
+  ],
+  [
+    1414,
+    "<!-- 联动选择器 -->"
+  ],
+  [
+    1415,
+    "<div class=\"flex items-center gap-2 text-xs flex-wrap\">"
+  ],
+  [
+    1416,
+    "<!-- 按月 -->"
+  ],
+  [
+    1417,
+    "<div v-if=\"statPeriodMode === 'month'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1418,
+    "<span class=\"text-stone-500\">月份:</span>"
+  ],
+  [
+    1419,
+    "<input type=\"month\" v-model=\"selectedMonthStr\" class=\"px-2.5 py-1 wf-input font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1420,
+    "<button @click=\"selectedMonthStr = currentYearMonth\" class=\"text-xs text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:underline\">返回当月</button>"
+  ],
+  [
+    1421,
+    "</div>"
+  ],
+  [
+    1422,
+    ""
+  ],
+  [
+    1423,
+    "<!-- 按季 -->"
+  ],
+  [
+    1424,
+    "<div v-if=\"statPeriodMode === 'quarter'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1425,
+    "<span class=\"text-stone-500\">年份:</span>"
+  ],
+  [
+    1426,
+    "<select v-model=\"selectedYearStr\" class=\"px-2 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1427,
+    "<option v-for=\"y in availableStatYears\" :key=\"y\" :value=\"y\">{{ y }} 年度</option>"
+  ],
+  [
+    1428,
+    "</select>"
+  ],
+  [
+    1429,
+    "<div class=\"flex items-center bg-stone-200/60 dark:bg-stone-800/80 p-0.5 rounded text-xs font-mono font-medium\">"
+  ],
+  [
+    1430,
+    "<button v-for=\"q in ['Q1', 'Q2', 'Q3', 'Q4']\" :key=\"q\""
+  ],
+  [
+    1431,
+    "@click=\"selectedQuarterStr = q\""
+  ],
+  [
+    1432,
+    ":class=\"selectedQuarterStr === q ? 'bg-emerald-600 text-white font-bold' : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100'\""
+  ],
+  [
+    1433,
+    "class=\"px-2 py-0.5 rounded transition\">"
+  ],
+  [
+    1434,
+    "{{ q }} ({{ q === 'Q1' ? '1-3月' : q === 'Q2' ? '4-6月' : q === 'Q3' ? '7-9月' : '10-12月' }})"
+  ],
+  [
+    1435,
+    "</button>"
+  ],
+  [
+    1436,
+    "</div>"
+  ],
+  [
+    1437,
+    "</div>"
+  ],
+  [
+    1438,
+    ""
+  ],
+  [
+    1439,
+    "<!-- 按年 -->"
+  ],
+  [
+    1440,
+    "<div v-if=\"statPeriodMode === 'year'\" class=\"flex items-center gap-2\">"
+  ],
+  [
+    1441,
+    "<span class=\"text-stone-500\">年份:</span>"
+  ],
+  [
+    1442,
+    "<select v-model=\"selectedYearStr\" class=\"px-2.5 py-1 wf-select font-mono text-xs bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1443,
+    "<option v-for=\"y in availableStatYears\" :key=\"y\" :value=\"y\">{{ y }} 年度</option>"
+  ],
+  [
+    1444,
+    "</select>"
+  ],
+  [
+    1445,
+    "</div>"
+  ],
+  [
+    1446,
+    "</div>"
+  ],
+  [
+    1447,
+    "</div>"
+  ],
+  [
+    1448,
+    "</div>"
+  ],
+  [
+    1449,
+    ""
+  ],
+  [
+    1450,
+    ""
+  ],
+  [
+    1451,
+    "</div>"
+  ],
+  [
+    1452,
+    ""
+  ],
+  [
+    1453,
+    "<!-- 搜索与筛选工具栏 -->"
+  ],
+  [
+    1454,
+    "<div class=\"wf-card p-3.5 space-y-3 border border-stone-200 dark:border-stone-800\">"
+  ],
+  [
+    1455,
+    "<div class=\"flex flex-col sm:flex-row sm:items-center justify-between gap-3\">"
+  ],
+  [
+    1456,
+    "<!-- 搜索框 -->"
+  ],
+  [
+    1457,
+    "<div class=\"relative flex-1 min-w-[240px]\">"
+  ],
+  [
+    1458,
+    "<i class=\"fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs\"></i>"
+  ],
+  [
+    1459,
+    "<input v-model=\"feeSearchQuery\" type=\"text\""
+  ],
+  [
+    1460,
+    "placeholder=\"搜索学员姓名、单号、经办人、备注...\""
+  ],
+  [
+    1461,
+    "class=\"w-full pl-9 pr-4 py-1.5 wf-input text-xs border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1462,
+    "</div>"
+  ],
+  [
+    1463,
+    ""
+  ],
+  [
+    1464,
+    "<!-- 筛选下拉 -->"
+  ],
+  [
+    1465,
+    "<div class=\"flex items-center gap-2.5 text-xs flex-wrap\">"
+  ],
+  [
+    1466,
+    "<!-- 支付方式 -->"
+  ],
+  [
+    1467,
+    "<select v-model=\"feePayMethodFilter\" class=\"px-2.5 py-1.5 wf-select text-xs font-medium border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1468,
+    "<option value=\"all\">全部支付方式</option>"
+  ],
+  [
+    1469,
+    "<option value=\"微信支付\">微信支付</option>"
+  ]
+]

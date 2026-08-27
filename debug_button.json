@@ -1,0 +1,62 @@
+[
+  [
+    1360,
+    ""
+  ],
+  [
+    1361,
+    "<!-- 右侧操作 -->"
+  ],
+  [
+    1362,
+    "<div class=\"flex items-center gap-3\">"
+  ],
+  [
+    1363,
+    "<button @click=\"exportPaymentOrdersCSV\" class=\"wf-btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700\">"
+  ],
+  [
+    1364,
+    "<i class=\"fa-solid fa-file-csv text-xs text-stone-500\"></i>"
+  ],
+  [
+    1365,
+    "<span>导出表格 (CSV)</span>"
+  ],
+  [
+    1366,
+    "</button>"
+  ],
+  [
+    1367,
+    "<button @click=\"openRechargeModal\" class=\"wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5\">"
+  ],
+  [
+    1368,
+    "<i class=\"fa-solid fa-plus text-xs\"></i>"
+  ],
+  [
+    1369,
+    "<span>录入收费</span>"
+  ],
+  [
+    1370,
+    "</button>"
+  ],
+  [
+    1371,
+    "</div>"
+  ],
+  [
+    1372,
+    "</div>"
+  ],
+  [
+    1373,
+    ""
+  ],
+  [
+    1374,
+    "<!-- 财务概览与周期切换控制条 -->"
+  ]
+]
