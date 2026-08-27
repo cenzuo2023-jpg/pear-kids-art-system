@@ -223,18 +223,17 @@
                     <!-- 剩余课时与积分微标签 -->
                     <div class="flex items-center justify-center gap-1 font-mono text-xs leading-none whitespace-nowrap">
                       <!-- 剩余课时 -->
-                      <span :class="stu.remainHours <= 0 ? 'nt-tag-red' : stu.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
-                        class="px-1.5 py-0.5 rounded font-bold font-mono">
-                        余{{ stu.remainHours }}
-                      </span>
+<span class="px-1.5 py-0.5 rounded font-bold font-mono text-stone-500 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-[11px]">
+  余{{ stu.remainHours }}
+</span>
 
                       <!-- 画币积分 -->
-                      <button @click.stop="openIndividualPointModal(stu, 'add')" 
-                        class="nt-tag-gold hover:border-amber-400 transition cursor-pointer font-bold flex items-center gap-0.5" 
-                        :title="'点击为【' + stu.name + '】变更积分'">
-                        <span>⭐</span>
-                        <span>{{ stu.points || 0 }}</span>
-                      </button>
+<button @click.stop="openIndividualPointModal(stu, 'add')"
+        class="px-1.5 py-0.5 rounded font-bold font-mono text-stone-500 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500 transition cursor-pointer flex items-center gap-0.5 text-[11px]"
+        :title="'点击为【' + stu.name + '】变更积分'">
+  <i class="fa-solid fa-star text-stone-400 text-[10px]"></i>
+  <span>{{ stu.points || 0 }}</span>
+</button>
                     </div>
                   </div>
 
@@ -900,22 +899,21 @@
                   </td>
 
                   <!-- 剩余课时 (Notion 显眼状态标签) -->
-                  <td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
-                    <span :class="s.remainHours <= 0 ? 'nt-tag-red' : s.remainHours <= 3 ? 'nt-tag-yellow' : 'nt-tag-green'"
-                      class="px-2.5 py-1 rounded text-sm inline-block font-mono">
-                      余 {{ s.remainHours }} 节
-                    </span>
-                  </td>
+<td class="py-3 px-4 whitespace-nowrap font-mono font-bold">
+  <span class="text-stone-500 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 px-2.5 py-1 rounded text-sm inline-block font-mono">
+    余 {{ s.remainHours }} 节
+  </span>
+</td>
 
                   <!-- 画币积分 -->
-                  <td class="py-3 px-3 whitespace-nowrap">
-                    <button @click.stop="openIndividualPointModal(s, 'add')" 
-                      class="nt-tag-gold cursor-pointer hover:border-amber-400 transition"
-                      :title="'点击为【' + s.name + '】变更积分'">
-                      <span>⭐ {{ s.points || 0 }}</span>
-                      <span class="text-[9px] opacity-60 ml-0.5">▾</span>
-                    </button>
-                  </td>
+<td class="py-3 px-3 whitespace-nowrap">
+  <button @click.stop="openIndividualPointModal(s, 'add')"
+          class="text-stone-500 bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500 transition px-2 py-0.5 rounded cursor-pointer font-bold inline-flex items-center gap-1 text-sm"
+          :title="'点击为【' + s.name + '】变更积分'">
+    <i class="fa-solid fa-star text-stone-400 text-xs"></i>
+    <span>{{ s.points || 0 }}</span>
+  </button>
+</td>
 
                   <!-- 家长联系方式 -->
                   <td class="py-3 px-4 font-mono text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
