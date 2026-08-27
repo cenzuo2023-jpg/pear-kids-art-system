@@ -1365,7 +1365,7 @@
               <i class="fa-solid fa-file-csv text-xs text-stone-500"></i>
               <span>导出表格 (CSV)</span>
             </button>
-            <button @click="openRechargeModal" class="wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5">
+            <button @click="openRecharge" class="wf-btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5">
               <i class="fa-solid fa-plus text-xs"></i>
               <span>录入收费</span>
             </button>
@@ -2767,6 +2767,18 @@
               </div>
             </div>
           </div>
+
+
+<div v-if="isEditStudent" class="p-3 rounded-lg border border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-2">
+  <div class="font-bold text-[11px] text-emerald-500">课时状态管理</div>
+  <div>
+    <label class="block text-black dark:text-stone-400 mb-1 font-semibold">当前剩余课时 (可手动校准)</label>
+    <div class="flex items-center gap-2">
+      <input v-model.number="studentForm.remainHours" type="number" class="flex-1 px-3 py-1.5 wf-input text-emerald-500 font-bold font-mono">
+      <span class="text-xs text-stone-500 font-semibold">节</span>
+    </div>
+  </div>
+</div>
 
           <div>
             <label class="block text-black dark:text-stone-400 mb-1 font-semibold">学员绘画特点与习惯备注</label>
