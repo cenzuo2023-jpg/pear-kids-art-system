@@ -1468,54 +1468,72 @@
           </div>
         </div>
 
-        <!-- 4 维核心财务统计卡片 (高清晰度 · 纯粹协调) -->
+                <!-- 4 维核心财务统计卡片 (点击任意卡片均可联动过滤下方列表) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- 1. 实收金额 -->
-          <div class="wf-card p-4 space-y-1.5 border-emerald-500/30 bg-emerald-500/5">
+          
+          <!-- 1. 实收总额 -->
+          <div @click="cardFilterMode = 'all'"
+            :class="cardFilterMode === 'all' ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
+            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
             <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
               <span class="font-bold text-stone-800 dark:text-stone-200">💰 周期实收总额</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold font-mono">
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
+                :class="cardFilterMode === 'all' ? 'bg-emerald-500 text-white' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'">
                 {{ periodStatSummary.orderCount }} 笔入账
               </span>
             </div>
             <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
               ¥ {{ periodStatSummary.totalAmount.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10">
-              实际收费入账总款项
+            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
+              <span>周期实际收入总和</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">显示全部 ↗</span>
             </div>
           </div>
 
-          <!-- 2. 购买课时 -->
-          <div class="wf-card p-4 space-y-1.5">
+          <!-- 2. 购买正课课时 -->
+          <div @click="cardFilterMode = 'bought'"
+            :class="cardFilterMode === 'bought' ? 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/30' : 'hover:border-emerald-500/40'"
+            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
             <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
               <span class="font-bold text-stone-800 dark:text-stone-200">⏳ 充值正课课时</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 font-bold font-mono">正课</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
+                :class="cardFilterMode === 'bought' ? 'bg-emerald-500 text-white' : 'bg-black/5 dark:bg-white/10 text-stone-700 dark:text-stone-300'">
+                正课
+              </span>
             </div>
             <div class="text-2xl sm:text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
               {{ periodStatSummary.totalHoursBought }} <span class="text-xs font-normal text-stone-400">节</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10">
-              折合均价: ¥{{ periodStatSummary.avgHourPrice }}/节
+            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
+              <span>折合均价: ¥{{ periodStatSummary.avgHourPrice }}/节</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">过滤查看 ↗</span>
             </div>
           </div>
 
           <!-- 3. 赠送课时 -->
-          <div class="wf-card p-4 space-y-1.5">
+          <div @click="cardFilterMode = 'gift'"
+            :class="cardFilterMode === 'gift' ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30' : 'hover:border-amber-500/40'"
+            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm">
             <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
               <span class="font-bold text-stone-800 dark:text-stone-200">🎁 机构赠送课时</span>
-              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 font-bold font-mono">赠送</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-bold font-mono"
+                :class="cardFilterMode === 'gift' ? 'bg-amber-500 text-black font-black' : 'bg-amber-500/20 text-amber-600'">
+                赠送
+              </span>
             </div>
             <div class="text-2xl sm:text-3xl font-black font-mono text-amber-500">
               {{ periodStatSummary.totalHoursGift }} <span class="text-xs font-normal text-stone-400">节</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10">
-              合计充值: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节课时
+            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
+              <span>合计充值: {{ periodStatSummary.totalHoursBought + periodStatSummary.totalHoursGift }} 节</span>
+              <span class="text-amber-500 font-bold hover:underline">只看有赠课 ↗</span>
             </div>
           </div>
 
           <!-- 4. 收费订单笔数 -->
-          <div class="wf-card p-4 space-y-1.5">
+          <div @click="cardFilterMode = 'all'"
+            class="wf-card p-4 space-y-1.5 cursor-pointer transition flex flex-col justify-between shadow-sm hover:border-blue-500/40">
             <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
               <span class="font-bold text-stone-800 dark:text-stone-200">🧾 收费订单总笔数</span>
               <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 font-bold font-mono">单量</span>
@@ -1523,10 +1541,12 @@
             <div class="text-2xl sm:text-3xl font-black font-mono text-blue-600 dark:text-blue-400">
               {{ periodStatSummary.orderCount }} <span class="text-xs font-normal text-stone-400">笔</span>
             </div>
-            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10">
-              平均每笔订单: ¥{{ periodStatSummary.avgOrderAmount }}
+            <div class="text-[11px] text-stone-500 font-mono pt-1 border-t border-black/5 dark:border-white/10 flex justify-between">
+              <span>笔均金额: ¥{{ periodStatSummary.avgOrderAmount }}</span>
+              <span class="text-blue-500 font-bold hover:underline">刷新总表 ↗</span>
             </div>
           </div>
+
         </div>
 
         <!-- 搜索与筛选工具栏 -->
@@ -1584,7 +1604,9 @@
                 <th class="py-3.5 px-4 whitespace-nowrap min-w-[90px]">支付方式</th>
                 <th class="py-3.5 px-4 whitespace-nowrap min-w-[80px]">经办人</th>
                 <th class="py-3.5 px-4 min-w-[130px]">备注说明</th>
-                <th class="py-3.5 px-4 text-right whitespace-nowrap min-w-[150px]">操作管理</th>
+                <th class="py-3.5 px-4 text-center whitespace-nowrap sticky right-0 bg-stone-100 dark:bg-stone-800 shadow-[-4px_0_8px_rgba(0,0,0,0.06)] min-w-[160px] z-10 font-bold">
+                  操作管理
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-black/5 dark:divide-white/5">
@@ -1650,19 +1672,19 @@
                   {{ order.remark || '-' }}
                 </td>
 
-                <!-- 操作管理按钮 (直接编辑与直接删除) -->
-                <td class="py-3 px-4 whitespace-nowrap text-right space-x-2 font-bold">
-                  <!-- 编辑按钮 -->
-                  <button @click="openDirectEditModal(order)"
-                    class="px-2.5 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 transition" title="直接修改单条金额/课时/时间">
-                    <i class="fa-solid fa-pen-to-square mr-1"></i>
+                <!-- 操作管理按钮 (直接编辑与直接删除 · 始终吸附右侧) -->
+                <td class="py-3 px-4 whitespace-nowrap text-center space-x-2 font-bold sticky right-0 bg-white dark:bg-[#1e1e1e] shadow-[-4px_0_8px_rgba(0,0,0,0.06)] z-10">
+                  <!-- ✏️ 编辑按钮 -->
+                  <button @click.stop="openDirectEditModal(order)"
+                    class="px-3 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 transition inline-flex items-center gap-1 shadow-sm text-xs font-bold" title="直接修改单条金额/课时/时间">
+                    <i class="fa-solid fa-pen-to-square"></i>
                     <span>编辑</span>
                   </button>
 
-                  <!-- 删除按钮 -->
-                  <button @click="directDeleteOrder(order)"
-                    class="px-2.5 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition" title="直接删除此条记录并扣减学员课时">
-                    <i class="fa-solid fa-trash mr-1"></i>
+                  <!-- 🗑️ 删除按钮 -->
+                  <button @click.stop="directDeleteOrder(order)"
+                    class="px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white transition inline-flex items-center gap-1 shadow-sm text-xs font-bold" title="直接删除此条记录并扣减学员课时">
+                    <i class="fa-solid fa-trash"></i>
                     <span>删除</span>
                   </button>
                 </td>
@@ -4290,6 +4312,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     const selectedYearStr = ref(new Date().getFullYear().toString()); // '2026'
     const selectedQuarterStr = ref('Q' + Math.ceil((new Date().getMonth() + 1) / 3)); // 'Q3'
 
+        const cardFilterMode = ref('all'); // 'all' | 'bought' | 'gift'
     const feeSearchQuery = ref('');
     const feePayMethodFilter = ref('all');
     const feeTypeFilter = ref('all');
@@ -4371,6 +4394,13 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     // 页面列表展示的收费记录 (带搜索与筛选)
     const displayedPaymentOrders = computed(() => {
       let list = (paymentOrders.value || []).filter(isOrderInActivePeriod);
+
+      // 卡片点击过滤
+      if (cardFilterMode.value === 'bought') {
+        list = list.filter(o => Number(o.hoursBought || o.hours || 0) > 0);
+      } else if (cardFilterMode.value === 'gift') {
+        list = list.filter(o => Number(o.hoursGift || 0) > 0);
+      }
 
       if (feePayMethodFilter.value !== 'all') {
         list = list.filter(o => (o.payMethod || '微信支付') === feePayMethodFilter.value);
