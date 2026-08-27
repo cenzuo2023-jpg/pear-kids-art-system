@@ -1391,19 +1391,19 @@
           <div @click="selectFinanceKpi('month')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'month' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">📅 本月收费入账</span>
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">📅 本月收费入账</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'month' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'month' ? '已下钻 ▾' : '当月实收 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-emerald-400">
+            <div class="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
               ¥ {{ financeStats.monthIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>当月入账 {{ financeStats.monthOrderCount }} 笔</span>
-              <span class="text-[10px] text-emerald-400 font-bold hover:underline">查看明细 ↗</span>
+              <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold hover:underline">查看明细 ↗</span>
             </div>
           </div>
 
@@ -1411,19 +1411,19 @@
           <div @click="selectFinanceKpi('year')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'year' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">📈 本年累计营收</span>
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">📈 本年累计营收</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'year' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'year' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'year' ? '已下钻 ▾' : '年度拆解 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-stone-100">
+            <div class="text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
               ¥ {{ financeStats.yearIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>本年累计 {{ financeStats.yearOrderCount }} 笔订单</span>
-              <span class="text-[10px] text-stone-300 font-bold hover:underline">月度趋势 ↗</span>
+              <span class="text-[10px] text-stone-800 dark:text-stone-300 font-bold hover:underline">月度趋势 ↗</span>
             </div>
           </div>
 
@@ -1431,19 +1431,19 @@
           <div @click="selectFinanceKpi('total')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeActiveKpi === 'total' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">💎 机构累计总营收</span>
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">💎 机构累计总营收</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeActiveKpi === 'total' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeActiveKpi === 'total' ? 'bg-emerald-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
                 {{ financeActiveKpi === 'total' ? '已下钻 ▾' : '历史总额 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-stone-100">
+            <div class="text-3xl font-black font-mono text-stone-900 dark:text-stone-100">
               ¥ {{ financeStats.totalIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
               <span>全校总消课 {{ consumptionSummaryKPI.totalAllConsumed }} 节</span>
-              <span class="text-[10px] text-stone-300 font-bold hover:underline">历史总账 ↗</span>
+              <span class="text-[10px] text-stone-800 dark:text-stone-300 font-bold hover:underline">历史总账 ↗</span>
             </div>
           </div>
 
@@ -1451,19 +1451,19 @@
           <div @click="selectFinanceKpi('renewal')"
             class="wf-card-interactive p-5 space-y-2 transition flex flex-col justify-between"
             :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''">
-            <div class="text-xs text-stone-400 flex items-center justify-between">
-              <span class="font-bold text-stone-300">⏳ 待续费预估收入</span>
+            <div class="text-xs text-stone-600 dark:text-stone-400 flex items-center justify-between">
+              <span class="font-bold text-stone-800 dark:text-stone-300">⏳ 待续费预估收入</span>
               <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold border border-black/10 dark:border-white/15"
-                :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'bg-amber-400 text-black font-black border-transparent' : 'text-stone-400 bg-white/5'">
+                :class="financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? 'bg-amber-400 text-black font-black border-transparent' : 'text-stone-600 dark:text-stone-400 bg-white/5'">
                 {{ financeSubTab === 'renewal' || financeActiveKpi === 'renewal' ? '已展开 ▾' : '需提醒 ↗' }}
               </span>
             </div>
-            <div class="text-3xl font-black font-mono text-amber-400">
+            <div class="text-3xl font-black font-mono text-amber-600 dark:text-amber-400">
               ¥ {{ financeStats.potentialRenewalIncome.toLocaleString() }}
             </div>
-            <div class="text-[11px] text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
-              <span>共有 <strong class="text-amber-400">{{ financeStats.warningCount }}</strong> 位学员待续费</span>
-              <span class="text-[10px] text-amber-400 font-bold hover:underline">查看名单 ↗</span>
+            <div class="text-[11px] text-stone-600 dark:text-stone-400 font-mono flex items-center justify-between pt-2 border-t border-black/[0.06] dark:border-white/10">
+              <span>共有 <strong class="text-amber-600 dark:text-amber-400">{{ financeStats.warningCount }}</strong> 位学员待续费</span>
+              <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold hover:underline">查看名单 ↗</span>
             </div>
           </div>
 
