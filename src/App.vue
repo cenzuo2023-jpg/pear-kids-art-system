@@ -3085,6 +3085,89 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const clonePlain = value => JSON.parse(JSON.stringify(value));
 
+    
+    // ========================================================
+    // 🌟 学员课时与考勤联动动态核算引擎
+    // 规则：所有学员默认剩余课时为 0；
+    // 若有缴费记录，则从最早缴费日期起统计至现在的考勤消课，
+    // 剩余课时 = 报名购买总课时 - 考勤消课节数。
+    // ========================================================
+    const toStandardISODate = (dateStr) => {
+      if (!dateStr) return '';
+      const m = String(dateStr).match(/(\d{4})[年/\.\-](\d{1,2})[月/\.\-](\d{1,2})/);
+      if (m) {
+        return `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+      }
+      const dt = new Date(dateStr);
+      if (!isNaN(dt.getTime())) {
+        return dt.toISOString().slice(0, 10);
+      }
+      return String(dateStr).slice(0, 10);
+    };
+
+    const recalculateSingleStudentHours = (stu, ordersList = null, attList = null) => {
+      if (!stu) return;
+      const allOrders = ordersList || paymentOrders.value || [];
+      const allAtts = attList || attendanceHistory.value || [];
+
+      // 1. 查找学员的所有有效收费订单 (排除已撤销)
+      const stuOrders = allOrders.filter(o =>
+        ((o.studentId && o.studentId === stu.id) || (o.studentName && o.studentName.trim() === stu.name.trim())) &&
+        o.status !== '已撤销'
+      );
+
+      // 2. 如果没有缴费记录：默认课时为 0
+      if (!stuOrders.length) {
+        stu.remainHours = 0;
+        stu.totalPurchased = 0;
+        stu.totalConsumed = 0;
+        return;
+      }
+
+      // 3. 计算缴费获得的总课时及最早缴费日期
+      let totalPurchased = 0;
+      let earliestPayDate = '';
+
+      stuOrders.forEach(o => {
+        const hours = Number(o.hoursBought || o.hours || 0) + Number(o.hoursGift || 0) - Number(o.refundHours || 0);
+        totalPurchased += Math.max(0, hours);
+
+        const pDate = toStandardISODate(o.payDate || o.date);
+        if (pDate) {
+          if (!earliestPayDate || pDate < earliestPayDate) {
+            earliestPayDate = pDate;
+          }
+        }
+      });
+
+      // 4. 从最早缴费日期起统计考勤消课
+      let attendedCount = 0;
+      allAtts.forEach(att => {
+        const attDate = toStandardISODate(att.date);
+        if (!earliestPayDate || !attDate || attDate >= earliestPayDate) {
+          const detail = (att.details || []).find(d => d.studentId === stu.id);
+          if (detail && detail.status === '到课') {
+            attendedCount += Number(detail.deductHours || 1);
+          }
+        }
+      });
+
+      // 5. 剩余课时 = 报名总课时 - 考勤消课
+      stu.totalPurchased = totalPurchased;
+      stu.totalConsumed = attendedCount;
+      stu.remainHours = Math.max(0, totalPurchased - attendedCount);
+    };
+
+    const recalculateAllStudentsHours = (studentsList = null, ordersList = null, attList = null) => {
+      const stus = studentsList || (students && students.value) || [];
+      const orders = ordersList || (paymentOrders && paymentOrders.value) || [];
+      const atts = attList || (attendanceHistory && attendanceHistory.value) || [];
+
+      stus.forEach(stu => {
+        recalculateSingleStudentHours(stu, orders, atts);
+      });
+    };
+
     const createDefaultSnapshot = () => clonePlain({
       studioInfo: DEFAULT_INITIAL_DATA.studioInfo,
       classes: DEFAULT_INITIAL_DATA.classes || [],
@@ -3100,7 +3183,7 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
     const normalizeSnapshot = input => {
       const fallback = createDefaultSnapshot();
       const source = input && typeof input === 'object' ? input : {};
-      return clonePlain({
+      const normalized = clonePlain({
         studioInfo: source.studioInfo && typeof source.studioInfo === 'object' ? source.studioInfo : fallback.studioInfo,
         classes: Array.isArray(source.classes) ? source.classes : fallback.classes,
         students: Array.isArray(source.students) ? source.students : fallback.students,
@@ -3111,6 +3194,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
         pointPrizes: Array.isArray(source.pointPrizes) ? source.pointPrizes : fallback.pointPrizes,
         pointLogs: Array.isArray(source.pointLogs) ? source.pointLogs : fallback.pointLogs
       });
+      recalculateAllStudentsHours(normalized.students, normalized.paymentOrders, normalized.attendanceHistory);
+      return normalized;
     };
 
     const buildDataSnapshot = () => normalizeSnapshot({
@@ -3747,7 +3832,8 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
             if (parsed.pointRewardOptions) pointRewardOptions.value = parsed.pointRewardOptions;
             if (parsed.pointPrizes) pointPrizes.value = parsed.pointPrizes;
             if (parsed.pointLogs) pointLogs.value = parsed.pointLogs;
-            saveData();
+            recalculateAllStudentsHours();
+      saveData();
             showToast('🍐 备份数据导入成功！');
           }
         } catch (err) {
@@ -4007,7 +4093,8 @@ const archivedClasses = computed(() => {
           });
         });
 
-        saveData();
+        recalculateAllStudentsHours();
+      saveData();
         showIndividualPointModal.value = false;
         showToast(`🎉 已为【${getClassById(individualPointForm.classId).name}】全员发放 +${pts} 积分！`);
         return;
@@ -4116,6 +4203,7 @@ const archivedClasses = computed(() => {
         profileStudent.value = s;
       }
 
+      recalculateAllStudentsHours();
       saveData();
       showIndividualPointModal.value = false;
     };
@@ -4160,6 +4248,7 @@ const archivedClasses = computed(() => {
         });
       });
 
+      recalculateAllStudentsHours();
       saveData();
       showBatchPointModal.value = false;
       showToast(`🎉 已为【${getClassById(targetClassId).name}】全员发放 +${pts} 画币积分！`);
@@ -4386,6 +4475,7 @@ const archivedClasses = computed(() => {
         });
       }
 
+      recalculateAllStudentsHours();
       saveData();
       showToast(`已成功删除【${order.studentName}】的收费记录，统计与课时已实时同步！`);
     };
@@ -4462,6 +4552,7 @@ const archivedClasses = computed(() => {
         }
       }
 
+      recalculateAllStudentsHours();
       saveData();
       showDirectEditModal.value = false;
       showToast(`已成功更新【${order.studentName}】的收费记录，课时与统计已实时同步！`);
@@ -5399,6 +5490,7 @@ const selectedClassDetail = ref(null);
         }
       });
 
+      recalculateAllStudentsHours();
       saveData();
       showEditAttendanceModal.value = false;
       showToast(`🍐 已成功更新课程《${newTheme}》与上课日期为 ${newDate}！`);
@@ -5434,6 +5526,7 @@ const selectedClassDetail = ref(null);
         applyCellStatusChange(att, stu, status || editingCell.currentStatus, editingCell.note);
       }
       showCellEditModal.value = false;
+      recalculateAllStudentsHours();
       saveData();
     };
 
@@ -5499,6 +5592,7 @@ const selectedClassDetail = ref(null);
       attendanceRecord.leaveCount = attendanceRecord.details.filter(d => d.status === '未到' || d.status === '请假').length;
       attendanceRecord.holidayCount = attendanceRecord.details.filter(d => d.status === '放假').length;
 
+      recalculateAllStudentsHours();
       saveData();
       const statusBadge = newStatus === '到课' ? '🟢 到课 (-1节)' : newStatus === '未到' ? '🔴 未到' : '🟣 放假';
       showToast(`已将【${student.name}】设为 ${statusBadge}，结余 ${student.remainHours} 节`, 'info', 2000);
@@ -5590,6 +5684,7 @@ const selectedClassDetail = ref(null);
         createdAt: nowStr
       });
 
+      recalculateAllStudentsHours();
       saveData();
       inlineNewRow.theme = '';
       showToast(`🎉 成功添加新课《${themeText}》！`);
@@ -5617,6 +5712,7 @@ const selectedClassDetail = ref(null);
       inlineNewRow.defaultStatus = newMatrixRowForm.defaultStatus;
       submitInlineNewRow();
       showAddMatrixRowModal.value = false;
+      recalculateAllStudentsHours();
       saveData();
     };
 
@@ -5650,6 +5746,7 @@ const selectedClassDetail = ref(null);
       });
 
       attendanceHistory.value = attendanceHistory.value.filter(a => a.id !== att.id);
+      recalculateAllStudentsHours();
       saveData();
       showToast('🔄 课次已删除，学员课时已全额退还！', 'info');
     };
@@ -5822,7 +5919,8 @@ const selectedClassDetail = ref(null);
       if (confirm(`确定要归档班级【${cls.name}】吗？\n归档后该班级将移入归档历史中心，不再出现在日常考勤大表中，但历史考勤记录与数据仍完整保留。`)) {
         cls.status = 'archived';
         cls.archivedAt = new Date().toISOString().slice(0, 10);
-        saveData();
+        recalculateAllStudentsHours();
+      saveData();
         showToast(`📦 班级【${cls.name}】已成功归档`);
       }
     };
@@ -5830,6 +5928,7 @@ const selectedClassDetail = ref(null);
     const unarchiveClass = (cls) => {
       cls.status = 'active';
       delete cls.archivedAt;
+      recalculateAllStudentsHours();
       saveData();
       showToast(`🔄 班级【${cls.name}】已恢复为正常开班！`);
     };
@@ -5858,7 +5957,8 @@ const selectedClassDetail = ref(null);
           operator: '陈老师',
           time: new Date().toLocaleString('zh-CN', { hour12: false })
         });
-        saveData();
+        recalculateAllStudentsHours();
+      saveData();
         showToast(`📦 学员【${realStudent.name}】已成功归档！`);
       }
     };
@@ -5886,6 +5986,7 @@ const selectedClassDetail = ref(null);
         operator: '陈老师',
         time: new Date().toLocaleString('zh-CN', { hour12: false })
       });
+      recalculateAllStudentsHours();
       saveData();
       showToast(`🔄 学员【${realStudent.name}】已恢复为在读状态！`);
     };
@@ -5998,6 +6099,7 @@ const selectedClassDetail = ref(null);
         createdAt: nowStr
       });
 
+      recalculateAllStudentsHours();
       saveData();
       showAdhocAttendanceModal.value = false;
       showToast(`🎉 已为【${s.name}】记录临时考勤，剩余 ${s.remainHours} 节`);
@@ -6200,9 +6302,11 @@ const selectedClassDetail = ref(null);
         status: '正常'
       });
 
+      recalculateAllStudentsHours();
       saveData();
       showRechargeModal.value = false;
       showToast(`🎉 ${rechargeMode.value === 'new' ? '新生建档入账成功' : '续费充值成功'}！【${targetStudent.name}】增加 ${addHours} 课时，当前剩余 ${targetStudent.remainHours} 节`);
+      recalculateAllStudentsHours();
       saveData();
     };
 
@@ -6306,8 +6410,10 @@ const selectedClassDetail = ref(null);
         });
         showToast(`🎉 成功录入学员【${newS.name}】并赠送 ${newS.points} 新生积分！`);
       }
+      recalculateAllStudentsHours();
       saveData();
       showStudentModal.value = false;
+      recalculateAllStudentsHours();
       saveData();
     };
 
@@ -6317,7 +6423,8 @@ const selectedClassDetail = ref(null);
         if (profileStudent.value && profileStudent.value.id === s.id) {
           showStudentProfileModal.value = false;
         }
-        saveData();
+        recalculateAllStudentsHours();
+      saveData();
         showToast(`学员【${s.name}】已彻底删除`, 'info');
       }
     };
@@ -6372,8 +6479,10 @@ const selectedClassDetail = ref(null);
         matrixClassId.value = newClass.id;
         showToast(`🎉 成功新建班级【${classForm.name}】`);
       }
+      recalculateAllStudentsHours();
       saveData();
       showClassModal.value = false;
+      recalculateAllStudentsHours();
       saveData();
     };
 
@@ -6387,6 +6496,7 @@ const selectedClassDetail = ref(null);
         if (!confirm(`确定要彻底删除班级【${cls.name}】吗？`)) return;
       }
       classes.value = classes.value.filter(c => c.id !== cls.id);
+      recalculateAllStudentsHours();
       saveData();
       showToast(`班级【${cls.name}】已彻底删除`, 'info');
     };
