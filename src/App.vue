@@ -196,13 +196,12 @@
                   </div>
                 </th>
 
-                <!-- 02 上课日期 (固定左侧第2列 · 145px 宽 · 带排序) -->
-                <th class="py-3 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[190px] w-[190px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
-                  <div class="flex items-center gap-1.5 whitespace-nowrap cursor-pointer group hover:text-emerald-600 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
+                                <!-- 02 上课日期 (固定左侧第2列 · 220px 充裕宽度 · 绝不截断) -->
+                <th class="py-3 px-4 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[220px] w-[220px] whitespace-nowrap sticky left-[160px] z-30 shadow-sm" style="background-color: var(--bg-surface);">
+                  <div class="flex items-center gap-2 whitespace-nowrap cursor-pointer group hover:text-emerald-600 transition" @click="attendanceSortOrder = attendanceSortOrder === 'desc' ? 'asc' : 'desc'" title="点击切换时间排序">
                     <span class="text-xs text-gray-500 font-mono font-bold">02</span>
                     <span class="text-sm font-bold tracking-tight text-[#111827] dark:text-[#f3f4f6]">上课日期</span>
                     <i class="fa-solid fa-sort text-xs opacity-50 group-hover:opacity-100 transition text-gray-600" :class="attendanceSortOrder === 'desc' ? 'fa-sort-down text-emerald-600 opacity-100' : 'fa-sort-up text-emerald-600 opacity-100'"></i>
-                    <span class="text-xs text-gray-400 ml-0.5">📅</span>
                   </div>
                 </th>
                 
@@ -263,14 +262,14 @@
                   </div>
                 </td>
 
-                <!-- 🌟 上课日期 (固定第2列 · 145px · 单行快速修改) -->
-                <td class="py-2.5 px-3 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[190px] w-[190px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
-                  <div @click="openEditAttendanceRow(att)" 
-                    class="cursor-pointer group flex items-center justify-between gap-1.5 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
+                                <!-- 🌟 上课日期 (固定第2列 · 220px 充裕宽度 · 单行快速修改) -->
+                <td class="py-2.5 px-4 text-left border-r border-[#e2e2e0] dark:border-[#333] min-w-[220px] w-[220px] whitespace-nowrap sticky left-[160px] z-10 shadow-sm" style="background-color: var(--bg-surface);">
+                  <div @click="openEditAttendanceRow(att)"
+                    class="cursor-pointer group flex items-center justify-between gap-2 py-1 px-1.5 -mx-1 rounded-md hover:bg-gray-100 dark:hover:bg-[#282828] transition whitespace-nowrap"
                     title="点击修改上课日期与课程主题">
-                    <div class="flex items-center gap-1.5 truncate">
+                    <div class="flex items-center gap-2 whitespace-nowrap">
                       <i class="fa-regular fa-calendar text-gray-400 text-xs flex-shrink-0"></i>
-                      <span class="font-mono text-sm text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 transition-colors whitespace-nowrap">{{ att.date }}</span>
+                      <span class="font-mono text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 transition-colors whitespace-nowrap">{{ att.date }}</span>
                     </div>
                     <i class="fa-solid fa-pen text-xs text-gray-400 opacity-0 group-hover:opacity-100 text-emerald-600 transition-opacity flex-shrink-0"></i>
                   </div>
@@ -3107,14 +3106,16 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
 
     const recalculateSingleStudentHours = (stu, ordersList = null, attList = null) => {
       if (!stu) return;
-      const allOrders = ordersList || paymentOrders.value || [];
-      const allAtts = attList || attendanceHistory.value || [];
+      const allOrders = ordersList || (paymentOrders && paymentOrders.value) || [];
+      const allAtts = attList || (attendanceHistory && attendanceHistory.value) || [];
 
       // 1. 查找学员的所有有效收费订单 (排除已撤销)
-      const stuOrders = allOrders.filter(o =>
-        ((o.studentId && o.studentId === stu.id) || (o.studentName && o.studentName.trim() === stu.name.trim())) &&
-        o.status !== '已撤销'
-      );
+      const stuOrders = allOrders.filter(o => {
+        if (!o || o.status === '已撤销') return false;
+        const matchId = (o.studentId && o.studentId === stu.id) || (o.student_id && o.student_id === stu.id);
+        const matchName = (o.studentName && o.studentName.trim() === stu.name.trim()) || (o.student_name && o.student_name.trim() === stu.name.trim());
+        return Boolean(matchId || matchName);
+      });
 
       // 2. 如果没有缴费记录：默认课时为 0
       if (!stuOrders.length) {
@@ -3129,10 +3130,10 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       let earliestPayDate = '';
 
       stuOrders.forEach(o => {
-        const hours = Number(o.hoursBought || o.hours || 0) + Number(o.hoursGift || 0) - Number(o.refundHours || 0);
+        const hours = Number(o.hoursBought ?? o.hours ?? o.hours_bought ?? 0) + Number(o.hoursGift ?? o.hours_gift ?? 0) - Number(o.refundHours ?? o.refund_hours ?? 0);
         totalPurchased += Math.max(0, hours);
 
-        const pDate = toStandardISODate(o.payDate || o.date);
+        const pDate = toStandardISODate(o.payDate || o.date || o.pay_date);
         if (pDate) {
           if (!earliestPayDate || pDate < earliestPayDate) {
             earliestPayDate = pDate;
@@ -3145,9 +3146,14 @@ const STORAGE_KEY = 'XIANGCHILI_ART_STUDIO_V16';
       allAtts.forEach(att => {
         const attDate = toStandardISODate(att.date);
         if (!earliestPayDate || !attDate || attDate >= earliestPayDate) {
-          const detail = (att.details || []).find(d => d.studentId === stu.id);
+          const detail = (att.details || []).find(d => 
+            (d.studentId && d.studentId === stu.id) ||
+            (d.student_id && d.student_id === stu.id) ||
+            (d.studentName && d.studentName.trim() === stu.name.trim()) ||
+            (d.student_name && d.student_name.trim() === stu.name.trim())
+          );
           if (detail && detail.status === '到课') {
-            attendedCount += Number(detail.deductHours || 1);
+            attendedCount += Number(detail.deductHours ?? detail.deduct_hours ?? 1);
           }
         }
       });
@@ -6589,10 +6595,20 @@ const selectedClassDetail = ref(null);
     window.addEventListener('popstate', syncStateFromHash);
     window.addEventListener('hashchange', syncStateFromHash);
 
+    
+    // 自动实时监听：当缴费订单或考勤记录发生任何变化时，全自动重新核算所有学员的剩余课时
+    watch([paymentOrders, attendanceHistory, students], () => {
+      if (students && students.value && students.value.length > 0) {
+        recalculateAllStudentsHours();
+      }
+    }, { deep: true, immediate: true });
+
     onMounted(() => {
       applyTheme();
       loadData();
       syncStateFromHash();
       window.addEventListener('click', handleGlobalClick);
+    
+      recalculateAllStudentsHours();
     });
 </script>
